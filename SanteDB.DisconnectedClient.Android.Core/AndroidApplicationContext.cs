@@ -60,12 +60,16 @@ namespace SanteDB.DisconnectedClient.Android.Core
     /// </summary>
     public class AndroidApplicationContext : XamarinApplicationContext
     {
+
+        // Current activity
+        private A.Content.Context m_currentActivity;
+
         // The application
         private static readonly SanteDB.Core.Model.Security.SecurityApplication c_application = new SanteDB.Core.Model.Security.SecurityApplication()
         {
             ApplicationSecret = "C5B645B7D30A4E7E81A1C3D8B0E28F4C",
             Key = Guid.Parse("5248ea19-369d-4071-8947-413310872b7e"),
-            Name = "org.santedb.santedb_mobile"
+            Name = "org.santedb.disconnected_client"
         };
 
         /// <summary>
@@ -118,7 +122,19 @@ namespace SanteDB.DisconnectedClient.Android.Core
         /// <summary>
         /// Gets or sets the current activity
         /// </summary>
-        public A.Content.Context CurrentActivity { get; set; }
+        public A.Content.Context CurrentActivity {
+            get
+            {
+                return this.m_currentActivity;
+            }
+            set
+            {
+                if (value != this.m_currentActivity && this.m_currentActivity != null)
+                    this.RemoveServiceProvider(this.m_currentActivity);
+                this.m_currentActivity = value;
+                this.AddServiceProvider(this.m_currentActivity);
+            }
+        }
 
         /// <summary>
         /// Start the application context
@@ -144,8 +160,8 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     {
                         // Set master application context
                         ApplicationContext.Current = retVal;
-                        retVal.CurrentActivity = launcherActivity;
                         //retVal.AddServiceProvider(typeof(ConfigurationManager));
+                        retVal.CurrentActivity = launcherActivity;
                         retVal.ConfigurationPersister.Backup(retVal.Configuration);
                     }
                     catch
@@ -324,19 +340,18 @@ namespace SanteDB.DisconnectedClient.Android.Core
                 var retVal = new AndroidApplicationContext();
 
                 retVal.Context = context;
-                retVal.CurrentActivity = launcherActivity;
                 retVal.SetProgress(context.GetString(Resource.String.startup_setup), 0);
                 retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
-
                 ApplicationContext.Current = retVal;
                 ApplicationServiceContext.Current = ApplicationContext.Current;
+                retVal.CurrentActivity = launcherActivity;
+
                 retVal.m_tracer = Tracer.GetTracer(typeof(AndroidApplicationContext));
                 foreach (var tr in retVal.Configuration.GetSection<DiagnosticsConfigurationSection>().TraceWriter)
                     Tracer.AddWriter(tr.TraceWriter, tr.Filter);
                 retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
 
                 AndroidApplicationContext.InstallAppletAssets(retVal);
-
                 retVal.Start();
                 return true;
             }

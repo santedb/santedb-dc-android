@@ -40,6 +40,7 @@ using SanteDB.DisconnectedClient.Android.Core.Services;
 using Android.Content.PM;
 using System.Threading;
 using SanteDB.Core.Diagnostics;
+using SanteDB.DisconnectedClient.Android.Core.Activities;
 
 namespace SanteDBAndroid
 {
@@ -48,7 +49,7 @@ namespace SanteDBAndroid
 	/// Applet activity
 	/// </summary>
 	[Activity (Label = "Applet", Theme = "@style/SanteDB", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize )]			
-	public class AppletActivity : SanteDBApplicationActivity
+	public class AppletActivity : AndroidActivityBase
 	{
 
 

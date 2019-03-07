@@ -47,6 +47,7 @@ using SanteDB.DisconnectedClient.Core.Configuration;
 using SanteDB.DisconnectedClient.Ags;
 using SanteDB.DisconnectedClient.Android.Core;
 using SanteDB.DisconnectedClient.Core.Services;
+using SanteDB.DisconnectedClient.Android.Core.Activities;
 
 namespace SanteDBAndroid
 {
@@ -57,8 +58,8 @@ namespace SanteDBAndroid
         Icon = "@mipmap/icon", 
         NoHistory = true, 
         ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize,
-        ScreenOrientation = ScreenOrientation.Portrait)]
-    public class SplashActivity : SanteDBApplicationActivity
+        ScreenOrientation = ScreenOrientation.Locked)]
+    public class SplashActivity : AndroidActivityBase
     {
         
         // Tracer
@@ -169,7 +170,7 @@ namespace SanteDBAndroid
                         }
                         catch (Exception e)
                         {
-                            this.m_tracer.TraceError(e.ToString());
+                            this.m_tracer?.TraceError(e.ToString());
                             ctSource.Cancel();
                             this.ShowException(e);
                         }

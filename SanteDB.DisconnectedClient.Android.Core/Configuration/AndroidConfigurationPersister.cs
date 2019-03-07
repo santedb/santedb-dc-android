@@ -106,7 +106,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                 Security = new AppletSecurityConfiguration()
                 {
                     AllowUnsignedApplets = true,
-                    TrustedPublishers = new List<string>() { "82C63E1E9B87578D0727E871D7613F2F0FAF683B" }
+                    TrustedPublishers = new List<string>() { "82C63E1E9B87578D0727E871D7613F2F0FAF683B", "4326A4421216AC254DA93DC61B93160B08925BB1" }
                 }
             };
 

@@ -44,7 +44,10 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
                     Accuracy = Accuracy.Medium,
                     PowerRequirement = Power.Low
                 }, true));
-                return new GeoTag(lastKnownLocation.Latitude, lastKnownLocation.Longitude, lastKnownLocation.Accuracy > 0.5f);
+                if (lastKnownLocation != null)
+                    return new GeoTag(lastKnownLocation.Latitude, lastKnownLocation.Longitude, lastKnownLocation.Accuracy > 0.5f);
+                else
+                    return null;
             }
             else
                 return null;

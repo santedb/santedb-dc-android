@@ -1,37 +1,23 @@
-﻿/*
- * Copyright 2015-2018 Mohawk College of Applied Arts and Technology
- * 
- * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you 
- * may not use this file except in compliance with the License. You may 
- * obtain a copy of the License at 
- * 
- * http://www.apache.org/licenses/LICENSE-2.0 
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
- * License for the specific language governing permissions and limitations under 
- * the License.
- * 
- * User: fyfej
- * Date: 2017-9-1
- */
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
 using Android.App;
-using Android.Content.PM;
+using Android.Content;
 using Android.OS;
 using Android.Runtime;
-using SanteDB.DisconnectedClient.Android.Core.Services;
+using Android.Views;
+using Android.Widget;
 using SanteDB.DisconnectedClient.Core.Security;
-using System;
-using System.Threading;
+using A = Android;
 
-namespace SanteDBAndroid
+namespace SanteDB.DisconnectedClient.Android.Core.Activities
 {
     /// <summary>
-    /// SanteDB application activity
+    /// An operating system security service which is for Android OS
     /// </summary>
-    public abstract class SanteDBApplicationActivity : Activity, IOperatingSystemSecurityService
+    public abstract class AndroidActivityBase : Activity, IOperatingSystemSecurityService
     {
         private ManualResetEvent m_permissionEvent = new ManualResetEvent(false);
 
@@ -46,9 +32,9 @@ namespace SanteDBAndroid
                 switch (permission)
                 {
                     case PermissionType.FileSystem:
-                        return this.CheckSelfPermission(Android.Manifest.Permission.WriteExternalStorage) == (int)Permission.Granted;
+                        return this.CheckSelfPermission(A.Manifest.Permission.WriteExternalStorage) == (int)A.Content.PM.Permission.Granted;
                     case PermissionType.GeoLocation:
-                        return this.CheckSelfPermission(Android.Manifest.Permission.AccessCoarseLocation) == (int)Permission.Granted;
+                        return this.CheckSelfPermission(A.Manifest.Permission.AccessCoarseLocation) == (int)A.Content.PM.Permission.Granted;
                     default:
                         return false;
                 }
@@ -68,27 +54,27 @@ namespace SanteDBAndroid
                 switch (permission)
                 {
                     case PermissionType.FileSystem:
-                        permissionString = Android.Manifest.Permission.WriteExternalStorage;
+                        permissionString = A.Manifest.Permission.WriteExternalStorage;
                         break;
                     case PermissionType.GeoLocation:
-                        permissionString = Android.Manifest.Permission.AccessCoarseLocation;
+                        permissionString = A.Manifest.Permission.AccessCoarseLocation;
                         break;
                     case PermissionType.Camera:
-                        permissionString = Android.Manifest.Permission.Camera;
+                        permissionString = A.Manifest.Permission.Camera;
                         break;
                     default:
                         return false;
                 }
                 this.RequestPermissions(new string[] { permissionString }, 0);
                 this.m_permissionEvent.WaitOne();
-                return this.CheckSelfPermission(Android.Manifest.Permission.AccessCoarseLocation) == (int)Permission.Granted;
+                return this.CheckSelfPermission(permissionString) == A.Content.PM.Permission.Granted;
             }
         }
 
         /// <summary>
         /// Request permission result
         /// </summary>
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
+        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] A.Content.PM.Permission[] grantResults)
         {
             this.m_permissionEvent.Set();
             base.OnRequestPermissionsResult(requestCode, permissions, grantResults);

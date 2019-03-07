@@ -51,10 +51,10 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
                 case BackupMedia.Private:
                     return System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData);
                 case BackupMedia.Public:
-                    var ossec = (ApplicationContext.Current as AndroidApplicationContext).CurrentActivity as IOperatingSystemSecurityService;
+                    var ossec = ApplicationContext.Current.GetService<IOperatingSystemSecurityService>();
                     if (ossec.HasPermission(PermissionType.FileSystem) ||
                         ossec.RequestPermission(PermissionType.FileSystem))
-                    {
+                    { 
                         var retVal = System.IO.Path.Combine(
                             A.OS.Environment.ExternalStorageDirectory.AbsolutePath,
                             A.OS.Environment.DirectoryDocuments,
