@@ -98,7 +98,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 				this.SetLayerType(A.Views.LayerType.Software, null);
 			}
 
-			this.AddJavascriptInterface(new AppletFunctionBridge(context, this), "SanteDBApplicationService");
+			this.AddJavascriptInterface(new AppletFunctionBridge(context, this), "SanteDBAppService");
 			//this.AddJavascriptInterface(new ConfigurationServiceBridge(), "SanteDBConfigurationService");
 			//this.AddJavascriptInterface(new SessionServiceBridge(), "SanteDBSessionService");
 			this.SetWebViewClient(new AppletWebViewClient());

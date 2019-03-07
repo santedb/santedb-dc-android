@@ -50,7 +50,14 @@ using SanteDB.DisconnectedClient.Core.Services;
 
 namespace SanteDBAndroid
 {
-    [Activity(Label = "@string/app_name", Theme = "@style/SanteDB.Splash", MainLauncher = true, Icon = "@mipmap/icon", NoHistory = true, ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize)]
+    [Activity(
+        Label = "@string/app_name", 
+        Theme = "@style/SanteDB.Splash", 
+        MainLauncher = true, 
+        Icon = "@mipmap/icon", 
+        NoHistory = true, 
+        ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize,
+        ScreenOrientation = ScreenOrientation.Portrait)]
     public class SplashActivity : SanteDBApplicationActivity
     {
         
