@@ -156,7 +156,6 @@
     <AndroidResource Include="Resources\values\Styles.xml" />
     <AndroidResource Include="Resources\layout\Splash.axml" />
     <AndroidResource Include="Resources\drawable\splash_gradient.xml" />
-    <AndroidResource Include="Resources\drawable\orange_gradient.xml" />
     <AndroidResource Include="Resources\drawable\blue_gradient.xml" />
     <AndroidResource Include="Resources\drawable\gray_gradient.xml" />
     <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
