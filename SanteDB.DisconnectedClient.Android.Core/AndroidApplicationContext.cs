@@ -71,12 +71,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
             Key = Guid.Parse("5248ea19-369d-4071-8947-413310872b7e"),
             Name = "org.santedb.disconnected_client"
         };
-
-        /// <summary>
-        /// Gets the operating system
-        /// </summary>
-        public override OperatingSystemID OperatingSystem => OperatingSystemID.Android;
-
+        
         
         /// <summary>
         /// Static CTOR bind to global handlers to log errors
@@ -401,6 +396,17 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     Name = this.Configuration.GetSection<SecurityConfigurationSection>().DeviceName,
                     DeviceSecret = this.Configuration.GetSection<SecurityConfigurationSection>().DeviceSecret
                 };
+            }
+        }
+
+        /// <summary>
+        /// Gets the allowed synchronization modes
+        /// </summary>
+        public override SynchronizationMode Modes
+        {
+            get
+            {
+                return SynchronizationMode.Online | SynchronizationMode.Sync;
             }
         }
 
