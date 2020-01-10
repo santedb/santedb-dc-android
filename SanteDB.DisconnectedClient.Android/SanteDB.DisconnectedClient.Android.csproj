@@ -56,7 +56,7 @@
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-    <Debugger>Microsoft</Debugger>
+    <Debugger>Xamarin</Debugger>
     <AotAssemblies>false</AotAssemblies>
     <EnableLLVM>false</EnableLLVM>
     <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
@@ -66,7 +66,7 @@
     <JavaMaximumHeapSize>512m</JavaMaximumHeapSize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SignedRelease|AnyCPU'">
-    <OutputPath>..\bin\Signed\</OutputPath>
+    <OutputPath>bin\SignedRelease\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -76,15 +76,15 @@
     <AndroidUseSharedRuntime>False</AndroidUseSharedRuntime>
     <AndroidLinkMode>SdkOnly</AndroidLinkMode>
     <EmbedAssembliesIntoApk>True</EmbedAssembliesIntoApk>
-    <BundleAssemblies>False</BundleAssemblies>
+    <BundleAssemblies>false</BundleAssemblies>
     <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
     <Debugger>Xamarin</Debugger>
-    <AotAssemblies>False</AotAssemblies>
-    <EnableLLVM>False</EnableLLVM>
+    <AotAssemblies>false</AotAssemblies>
+    <EnableLLVM>false</EnableLLVM>
     <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
     <EnableProguard>False</EnableProguard>
     <AndroidLinkSkip>System.Xml.Linq;mscorlib;System</AndroidLinkSkip>
-    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions>.pak</AndroidStoreUncompressedFileExtensions>
     <DebugSymbols>False</DebugSymbols>
     <JavaMaximumHeapSize>512m</JavaMaximumHeapSize>
@@ -136,6 +136,7 @@
     <AndroidAsset Include="Assets\Applets\org.santedb.i18n.fr.pak" />
     <AndroidAsset Include="Assets\Applets\org.santedb.i18n.sw.pak" />
     <AndroidAsset Include="Assets\Applets\org.santedb.uicore.pak" />
+    <AndroidAsset Include="Assets\Applets\org.santedb.bicore.pak" />
     <None Include="Resources\AboutResources.txt" />
     <None Include="Properties\AndroidManifest.xml">
       <SubType>Designer</SubType>
@@ -179,37 +180,34 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="RestSrvr">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Api">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Applets">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Model">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Model.AMI">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Model.RISI">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.Ags">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.Core">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.SQLite">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.Xamarin">
-      <Version>1.52.0</Version>
-    </PackageReference>
-    <PackageReference Include="SanteDB.ReportR">
-      <Version>1.52.0</Version>
+      <Version>1.113.0</Version>
     </PackageReference>
     <PackageReference Include="SQLite.Net-PCL.MEDIC">
       <Version>3.1.1</Version>
@@ -226,38 +224,41 @@
   </ItemGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PreBuildEvent>
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\config.init" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.init.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\config" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\core" --output="$(ProjectDir)\Assets\Applets\org.santedb.core.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\uicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.uicore.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.en" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.en.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.sw" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.sw.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.fr" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.fr.pak"
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.es" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.es.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\config.init" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.init.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\config" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\core" --output="$(ProjectDir)\Assets\Applets\org.santedb.core.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\uicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.uicore.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\bicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.bicore.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.en" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.en.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.sw" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.sw.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.fr" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.fr.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.es" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.es.pak"
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SignedRelease|AnyCPU'">
     <PreBuildEvent>
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\config.init" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.init.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\config" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\core" --output="$(ProjectDir)\Assets\Applets\org.santedb.core.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\uicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.uicore.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.en" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.en.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.sw" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.sw.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.fr" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.fr.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.es" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.es.pak" --keyFile="$(SolutionDir)..\..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\..\keys\community.santesuite.net.pass" --embedcert --optimize
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\config.init" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.init.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\config" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\core" --output="$(ProjectDir)\Assets\Applets\org.santedb.core.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\uicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.uicore.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\bicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.bicore.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.en" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.en.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.sw" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.sw.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.fr" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.fr.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.es" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.es.pak" --keyFile="$(SolutionDir)..\keys\community.santesuite.net.pfx" --keyPassword="$(SolutionDir)..\keys\community.santesuite.net.pass" --embedcert
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PreBuildEvent>
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\config.init" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.init.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\config" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\core"   --output="$(ProjectDir)\Assets\Applets\org.santedb.core.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\uicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.uicore.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.en" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.en.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.sw" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.sw.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.fr" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.fr.pak" --optimize
-      "c:\Program Files\SanteSuite\SanteDB\SDK\sdb-pakr.exe" --compile --source="$(SolutionDir)..\applets\i18n.es" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.es.pak" --optimize
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\config.init" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.init.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\config" --output="$(ProjectDir)\Assets\Applets\org.santedb.config.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\core"   --output="$(ProjectDir)\Assets\Applets\org.santedb.core.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\uicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.uicore.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\bicore" --output="$(ProjectDir)\Assets\Applets\org.santedb.bicore.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.en" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.en.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.sw" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.sw.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.fr" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.fr.pak"
+      "c:\Program Files\SanteSuite\SanteDB\SDK\pakman.exe" --compile --source="$(SolutionDir)..\applets\i18n.es" --output="$(ProjectDir)\Assets\Applets\org.santedb.i18n.es.pak"
     </PreBuildEvent>
   </PropertyGroup>
 </Project>

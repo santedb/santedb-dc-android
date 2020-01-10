@@ -83,12 +83,13 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			this.Settings.BuiltInZoomControls = false;
 			this.Settings.DisplayZoomControls = false;
 			this.Settings.UserAgentString = $"SanteDB-DC {ApplicationContext.Current.ExecutionUuid}";
-			this.Settings.DatabaseEnabled = false;
+			this.Settings.DatabaseEnabled = true;
 			this.Settings.JavaScriptCanOpenWindowsAutomatically = false;
-			this.Settings.PluginsEnabled = false;
-			this.Settings.SetRenderPriority(WebSettings.RenderPriority.High);
+			this.Settings.SetRenderPriority(WebSettings.RenderPriority.Normal);
 			this.Settings.SetAppCacheEnabled(true);
 			this.Settings.SetSupportMultipleWindows(false);
+            this.Settings.DomStorageEnabled = true;
+            
 			if (A.OS.Build.VERSION.SdkInt >= A.OS.BuildVersionCodes.Kitkat)
 			{
 				this.SetLayerType(A.Views.LayerType.Hardware, null);
@@ -129,19 +130,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 				base.LoadUrl("http://127.0.0.1:9200/views/errors/404.html", unlockDictionary);
 		}
 
-		/// <summary>
-		/// Execute the specified javascript
-		/// </summary>
-		/// <param name="javascript">Javascript.</param>
-		public string Execute(String javascript)
-		{
-			this.m_tracer.TraceVerbose("Execute Javascript: {0}", javascript);
-			if (String.IsNullOrEmpty(javascript))
-				throw new ArgumentNullException(nameof(javascript));
-			this.LoadUrl("javascript:" + javascript);
-			return "";
-		}
-
+	
 		/// <summary>
 		/// Applet web view client.
 		/// </summary>
@@ -168,20 +157,20 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 				base.OnLoadResource(view, url);
 			}
 
-			/// <param name="view">The WebView that is initiating the callback.</param>
-			/// <param name="url">The url to be loaded.</param>
-			/// <summary>
-			/// Give the host application a chance to take over the control when a new
-			///  url is about to be loaded in the current WebView.
-			/// </summary>
-			/// <returns>To be added.</returns>
-			public override bool ShouldOverrideUrlLoading(WebView view, string url)
-			{
-				this.m_tracer.TraceInfo("Overridding url {0}", url);
+			///// <param name="view">The WebView that is initiating the callback.</param>
+			///// <param name="url">The url to be loaded.</param>
+			///// <summary>
+			///// Give the host application a chance to take over the control when a new
+			/////  url is about to be loaded in the current WebView.
+			///// </summary>
+			///// <returns>To be added.</returns>
+			//public override bool ShouldOverrideUrlLoading(WebView view, string url)
+			//{
+			//	this.m_tracer.TraceInfo("Overridding url {0}", url);
 
-				view.LoadUrl(url);
-				return true;
-			}
+			//	view.LoadUrl(url);
+			//	return true;
+			//}
 
 			///// <summary>
 			///// Page is finished
@@ -223,17 +212,25 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			/// <returns>To be added.</returns>
 			public override bool OnJsAlert(WebView view, string url, string message, JsResult result)
 			{
-				var alertDialogBuilder = new AlertDialog.Builder(this.m_context)
-					 .SetMessage(message)
-					.SetCancelable(false)
-					.SetPositiveButton(this.m_context.Resources.GetString(Resource.String.confirm), (sender, args) =>
-					{
-						result.Confirm();
-					});
+                try
+                {
+                    var alertDialogBuilder = new AlertDialog.Builder(this.m_context)
+                         .SetMessage(message)
+                        .SetCancelable(false)
+                        .SetPositiveButton(this.m_context.Resources.GetString(Resource.String.confirm), (sender, args) =>
+                        {
+                            result.Confirm();
+                        });
 
-				alertDialogBuilder.Create().Show();
+                    alertDialogBuilder.Create().Show();
 
-				return true;
+                    return true;
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error showing JS ALERT: {0}", e);
+                    return false;
+                }
 			}
 
 			/// <param name="consoleMessage">Object containing details of the console message.</param>
@@ -243,22 +240,30 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			/// <returns>To be added.</returns>
 			public override bool OnConsoleMessage(ConsoleMessage consoleMessage)
 			{
-				var retVal = base.OnConsoleMessage(consoleMessage);
+                try
+                {
+                    var retVal = base.OnConsoleMessage(consoleMessage);
 
-				// Start off verbose
-				EventLevel eventLevel = EventLevel.Verbose;
-				if (consoleMessage.InvokeMessageLevel() == Webkit.ConsoleMessage.MessageLevel.Error)
-				{
-					//Toast.MakeText(this.m_context, "This applet reported an error", ToastLength.Long).Show();
-					eventLevel = EventLevel.Error;
-				}
-				else if (consoleMessage.InvokeMessageLevel() == Webkit.ConsoleMessage.MessageLevel.Warning)
-					eventLevel = EventLevel.Warning;
-				else if (consoleMessage.InvokeMessageLevel() == Webkit.ConsoleMessage.MessageLevel.Log)
-					eventLevel = EventLevel.Informational;
+                    // Start off verbose
+                    EventLevel eventLevel = EventLevel.Verbose;
+                    if (consoleMessage.InvokeMessageLevel() == Webkit.ConsoleMessage.MessageLevel.Error)
+                    {
+                        //Toast.MakeText(this.m_context, "This applet reported an error", ToastLength.Long).Show();
+                        eventLevel = EventLevel.Error;
+                    }
+                    else if (consoleMessage.InvokeMessageLevel() == Webkit.ConsoleMessage.MessageLevel.Warning)
+                        eventLevel = EventLevel.Warning;
+                    else if (consoleMessage.InvokeMessageLevel() == Webkit.ConsoleMessage.MessageLevel.Log)
+                        eventLevel = EventLevel.Informational;
 
-				this.m_tracer.TraceEvent(eventLevel, "[{0}:{1}] {2}", consoleMessage.SourceId(), consoleMessage.LineNumber(), consoleMessage.Message());
-				return retVal;
+                    this.m_tracer.TraceEvent(eventLevel, "[{0}:{1}] {2}", consoleMessage.SourceId(), consoleMessage.LineNumber(), consoleMessage.Message());
+                    return retVal;
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error writing console message: {0}", e);
+                    return false;
+                }
 			}
 
 			/// <param name="view">The WebView that initiated the callback.</param>
@@ -294,8 +299,16 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			/// </summary>
 			public override void OnProgressChanged(WebView view, int newProgress)
 			{
-				base.OnProgressChanged(view, newProgress);
-				AndroidApplicationContext.Current.SetProgress(view.Url, (float)newProgress / 100);
+                try
+                {
+                    base.OnProgressChanged(view, newProgress);
+                    AndroidApplicationContext.Current.SetProgress(view.Url, (float)newProgress / 100);
+                }
+                catch(Exception e)
+                {
+                    this.m_tracer.TraceError("Error setting progress: {0}", e);
+
+                }
 			}
 		}
 	}

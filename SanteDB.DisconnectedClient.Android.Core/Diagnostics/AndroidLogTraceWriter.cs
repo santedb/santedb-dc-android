@@ -66,7 +66,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Diagnostics
 					break;
 
 				case EventLevel.Verbose:
-					Log.Verbose(source, String.Format(format, args));
+					Log.Info(source, String.Format(format, args));
 					break;
 			}
 			Console.WriteLine(format, args);

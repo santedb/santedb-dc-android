@@ -52,7 +52,6 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         /// </summary>
         public static String ToJson<T>(T obj) 
 		{
-
             JsonSerializer jsz = new JsonSerializer();
             jsz.Converters.Add(new StringEnumConverter());
             jsz.NullValueHandling = NullValueHandling.Ignore;

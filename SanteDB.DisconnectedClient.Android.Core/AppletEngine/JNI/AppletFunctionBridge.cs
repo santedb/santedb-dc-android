@@ -91,8 +91,16 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public String GetDataAsset(String dataId)
         {
-            dataId = String.Format("data/{0}", dataId);
-            return Convert.ToBase64String(ApplicationContext.Current.GetService<IAppletManagerService>().Applets.RenderAssetContent(XamarinApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Assets).FirstOrDefault(o => o.Name == dataId), CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
+            try
+            {
+                dataId = String.Format("data/{0}", dataId);
+                return Convert.ToBase64String(ApplicationContext.Current.GetService<IAppletManagerService>().Applets.RenderAssetContent(XamarinApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Assets).FirstOrDefault(o => o.Name == dataId), CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Error getting asset {0} : {1}", dataId, e);
+                return string.Empty;
+            }
         }
 
         /// <summary>
@@ -102,7 +110,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public bool GetOnlineState()
         {
-            return ApplicationContext.Current?.GetService<INetworkInformationService>()?.IsNetworkAvailable == true;
+            try
+            {
+                return ApplicationContext.Current?.GetService<INetworkInformationService>()?.IsNetworkAvailable == true;
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Error online state: {0}", e);
+                return true;
+            }
         }
 
 
@@ -111,7 +127,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         /// </summary>
         public bool IsClinicalAvailable()
         {
-            return ApplicationContext.Current.GetService<IClinicalIntegrationService>().IsAvailable();
+            try
+            {
+                return ApplicationContext.Current.GetService<IClinicalIntegrationService>().IsAvailable();
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Error clinical state: {0}", e);
+                return true;
+            }
         }
 
         /// <summary>
@@ -119,7 +143,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         /// </summary>
         public bool IsAdminAvailable()
         {
-            return ApplicationContext.Current.GetService<IAdministrationIntegrationService>().IsAvailable();
+            try
+            {
+                return ApplicationContext.Current.GetService<IAdministrationIntegrationService>().IsAvailable();
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Error admin state: {0}", e);
+                return true;
+            }
         }
 
         /// <summary>
@@ -129,7 +161,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public String GetStatus()
         {
-            return String.Format("[\"{0}\",{1}]", this.m_applicationStatus.Key, this.m_applicationStatus.Value);
+            try
+            {
+                return String.Format("[\"{0}\",{1}]", this.m_applicationStatus.Key, this.m_applicationStatus.Value);
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting app status: {0}", e);
+                return String.Empty;
+            }
         }
 
 
@@ -167,7 +207,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [Export]
         public String GetTemplateForm(String templateId)
         {
-            return AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetTemplateDefinition(templateId)?.Form;
+            try
+            {
+                return AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetTemplateDefinition(templateId)?.Form;
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting template {0}: {1}", templateId, e);
+                return String.Empty;
+            }
         }
 
 
@@ -179,7 +227,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [Export]
         public String GetTemplateView(String templateId)
         {
-            return AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetTemplateDefinition(templateId)?.View;
+            try
+            {
+                return AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetTemplateDefinition(templateId)?.View;
+            }
+            catch (Exception e)
+            {
+                this.m_tracer.TraceError("Error getting template view {0}: {1}", templateId, e);
+                return String.Empty;
+            }
         }
 
         /// <summary>
@@ -189,8 +245,16 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public String GetTemplates()
         {
-            return $"[{String.Join(",", XamarinApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Templates).Where(o => o.Public).Select(o => $"\"{o.Mnemonic}\""))}]";
-        }
+            try
+            {
+                return $"[{String.Join(",", XamarinApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Templates).Where(o => o.Public).Select(o => $"\"{o.Mnemonic}\""))}]";
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting template list : {0}", e);
+                return String.Empty;
+            }
+}
 
 
         /// <summary>
@@ -237,7 +301,15 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public string GetCurrentAssetTitle()
         {
-            return (this.m_view as AppletWebView).ThreadSafeTitle;
+            try
+            {
+                return (this.m_view as AppletWebView).ThreadSafeTitle;
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting asset title: {0}", e);
+                return String.Empty;
+            }
         }
 
         /// <summary>
@@ -247,11 +319,19 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [Export]
         public String GetVersion()
         {
-            if (this.m_appAssembly == null)
-                this.m_appAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(o => o.DefinedTypes.Any(t => t.Name == "SplashActivity")) ?? typeof(SanteDB.DisconnectedClient.Core.Services.IAdministrationIntegrationService).Assembly;
+            try
+            {
+                if (this.m_appAssembly == null)
+                    this.m_appAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(o => o.DefinedTypes.Any(t => t.Name == "SplashActivity")) ?? typeof(SanteDB.DisconnectedClient.Core.Services.IAdministrationIntegrationService).Assembly;
 
-            return String.Format("{0} ({1})", this.m_appAssembly.GetName().Version,
-                this.m_appAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+                return String.Format("{0} ({1})", this.m_appAssembly.GetName().Version,
+                    this.m_appAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting application version: {0}", e);
+                return String.Empty;
+            }
         }
 
         /// <summary>
@@ -271,27 +351,42 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [Export]
         public String GetService(String serviceName)
         {
-
-            Type serviceType = Type.GetType(serviceName);
-            if (serviceType == null)
-                return ApplicationContext.Current.GetService<IServiceManager>().GetServices().FirstOrDefault(
-                    o => o.GetType().GetInterfaces().Any(i => i.Name == serviceName) ||
-                    o.GetType().Name == serviceName || o.GetType().BaseType.Name == serviceName
-                )?.GetType().Name;
-            else
-                return ApplicationContext.Current.GetService(serviceType)?.GetType().Name;
+            try
+            {
+                Type serviceType = Type.GetType(serviceName);
+                if (serviceType == null)
+                    return ApplicationContext.Current.GetService<IServiceManager>().GetServices().FirstOrDefault(
+                        o => o.GetType().GetInterfaces().Any(i => i.Name == serviceName) ||
+                        o.GetType().Name == serviceName || o.GetType().BaseType.Name == serviceName
+                    )?.GetType().Name;
+                else
+                    return ApplicationContext.Current.GetService(serviceType)?.GetType().Name;
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting service {0} : {1}", serviceName, e);
+                return String.Empty;
+            }
         }
 
-       
-		[Export]
-		[JavascriptInterface]
-		public string GetNetworkState()
-		{
-			var networkInformationService = ApplicationContext.Current.GetService<INetworkInformationService>();
 
-			return networkInformationService.IsNetworkAvailable.ToString();
-		}
-        
+        [Export]
+        [JavascriptInterface]
+        public string GetNetworkState()
+        {
+            try
+            {
+                var networkInformationService = ApplicationContext.Current.GetService<INetworkInformationService>();
+
+                return networkInformationService.IsNetworkAvailable.ToString();
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error getting network status: {0}", e);
+                return String.Empty;
+            }
+        }
+
         /// <summary>
         /// Navigate the specified appletId and context.
         /// </summary>
@@ -301,11 +396,19 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public void Navigate(String appletId, String context)
         {
-            // TODO: Parameters
-            Application.SynchronizationContext.Post(_ =>
+            try
             {
-                this.m_view.LoadUrl(String.Format("app://santedb.org/applet/{0}/", appletId));
-            }, null);
+                // TODO: Parameters
+                Application.SynchronizationContext.Post(_ =>
+                {
+                    this.m_view.LoadUrl(String.Format("app://santedb.org/applet/{0}/", appletId));
+                }, null);
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error navigating to {0} : {1}", appletId, e);
+                
+            }
         }
 
         /// <summary>
@@ -360,14 +463,21 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public void Close()
         {
-            Application.SynchronizationContext.Post(_ =>
+            try
             {
-                this.m_tracer.TraceInfo("Received close() request");
-                ApplicationContext.Current.Stop();
-                AppletCollection.ClearCaches();
-                ApplicationContext.Current.Exit();
+                Application.SynchronizationContext.Post(_ =>
+                {
+                    this.m_tracer.TraceInfo("Received close() request");
+                    ApplicationContext.Current.Stop();
+                    AppletCollection.ClearCaches();
+                    ApplicationContext.Current.Exit();
                 //(this.m_context as Activity).Finish();
             }, null);
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("Error closing application: {0}", e);
+            }
         }
 
         /// <summary>
@@ -418,19 +528,26 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public String GetStrings(String locale)
         {
-            var strings = AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetStrings(locale);
-
-            using (StringWriter sw = new StringWriter())
+            try
             {
-                sw.Write("{");
-                foreach (var itm in strings)
-                {
-                    sw.Write("\"{0}\":\"{1}\",", itm.Key, itm.Value);
-                }
-                sw.Write("\"locale\":\"{0}\" }}", locale);
-                return sw.ToString();
-            }
+                var strings = AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetStrings(locale);
 
+                using (StringWriter sw = new StringWriter())
+                {
+                    sw.Write("{");
+                    foreach (var itm in strings)
+                    {
+                        sw.Write("\"{0}\":\"{1}\",", itm.Key, itm.Value);
+                    }
+                    sw.Write("\"locale\":\"{0}\" }}", locale);
+                    return sw.ToString();
+                }
+            }
+            catch(Exception e)
+            {
+                this.m_tracer.TraceError("error getting strings for {0}: {1}", locale, e);
+                return String.Empty;
+            }
         }
 
         /// <summary>

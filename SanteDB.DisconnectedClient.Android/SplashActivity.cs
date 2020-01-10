@@ -57,7 +57,7 @@ namespace SanteDBAndroid
         MainLauncher = true, 
         Icon = "@mipmap/icon", 
         NoHistory = true, 
-        ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize,
+        ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation | Android.Content.PM.ConfigChanges.ScreenSize | ConfigChanges.Mcc | ConfigChanges.Mnc,
         ScreenOrientation = ScreenOrientation.Locked)]
     public class SplashActivity : AndroidActivityBase
     {
@@ -79,7 +79,7 @@ namespace SanteDBAndroid
         /// </summary>
         private void OnProgressUpdated(Object sender, ApplicationProgressEventArgs e)
         {
-            this.RunOnUiThread(() => this.FindViewById<TextView>(Resource.Id.txt_splash_info).Text = String.Format("{0} {1}", e.ProgressText, e.Progress > 0 ? String.Format("({0:0%})", e.Progress) : null));
+            //this.RunOnUiThread(() => this.FindViewById<TextView>(Resource.Id.txt_splash_info).Text = String.Format("{0} {1}", e.ProgressText, e.Progress > 0 ? String.Format("({0:0%})", e.Progress) : null));
         }
 
         /// <summary>
@@ -88,6 +88,7 @@ namespace SanteDBAndroid
         /// <param name="savedInstanceState">Saved instance state.</param>
         protected override void OnCreate(Bundle savedInstanceState)
         {
+            
             base.OnCreate(savedInstanceState);
 
             this.SetContentView(Resource.Layout.Splash);
@@ -126,9 +127,7 @@ namespace SanteDBAndroid
                         doStart();
                     else
                         AndroidApplicationContext.Current.GetService<AgsService>().Started += (oo, oe) =>
-                        {
                             doStart();
-                        };
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
@@ -143,7 +142,7 @@ namespace SanteDBAndroid
         private bool DoConfigure()
         {
 
-            this.RunOnUiThread(() => this.FindViewById<TextView>(Resource.Id.txt_splash_info).Text = Resources.GetString(Resource.String.startup));
+            //this.RunOnUiThread(() => this.FindViewById<TextView>(Resource.Id.txt_splash_info).Text = Resources.GetString(Resource.String.startup));
             AndroidApplicationContext.ProgressChanged += this.OnProgressUpdated;
 
             try
@@ -197,9 +196,7 @@ namespace SanteDBAndroid
                                 doStart();
                             else
                                 AndroidApplicationContext.Current.GetService<AgsService>().Started += (oo, oe) =>
-                                {
                                     doStart();
-                                };
                         }
                     }, TaskScheduler.Current);
 

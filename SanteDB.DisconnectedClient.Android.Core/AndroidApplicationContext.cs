@@ -69,7 +69,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
         {
             ApplicationSecret = "C5B645B7D30A4E7E81A1C3D8B0E28F4C",
             Key = Guid.Parse("5248ea19-369d-4071-8947-413310872b7e"),
-            Name = "org.santedb.disconnected_client"
+            Name = "org.santedb.disconnected_client.android"
         };
         
         
@@ -154,7 +154,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     try
                     {
                         // Set master application context
-                        ApplicationContext.Current = retVal;
+                        ApplicationServiceContext.Current = ApplicationContext.Current = retVal;
                         //retVal.AddServiceProvider(typeof(ConfigurationManager));
                         retVal.CurrentActivity = launcherActivity;
                         retVal.ConfigurationPersister.Backup(retVal.Configuration);
@@ -187,9 +187,10 @@ namespace SanteDB.DisconnectedClient.Android.Core
                         Value = "true"
                     });
 
+                    // Add tracers
                     retVal.m_tracer = Tracer.GetTracer(typeof(AndroidApplicationContext));
                     foreach (var tr in retVal.Configuration.GetSection<DiagnosticsConfigurationSection>().TraceWriter)
-                        Tracer.AddWriter(tr.TraceWriter, tr.Filter);
+                        Tracer.AddWriter(Activator.CreateInstance(tr.TraceWriter, tr.Filter, tr.InitializationData) as TraceWriter, tr.Filter);
 
                     // Load configured applets
                     var configuredApplets = retVal.Configuration.GetSection<AppletConfigurationSection>().Applets;
@@ -337,13 +338,14 @@ namespace SanteDB.DisconnectedClient.Android.Core
                 retVal.Context = context;
                 retVal.SetProgress(context.GetString(Resource.String.startup_setup), 0);
                 retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
-                ApplicationContext.Current = retVal;
-                ApplicationServiceContext.Current = ApplicationContext.Current;
+                ApplicationServiceContext.Current = ApplicationContext.Current = retVal ;
                 retVal.CurrentActivity = launcherActivity;
 
+                // Add tracers
                 retVal.m_tracer = Tracer.GetTracer(typeof(AndroidApplicationContext));
                 foreach (var tr in retVal.Configuration.GetSection<DiagnosticsConfigurationSection>().TraceWriter)
-                    Tracer.AddWriter(tr.TraceWriter, tr.Filter);
+                    Tracer.AddWriter(Activator.CreateInstance(tr.TraceWriter, tr.Filter, tr.InitializationData) as TraceWriter, tr.Filter);
+
                 retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
 
                 AndroidApplicationContext.InstallAppletAssets(retVal);
@@ -428,30 +430,31 @@ namespace SanteDB.DisconnectedClient.Android.Core
         /// </summary>
         public override bool Confirm(string confirmText)
         {
-            AutoResetEvent evt = new AutoResetEvent(false);
-            bool result = false;
+            //AutoResetEvent evt = new AutoResetEvent(false);
+            //bool result = false;
 
-            A.App.Application.SynchronizationContext.Post(_ =>
-            {
-                var alertDialogBuilder = new AlertDialog.Builder(this.CurrentActivity)
-                        .SetMessage(confirmText)
-                        .SetCancelable(false)
-                        .SetPositiveButton(Strings.locale_confirm, (sender, args) =>
-                        {
-                            result = true;
-                            evt.Set();
-                        })
-                        .SetNegativeButton(Strings.locale_cancel, (sender, args) =>
-                        {
-                            result = false;
-                            evt.Set();
-                        });
+            //A.App.Application.SynchronizationContext.Post(_ =>
+            //{
+            //    var alertDialogBuilder = new AlertDialog.Builder(this.CurrentActivity)
+            //            .SetMessage(confirmText)
+            //            .SetCancelable(false)
+            //            .SetPositiveButton(Strings.locale_confirm, (sender, args) =>
+            //            {
+            //                result = true;
+            //                evt.Set();
+            //            })
+            //            .SetNegativeButton(Strings.locale_cancel, (sender, args) =>
+            //            {
+            //                result = false;
+            //                evt.Set();
+            //            });
 
-                alertDialogBuilder.Create().Show();
-            }, null);
+            //    alertDialogBuilder.Create().Show();
+            //}, null);
 
-            evt.WaitOne();
-            return result;
+            //evt.WaitOne();
+            //return result;
+            return true;
         }
 
 
@@ -460,12 +463,13 @@ namespace SanteDB.DisconnectedClient.Android.Core
         /// </summary>
         public override void ShowToast(String message)
         {
-            if (Looper.MyLooper() == null)
-            {
-                Looper.Prepare();
-            }
+            //if (Looper.MyLooper() == null)
+            //{
+            //    Looper.Prepare();
+            //}
 
-            A.Widget.Toast.MakeText(this.CurrentActivity, message, A.Widget.ToastLength.Long);
+            
+            //A.Widget.Toast.MakeText(this.CurrentActivity, message, A.Widget.ToastLength.Long);
         }
 
         /// <summary>
@@ -473,23 +477,23 @@ namespace SanteDB.DisconnectedClient.Android.Core
         /// </summary>
         public override void Alert(string alertText)
         {
-            AutoResetEvent evt = new AutoResetEvent(false);
+            //AutoResetEvent evt = new AutoResetEvent(false);
 
-            A.App.Application.SynchronizationContext.Post(_ =>
-            {
+            //A.App.Application.SynchronizationContext.Post(_ =>
+            //{
 
-                var alertDialogBuilder = new AlertDialog.Builder(this.CurrentActivity)
-                         .SetMessage(alertText)
-                        .SetCancelable(false)
-                        .SetPositiveButton(Strings.locale_confirm, (sender, args) =>
-                        {
-                            evt.Set();
-                        });
+            //    var alertDialogBuilder = new AlertDialog.Builder(this.CurrentActivity)
+            //             .SetMessage(alertText)
+            //            .SetCancelable(false)
+            //            .SetPositiveButton(Strings.locale_confirm, (sender, args) =>
+            //            {
+            //                evt.Set();
+            //            });
 
-                alertDialogBuilder.Create().Show();
-            }, null);
+            //    alertDialogBuilder.Create().Show();
+            //}, null);
 
-            evt.WaitOne();
+            //evt.WaitOne();
         }
 
         /// <summary>

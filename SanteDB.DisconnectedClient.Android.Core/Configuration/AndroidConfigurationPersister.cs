@@ -39,7 +39,6 @@ using SanteDB.DisconnectedClient.Android.Core.Net;
 using SanteDB.DisconnectedClient.Android.Core.Diagnostics;
 using SanteDB.DisconnectedClient.Android.Core.Services;
 using SanteDB.Cdss.Xml;
-using SanteDB.ReportR;
 using SanteDB.DisconnectedClient.Core.Data.Warehouse;
 using SanteDB.DisconnectedClient.Core.Tickler;
 using SharpCompress.Compressors.LZMA;
@@ -58,6 +57,9 @@ using SanteDB.DisconnectedClient.Xamarin.Services;
 using SanteDB.DisconnectedClient.Xamarin.Diagnostics;
 using SanteDB.DisconnectedClient.Xamarin.Http;
 using SanteDB.DisconnectedClient.Core;
+using SanteDB.BI.Services.Impl;
+using SanteDB.Core.Applets.Services.Impl;
+using SanteDB.DisconnectedClient.Core.Synchronization;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Configuration
 {
@@ -146,8 +148,10 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                     new TypeReferenceConfiguration(typeof(SimplePatchService)),
                     new TypeReferenceConfiguration(typeof(AndroidBackupService)),
                     new TypeReferenceConfiguration(typeof(AndroidAppletManagerService)),
-                    new TypeReferenceConfiguration(typeof(ReportExecutor)),
-                    new TypeReferenceConfiguration(typeof(AppletReportRepository)),
+                    new TypeReferenceConfiguration(typeof(AppletBiRepository)),
+                    new TypeReferenceConfiguration(typeof(DefaultOperatingSystemInfoService)),
+                    new TypeReferenceConfiguration(typeof(AppletSubscriptionRepository)),
+                    new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
                     new TypeReferenceConfiguration(typeof(AndroidGeoLocationService))
                 }
             };
@@ -162,7 +166,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
             SecurityConfigurationSection secSection = new SecurityConfigurationSection()
             {
                 DeviceName = String.Format("{0}-{1}", AndroidOS.Build.Model, macAddress).Replace(" ", ""),
-                AuditRetention = new TimeSpan(30, 0, 0, 0, 0)
+                AuditRetention = new TimeSpan(30, 0, 0, 0, 0),
+                DomainAuthentication = DomainClientAuthentication.Inline
             };
 
             // Device key
@@ -177,37 +182,39 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
 
             // Trace writer
 #if DEBUG
-			DiagnosticsConfigurationSection diagSection = new DiagnosticsConfigurationSection () {
-				TraceWriter = new System.Collections.Generic.List<TraceWriterConfiguration> () {
-					new TraceWriterConfiguration () { 
-						Filter = System.Diagnostics.Tracing.EventLevel.LogAlways,
-						InitializationData = "SanteDB",
-						TraceWriter = new LogTraceWriter (System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB")
-					},
-					new TraceWriterConfiguration() {
-						Filter = System.Diagnostics.Tracing.EventLevel.LogAlways,
-						InitializationData = "SanteDB",
-						TraceWriter = new FileTraceWriter(System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB")
-					},
-                    new TraceWriterConfiguration() {
+            DiagnosticsConfigurationSection diagSection = new DiagnosticsConfigurationSection()
+            {
+                TraceWriter = new System.Collections.Generic.List<TraceWriterConfiguration>() {
+                    new TraceWriterConfiguration () {
                         Filter = System.Diagnostics.Tracing.EventLevel.LogAlways,
                         InitializationData = "SanteDB",
-                        TraceWriter = new AndroidLogTraceWriter(System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB")
+                        TraceWriter = typeof(AndroidLogTraceWriter)
+                    },
+                    new TraceWriterConfiguration() {
+                        Filter = System.Diagnostics.Tracing.EventLevel.Informational,
+                        InitializationData = "SanteDB",
+                        TraceWriter = typeof(FileTraceWriter)
                     }
                 }
-			};
+            };
 #else
             DiagnosticsConfigurationSection diagSection = new DiagnosticsConfigurationSection()
             {
                 TraceWriter = new List<TraceWriterConfiguration>() {
-                    new TraceWriterConfiguration() {
-                        Filter = System.Diagnostics.Tracing.EventLevel.Warning,
+                    new TraceWriterConfiguration () {
+                        Filter = System.Diagnostics.Tracing.EventLevel.Error,
                         InitializationData = "SanteDB",
-                        TraceWriter = new FileTraceWriter(System.Diagnostics.Tracing.EventLevel.LogAlways, "SanteDB")
+                        TraceWriter = typeof(FileTraceWriter)
+                    },
+                    new TraceWriterConfiguration () {
+                        Filter = System.Diagnostics.Tracing.EventLevel.LogAlways,
+                        InitializationData = "SanteDB",
+                        TraceWriter = typeof(AndroidLogTraceWriter)
                     }
                 }
             };
 #endif
+
             retVal.Sections.Add(appServiceSection);
             retVal.Sections.Add(appletSection);
             retVal.Sections.Add(diagSection);
@@ -215,13 +222,38 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
             retVal.Sections.Add(secSection);
             retVal.Sections.Add(serviceSection);
             retVal.AddSection(AgsService.GetDefaultConfiguration());
-            retVal.Sections.Add(new SynchronizationConfigurationSection()
+            retVal.Sections.Add(new AuditAccountabilityConfigurationSection()
             {
-                PollInterval = new TimeSpan(0, 5, 0)
+                AuditFilters = new List<AuditFilterConfiguration>()
+                {
+                    // Audit any failure - No matter which event
+                    new AuditFilterConfiguration(null, null, SanteDB.Core.Auditing.OutcomeIndicator.EpicFail | SanteDB.Core.Auditing.OutcomeIndicator.MinorFail | SanteDB.Core.Auditing.OutcomeIndicator.SeriousFail, true, true),
+                    // Audit anything that creates, reads, or updates data
+                    new AuditFilterConfiguration(SanteDB.Core.Auditing.ActionType.Create | SanteDB.Core.Auditing.ActionType.Read | SanteDB.Core.Auditing.ActionType.Update | SanteDB.Core.Auditing.ActionType.Delete, null, null, true, true)
+                }
             });
 
-            foreach (var t in AppDomain.CurrentDomain.GetAssemblies().Where(a => !a.IsDynamic).SelectMany(a => a.ExportedTypes).Where(t => typeof(IInitialConfigurationProvider).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface))
-                retVal = (Activator.CreateInstance(t) as IInitialConfigurationProvider).Provide(retVal);
+            retVal.Sections.Add(new DcDataConfigurationSection()
+            {
+                MainDataSourceConnectionStringName = "santeDbData",
+                MessageQueueConnectionStringName = "santeDbQueue"
+            });
+
+            retVal.Sections.Add(new SynchronizationConfigurationSection()
+            {
+                PollInterval = new TimeSpan(0, 5, 0),
+                ForbiddenResouces = new List<SynchronizationForbidConfiguration>()
+                {
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "DeviceEntity"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "ApplicationEntity"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "Concept"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "ConceptSet"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "Place"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "ReferenceTerm"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.All, "AssigningAuthority"),
+                    new SynchronizationForbidConfiguration(SynchronizationOperationType.Obsolete, "UserEntity")
+                }
+            });
 
             return retVal;
         }
@@ -302,7 +334,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
         /// </summary>
         public void Backup(SanteDBConfiguration configuration)
         {
-            using (var lzs = new BZip2Stream(File.Create(Path.ChangeExtension(this.m_configPath, "bak.bz2")), SharpCompress.Compressors.CompressionMode.Compress))
+            using (var lzs = new BZip2Stream(File.Create(Path.ChangeExtension(this.m_configPath, "bak.bz2")), SharpCompress.Compressors.CompressionMode.Compress, false))
                 configuration.Save(lzs);
         }
 
@@ -319,7 +351,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
         /// </summary>
         public SanteDBConfiguration Restore()
         {
-            using (var lzs = new BZip2Stream(File.OpenRead(Path.ChangeExtension(this.m_configPath, "bak.bz2")), SharpCompress.Compressors.CompressionMode.Decompress))
+            using (var lzs = new BZip2Stream(File.OpenRead(Path.ChangeExtension(this.m_configPath, "bak.bz2")), SharpCompress.Compressors.CompressionMode.Decompress, false))
             {
                 var retVal = SanteDBConfiguration.Load(lzs);
                 this.Save(retVal);

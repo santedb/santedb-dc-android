@@ -72,7 +72,6 @@ namespace SanteDB.DisconnectedClient.Android.Core.Net
         {
             get
             {
-                
                 return this.m_connManager.ActiveNetworkInfo != null && this.m_connManager.ActiveNetworkInfo.IsConnected &&
                     !this.m_connManager.ActiveNetworkInfo.IsRoaming;
             }
