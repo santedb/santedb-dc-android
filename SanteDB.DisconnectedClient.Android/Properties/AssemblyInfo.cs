@@ -29,7 +29,7 @@ using Android.App;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("SanteSuite Contributors")]
 [assembly: AssemblyProduct ("SanteDB Disconnected Client")]
-[assembly: AssemblyCopyright ("(C) 2015-2019 Mohawk College of Applied Arts and Technology")]
+[assembly: AssemblyCopyright ("(C) 2015-2020 SanteSuite Contributors")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
@@ -37,8 +37,8 @@ using Android.App;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion ("1.112.0.*")]
-[assembly: AssemblyInformationalVersion("Iqaliut")]
+[assembly: AssemblyVersion ("2.0.4.*")]
+[assembly: AssemblyInformationalVersion("Jasper")]
 
 // The following attributes are used to specify the signing key for the assembly,
 // if desired. See the Mono documentation for more information about signing.

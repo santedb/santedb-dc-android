@@ -59,17 +59,17 @@ namespace SanteDBAndroid
 		public partial class Attribute
 		{
 			
-			// aapt resource value: 0x7f010000
+			// aapt resource value: 0x7F010000
 			public const int horizontalSpacing = 2130771968;
 			
-			// aapt resource value: 0x7f010002
-			public const int layout_breakLine = 2130771970;
+			// aapt resource value: 0x7F010001
+			public const int layout_breakLine = 2130771969;
 			
-			// aapt resource value: 0x7f010003
-			public const int layout_horizontalSpacing = 2130771971;
+			// aapt resource value: 0x7F010002
+			public const int layout_horizontalSpacing = 2130771970;
 			
-			// aapt resource value: 0x7f010001
-			public const int verticalSpacing = 2130771969;
+			// aapt resource value: 0x7F010003
+			public const int verticalSpacing = 2130771971;
 			
 			static Attribute()
 			{
@@ -84,25 +84,25 @@ namespace SanteDBAndroid
 		public partial class Drawable
 		{
 			
-			// aapt resource value: 0x7f020000
+			// aapt resource value: 0x7F020000
 			public const int blue_gradient = 2130837504;
 			
-			// aapt resource value: 0x7f020001
+			// aapt resource value: 0x7F020001
 			public const int circle_bg = 2130837505;
 			
-			// aapt resource value: 0x7f020002
+			// aapt resource value: 0x7F020002
 			public const int gray_gradient = 2130837506;
 			
-			// aapt resource value: 0x7f020003
+			// aapt resource value: 0x7F020003
 			public const int icon = 2130837507;
 			
-			// aapt resource value: 0x7f020004
+			// aapt resource value: 0x7F020004
 			public const int logo = 2130837508;
 			
-			// aapt resource value: 0x7f020005
+			// aapt resource value: 0x7F020005
 			public const int logo_lg = 2130837509;
 			
-			// aapt resource value: 0x7f020006
+			// aapt resource value: 0x7F020006
 			public const int splash_gradient = 2130837510;
 			
 			static Drawable()
@@ -118,17 +118,17 @@ namespace SanteDBAndroid
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f070000
-			public const int applet_view = 2131165184;
+			// aapt resource value: 0x7F030000
+			public const int applet_view = 2130903040;
 			
-			// aapt resource value: 0x7f070003
-			public const int contentFrame = 2131165187;
+			// aapt resource value: 0x7F030001
+			public const int contentFrame = 2130903041;
 			
-			// aapt resource value: 0x7f070001
-			public const int txt_splash_info = 2131165185;
+			// aapt resource value: 0x7F030002
+			public const int txt_splash_info = 2130903042;
 			
-			// aapt resource value: 0x7f070002
-			public const int txt_splash_version = 2131165186;
+			// aapt resource value: 0x7F030003
+			public const int txt_splash_version = 2130903043;
 			
 			static Id()
 			{
@@ -143,16 +143,16 @@ namespace SanteDBAndroid
 		public partial class Layout
 		{
 			
-			// aapt resource value: 0x7f040000
+			// aapt resource value: 0x7F040000
 			public const int Applet = 2130968576;
 			
-			// aapt resource value: 0x7f040001
+			// aapt resource value: 0x7F040001
 			public const int Splash = 2130968577;
 			
-			// aapt resource value: 0x7f040002
+			// aapt resource value: 0x7F040002
 			public const int zxingscanneractivitylayout = 2130968578;
 			
-			// aapt resource value: 0x7f040003
+			// aapt resource value: 0x7F040003
 			public const int zxingscannerfragmentlayout = 2130968579;
 			
 			static Layout()
@@ -168,8 +168,8 @@ namespace SanteDBAndroid
 		public partial class Mipmap
 		{
 			
-			// aapt resource value: 0x7f030000
-			public const int Icon = 2130903040;
+			// aapt resource value: 0x7F050000
+			public const int Icon = 2131034112;
 			
 			static Mipmap()
 			{
@@ -184,170 +184,170 @@ namespace SanteDBAndroid
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f050001
-			public const int ApplicationName = 2131034113;
+			// aapt resource value: 0x7F060002
+			public const int activity_login = 2131099650;
 			
-			// aapt resource value: 0x7f050000
-			public const int Hello = 2131034112;
+			// aapt resource value: 0x7F060003
+			public const int activity_setup = 2131099651;
 			
-			// aapt resource value: 0x7f05002f
-			public const int activity_login = 2131034159;
+			// aapt resource value: 0x7F060005
+			public const int applet_confirm_close = 2131099653;
 			
-			// aapt resource value: 0x7f050030
-			public const int activity_setup = 2131034160;
+			// aapt resource value: 0x7F060000
+			public const int ApplicationName = 2131099648;
 			
-			// aapt resource value: 0x7f050016
-			public const int app_name = 2131034134;
+			// aapt resource value: 0x7F060004
+			public const int app_name = 2131099652;
 			
-			// aapt resource value: 0x7f050005
-			public const int applet_confirm_close = 2131034117;
+			// aapt resource value: 0x7F060006
+			public const int cancel = 2131099654;
 			
-			// aapt resource value: 0x7f050004
-			public const int cancel = 2131034116;
+			// aapt resource value: 0x7F060007
+			public const int confirm = 2131099655;
 			
-			// aapt resource value: 0x7f050003
-			public const int confirm = 2131034115;
+			// aapt resource value: 0x7F060008
+			public const int err_applet_not_found = 2131099656;
 			
-			// aapt resource value: 0x7f050031
-			public const int err_applet_not_found = 2131034161;
+			// aapt resource value: 0x7F060009
+			public const int err_exception = 2131099657;
 			
-			// aapt resource value: 0x7f050035
-			public const int err_exception = 2131034165;
+			// aapt resource value: 0x7F06000A
+			public const int err_general = 2131099658;
 			
-			// aapt resource value: 0x7f050006
-			public const int err_general = 2131034118;
+			// aapt resource value: 0x7F06000B
+			public const int err_login = 2131099659;
 			
-			// aapt resource value: 0x7f050033
-			public const int err_login = 2131034163;
+			// aapt resource value: 0x7F06000C
+			public const int err_login_invalidusername = 2131099660;
 			
-			// aapt resource value: 0x7f050034
-			public const int err_login_invalidusername = 2131034164;
+			// aapt resource value: 0x7F06000D
+			public const int err_oauth2_invalid_client = 2131099661;
 			
-			// aapt resource value: 0x7f050008
-			public const int err_oauth2_invalid_client = 2131034120;
+			// aapt resource value: 0x7F06000E
+			public const int err_oauth2_invalid_grant = 2131099662;
 			
-			// aapt resource value: 0x7f050009
-			public const int err_oauth2_invalid_grant = 2131034121;
+			// aapt resource value: 0x7F06000F
+			public const int err_oauth2_invalid_request = 2131099663;
 			
-			// aapt resource value: 0x7f050007
-			public const int err_oauth2_invalid_request = 2131034119;
+			// aapt resource value: 0x7F060010
+			public const int err_oauth2_invalid_scope = 2131099664;
 			
-			// aapt resource value: 0x7f05000c
-			public const int err_oauth2_invalid_scope = 2131034124;
+			// aapt resource value: 0x7F060011
+			public const int err_oauth2_unauthorized_client = 2131099665;
 			
-			// aapt resource value: 0x7f05000a
-			public const int err_oauth2_unauthorized_client = 2131034122;
+			// aapt resource value: 0x7F060012
+			public const int err_oauth2_unsupported_grant_type = 2131099666;
 			
-			// aapt resource value: 0x7f05000b
-			public const int err_oauth2_unsupported_grant_type = 2131034123;
+			// aapt resource value: 0x7F060013
+			public const int err_online_required = 2131099667;
 			
-			// aapt resource value: 0x7f050036
-			public const int err_online_required = 2131034166;
+			// aapt resource value: 0x7F060014
+			public const int err_startup = 2131099668;
 			
-			// aapt resource value: 0x7f050032
-			public const int err_startup = 2131034162;
+			// aapt resource value: 0x7F060015
+			public const int err_token_InvalidSignature = 2131099669;
 			
-			// aapt resource value: 0x7f05000e
-			public const int err_token_InvalidSignature = 2131034126;
+			// aapt resource value: 0x7F060016
+			public const int err_token_InvalidTokenType = 2131099670;
 			
-			// aapt resource value: 0x7f05000f
-			public const int err_token_InvalidTokenType = 2131034127;
+			// aapt resource value: 0x7F060017
+			public const int err_token_KeyNotFound = 2131099671;
 			
-			// aapt resource value: 0x7f050010
-			public const int err_token_KeyNotFound = 2131034128;
+			// aapt resource value: 0x7F060018
+			public const int err_token_NotYetValid = 2131099672;
 			
-			// aapt resource value: 0x7f050011
-			public const int err_token_NotYetValid = 2131034129;
+			// aapt resource value: 0x7F060019
+			public const int err_token_TokenExpired = 2131099673;
 			
-			// aapt resource value: 0x7f05000d
-			public const int err_token_TokenExpired = 2131034125;
+			// aapt resource value: 0x7F060001
+			public const int Hello = 2131099649;
 			
-			// aapt resource value: 0x7f05001d
-			public const int installing_applets = 2131034141;
+			// aapt resource value: 0x7F06001A
+			public const int installing_applets = 2131099674;
 			
-			// aapt resource value: 0x7f05002c
-			public const int joinRealm = 2131034156;
+			// aapt resource value: 0x7F06001B
+			public const int joinRealm = 2131099675;
 			
-			// aapt resource value: 0x7f05002e
-			public const int leaveRealm = 2131034158;
+			// aapt resource value: 0x7F06001C
+			public const int leaveRealm = 2131099676;
 			
-			// aapt resource value: 0x7f050002
-			public const int library_name = 2131034114;
+			// aapt resource value: 0x7F06001D
+			public const int library_name = 2131099677;
 			
-			// aapt resource value: 0x7f05001f
-			public const int loading = 2131034143;
+			// aapt resource value: 0x7F06001E
+			public const int loading = 2131099678;
 			
-			// aapt resource value: 0x7f050019
-			public const int login = 2131034137;
+			// aapt resource value: 0x7F06001F
+			public const int login = 2131099679;
 			
-			// aapt resource value: 0x7f05001a
-			public const int login_title = 2131034138;
+			// aapt resource value: 0x7F060020
+			public const int login_title = 2131099680;
 			
-			// aapt resource value: 0x7f05001c
-			public const int needs_setup = 2131034140;
+			// aapt resource value: 0x7F060021
+			public const int needs_setup = 2131099681;
 			
-			// aapt resource value: 0x7f05002d
-			public const int noRealm = 2131034157;
+			// aapt resource value: 0x7F060022
+			public const int noRealm = 2131099682;
 			
-			// aapt resource value: 0x7f050018
-			public const int password = 2131034136;
+			// aapt resource value: 0x7F060023
+			public const int password = 2131099683;
 			
-			// aapt resource value: 0x7f05002a
-			public const int setting_log = 2131034154;
+			// aapt resource value: 0x7F060024
+			public const int setting_log = 2131099684;
 			
-			// aapt resource value: 0x7f05002b
-			public const int setting_log_desc = 2131034155;
+			// aapt resource value: 0x7F060025
+			public const int setting_log_desc = 2131099685;
 			
-			// aapt resource value: 0x7f050028
-			public const int setting_offline_only = 2131034152;
+			// aapt resource value: 0x7F060026
+			public const int setting_offline_only = 2131099686;
 			
-			// aapt resource value: 0x7f050029
-			public const int setting_offline_only_desc = 2131034153;
+			// aapt resource value: 0x7F060027
+			public const int setting_offline_only_desc = 2131099687;
 			
-			// aapt resource value: 0x7f050021
-			public const int setup_subTitle = 2131034145;
+			// aapt resource value: 0x7F060028
+			public const int setup_subTitle = 2131099688;
 			
-			// aapt resource value: 0x7f050025
-			public const int setup_subTitle_app = 2131034149;
+			// aapt resource value: 0x7F060029
+			public const int setup_subTitle_app = 2131099689;
 			
-			// aapt resource value: 0x7f050027
-			public const int setup_subTitle_lnf = 2131034151;
+			// aapt resource value: 0x7F06002A
+			public const int setup_subTitle_lnf = 2131099690;
 			
-			// aapt resource value: 0x7f050023
-			public const int setup_subTitle_sec = 2131034147;
+			// aapt resource value: 0x7F06002B
+			public const int setup_subTitle_sec = 2131099691;
 			
-			// aapt resource value: 0x7f050020
-			public const int setup_title = 2131034144;
+			// aapt resource value: 0x7F06002C
+			public const int setup_title = 2131099692;
 			
-			// aapt resource value: 0x7f050024
-			public const int setup_title_app = 2131034148;
+			// aapt resource value: 0x7F06002D
+			public const int setup_title_app = 2131099693;
 			
-			// aapt resource value: 0x7f050026
-			public const int setup_title_lnf = 2131034150;
+			// aapt resource value: 0x7F06002E
+			public const int setup_title_lnf = 2131099694;
 			
-			// aapt resource value: 0x7f050022
-			public const int setup_title_sec = 2131034146;
+			// aapt resource value: 0x7F06002F
+			public const int setup_title_sec = 2131099695;
 			
-			// aapt resource value: 0x7f05001e
-			public const int starting_services = 2131034142;
+			// aapt resource value: 0x7F060030
+			public const int starting_services = 2131099696;
 			
-			// aapt resource value: 0x7f05001b
-			public const int startup = 2131034139;
+			// aapt resource value: 0x7F060031
+			public const int startup = 2131099697;
 			
-			// aapt resource value: 0x7f050012
-			public const int startup_configuration = 2131034130;
+			// aapt resource value: 0x7F060032
+			public const int startup_configuration = 2131099698;
 			
-			// aapt resource value: 0x7f050013
-			public const int startup_data = 2131034131;
+			// aapt resource value: 0x7F060033
+			public const int startup_data = 2131099699;
 			
-			// aapt resource value: 0x7f050015
-			public const int startup_setup = 2131034133;
+			// aapt resource value: 0x7F060034
+			public const int startup_setup = 2131099700;
 			
-			// aapt resource value: 0x7f050014
-			public const int startup_update = 2131034132;
+			// aapt resource value: 0x7F060035
+			public const int startup_update = 2131099701;
 			
-			// aapt resource value: 0x7f050017
-			public const int user_name = 2131034135;
+			// aapt resource value: 0x7F060036
+			public const int user_name = 2131099702;
 			
 			static String()
 			{
@@ -362,32 +362,32 @@ namespace SanteDBAndroid
 		public partial class Style
 		{
 			
-			// aapt resource value: 0x7f060005
-			public const int ActionBar = 2131099653;
+			// aapt resource value: 0x7F070000
+			public const int ActionBar = 2131165184;
 			
-			// aapt resource value: 0x7f060001
-			public const int AppletTile = 2131099649;
+			// aapt resource value: 0x7F070001
+			public const int AppletTile = 2131165185;
 			
-			// aapt resource value: 0x7f060002
-			public const int BlueTitle = 2131099650;
+			// aapt resource value: 0x7F070002
+			public const int BlueTitle = 2131165186;
 			
-			// aapt resource value: 0x7f060000
-			public const int DefaultFont = 2131099648;
+			// aapt resource value: 0x7F070003
+			public const int DefaultFont = 2131165187;
 			
-			// aapt resource value: 0x7f060003
-			public const int GrayTitle = 2131099651;
+			// aapt resource value: 0x7F070004
+			public const int GrayTitle = 2131165188;
 			
-			// aapt resource value: 0x7f060004
-			public const int SanteDB = 2131099652;
+			// aapt resource value: 0x7F070005
+			public const int SanteDB = 2131165189;
 			
-			// aapt resource value: 0x7f060007
-			public const int SanteDB_NoTitle = 2131099655;
+			// aapt resource value: 0x7F070006
+			public const int SanteDB_NoTitle = 2131165190;
 			
-			// aapt resource value: 0x7f060008
-			public const int SanteDB_Splash = 2131099656;
+			// aapt resource value: 0x7F070007
+			public const int SanteDB_Splash = 2131165191;
 			
-			// aapt resource value: 0x7f060006
-			public const int SoftInputMode = 2131099654;
+			// aapt resource value: 0x7F070008
+			public const int SoftInputMode = 2131165192;
 			
 			static Style()
 			{
@@ -402,25 +402,27 @@ namespace SanteDBAndroid
 		public partial class Styleable
 		{
 			
+			// aapt resource value: { 0x7F010000,0x7F010003 }
 			public static int[] FlowLayout = new int[] {
 					2130771968,
-					2130771969};
+					2130771971};
 			
 			// aapt resource value: 0
 			public const int FlowLayout_horizontalSpacing = 0;
 			
-			// aapt resource value: 1
-			public const int FlowLayout_verticalSpacing = 1;
-			
+			// aapt resource value: { 0x7F010001,0x7F010002 }
 			public static int[] FlowLayout_LayoutParams = new int[] {
-					2130771970,
-					2130771971};
+					2130771969,
+					2130771970};
 			
 			// aapt resource value: 0
 			public const int FlowLayout_LayoutParams_layout_breakLine = 0;
 			
 			// aapt resource value: 1
 			public const int FlowLayout_LayoutParams_layout_horizontalSpacing = 1;
+			
+			// aapt resource value: 1
+			public const int FlowLayout_verticalSpacing = 1;
 			
 			static Styleable()
 			{

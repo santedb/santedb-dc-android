@@ -14,8 +14,8 @@ using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;
 using SanteDB.DisconnectedClient.Android.Core;
-using SanteDB.DisconnectedClient.Core.Security;
-using SanteDB.DisconnectedClient.Core.Services;
+using SanteDB.DisconnectedClient.Security;
+using SanteDB.DisconnectedClient.Services;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Services
 {

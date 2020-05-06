@@ -9,7 +9,7 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using SanteDB.DisconnectedClient.Core.Security;
+using SanteDB.DisconnectedClient.Security;
 using A = Android;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Activities

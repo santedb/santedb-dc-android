@@ -18,7 +18,7 @@
  * Date: 2017-9-1
  */
 using System.Linq;
-using SanteDB.DisconnectedClient.Core.Interop;
+using SanteDB.DisconnectedClient.Interop;
 
 using System;
 using Android.Webkit;
@@ -34,21 +34,21 @@ using System.Collections.Generic;
 using SanteDB.Core.Applets.Model;
 using A = Android;
 using System.Reflection;
-using SanteDB.DisconnectedClient.Core.Configuration;
+using SanteDB.DisconnectedClient.Configuration;
 using System.Globalization;
 using System.Security.Principal;
-using SanteDB.DisconnectedClient.Core.Services;
-using SanteDB.DisconnectedClient.Xamarin;
-using SanteDB.DisconnectedClient.Xamarin.Services.Model;
+using SanteDB.DisconnectedClient.Services;
+using SanteDB.DisconnectedClient;
+using SanteDB.DisconnectedClient.Services.Model;
 using System.Text;
 using SanteDB.Core.Applets;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Diagnostics;
-using SanteDB.DisconnectedClient.Core;
+using SanteDB.DisconnectedClient;
 using SanteDB.Core.Services;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core;
-using SanteDB.DisconnectedClient.Core.Security;
+using SanteDB.DisconnectedClient.Security;
 
 namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
 {
@@ -94,7 +94,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             try
             {
                 dataId = String.Format("data/{0}", dataId);
-                return Convert.ToBase64String(ApplicationContext.Current.GetService<IAppletManagerService>().Applets.RenderAssetContent(XamarinApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Assets).FirstOrDefault(o => o.Name == dataId), CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
+                return Convert.ToBase64String(ApplicationContext.Current.GetService<IAppletManagerService>().Applets.RenderAssetContent(ApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Assets).FirstOrDefault(o => o.Name == dataId), CultureInfo.CurrentUICulture.TwoLetterISOLanguageName));
             }
             catch (Exception e)
             {
@@ -247,7 +247,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         {
             try
             {
-                return $"[{String.Join(",", XamarinApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Templates).Where(o => o.Public).Select(o => $"\"{o.Mnemonic}\""))}]";
+                return $"[{String.Join(",", ApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Templates).Where(o => o.Public).Select(o => $"\"{o.Mnemonic}\""))}]";
             }
             catch(Exception e)
             {
@@ -322,7 +322,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             try
             {
                 if (this.m_appAssembly == null)
-                    this.m_appAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(o => o.DefinedTypes.Any(t => t.Name == "SplashActivity")) ?? typeof(SanteDB.DisconnectedClient.Core.Services.IAdministrationIntegrationService).Assembly;
+                    this.m_appAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(o => o.DefinedTypes.Any(t => t.Name == "SplashActivity")) ?? typeof(SanteDB.DisconnectedClient.Services.IAdministrationIntegrationService).Assembly;
 
                 return String.Format("{0} ({1})", this.m_appAssembly.GetName().Version,
                     this.m_appAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
@@ -493,9 +493,9 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                 var permService = ApplicationServiceContext.Current.GetService<IOperatingSystemSecurityService>();
                 if (!permService.HasPermission(PermissionType.Camera) && !permService.RequestPermission(PermissionType.Camera))
                     return String.Empty;
-                if (!this.m_zxingInitialized && (XamarinApplicationContext.Current as AndroidApplicationContext).AndroidApplication != null)
+                if (!this.m_zxingInitialized && (ApplicationContext.Current as AndroidApplicationContext).AndroidApplication != null)
                 {
-                    ZXing.Mobile.MobileBarcodeScanner.Initialize((XamarinApplicationContext.Current as AndroidApplicationContext).AndroidApplication);
+                    ZXing.Mobile.MobileBarcodeScanner.Initialize((ApplicationContext.Current as AndroidApplicationContext).AndroidApplication);
                     this.m_zxingInitialized = true;
                 }
                 var scanner = new ZXing.Mobile.MobileBarcodeScanner();

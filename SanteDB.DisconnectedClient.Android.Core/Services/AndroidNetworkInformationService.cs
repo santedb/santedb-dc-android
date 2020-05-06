@@ -29,10 +29,10 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using Android.Net;
-using SanteDB.DisconnectedClient.Core.Services;
+using SanteDB.DisconnectedClient.Services;
 using System.Net.NetworkInformation;
 using AndroidOS = Android.OS;
-using SanteDB.DisconnectedClient.Xamarin.Net;
+using SanteDB.DisconnectedClient.Net;
 using SanteDB.Core.Services;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Net
@@ -48,7 +48,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Net
 
         public AndroidNetworkInformationService()
         {
-            this.m_connManager = (ConnectivityManager)((Xamarin.XamarinApplicationContext.Current as AndroidApplicationContext).Context).GetSystemService(Context.ConnectivityService);
+            this.m_connManager = (ConnectivityManager)((ApplicationContext.Current as AndroidApplicationContext).Context).GetSystemService(Context.ConnectivityService);
         }
         /// <summary>
         /// Get interfaces

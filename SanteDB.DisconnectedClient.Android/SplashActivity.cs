@@ -37,16 +37,16 @@ using System.Threading;
 using SanteDB.Core.Applets.Model;
 using System.Xml.Serialization;
 using SanteDB.DisconnectedClient.Android.Core.Services;
-using SanteDB.DisconnectedClient.Core;
+using SanteDB.DisconnectedClient;
 using System.IO.Compression;
 using Android.Content.PM;
 using SanteDB.Core.Diagnostics;
 using SanteDB;
-using SanteDB.DisconnectedClient.Xamarin;
-using SanteDB.DisconnectedClient.Core.Configuration;
+using SanteDB.DisconnectedClient;
+using SanteDB.DisconnectedClient.Configuration;
 using SanteDB.DisconnectedClient.Ags;
 using SanteDB.DisconnectedClient.Android.Core;
-using SanteDB.DisconnectedClient.Core.Services;
+using SanteDB.DisconnectedClient.Services;
 using SanteDB.DisconnectedClient.Android.Core.Activities;
 
 namespace SanteDBAndroid
@@ -93,7 +93,7 @@ namespace SanteDBAndroid
 
             this.SetContentView(Resource.Layout.Splash);
 
-            SanteDB.DisconnectedClient.Core.ApplicationContext.Current = null;
+            SanteDB.DisconnectedClient.ApplicationContext.Current = null;
 
             this.FindViewById<TextView>(Resource.Id.txt_splash_version).Text = String.Format("V {0} ({1})",
                 typeof(SplashActivity).Assembly.GetName().Version,
@@ -105,7 +105,7 @@ namespace SanteDBAndroid
 
             Task startupWork = new Task(() =>
             {
-                if (XamarinApplicationContext.Current == null)
+                if (AndroidApplicationContext.Current == null)
                     if (!this.DoConfigure())
                         ctSource.Cancel();
             }, ct);
@@ -254,7 +254,7 @@ namespace SanteDBAndroid
 
             reset.WaitOne();
 
-            var bksvc = XamarinApplicationContext.Current.GetService<IBackupService>();
+            var bksvc = AndroidApplicationContext.Current.GetService<IBackupService>();
             bksvc.Backup(result ? BackupMedia.Public : BackupMedia.Private);
             File.Delete(Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "SanteDB.config"));
             Directory.Delete(Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData)), true);

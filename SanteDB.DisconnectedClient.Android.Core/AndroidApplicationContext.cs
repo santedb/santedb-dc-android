@@ -27,11 +27,11 @@ using SanteDB.Core.Model.EntityLoader;
 using SanteDB.Core.Protocol;
 using SanteDB.Core.Services;
 using SanteDB.DisconnectedClient.Android.Core.Configuration;
-using SanteDB.DisconnectedClient.Core.Configuration;
-using SanteDB.DisconnectedClient.Core.Configuration.Data;
-using SanteDB.DisconnectedClient.Core.Security;
-using SanteDB.DisconnectedClient.Core.Services;
-using SanteDB.DisconnectedClient.Xamarin;
+using SanteDB.DisconnectedClient.Configuration;
+using SanteDB.DisconnectedClient.Configuration.Data;
+using SanteDB.DisconnectedClient.Security;
+using SanteDB.DisconnectedClient.Services;
+using SanteDB.DisconnectedClient;
 using System;
 using System.Diagnostics.Tracing;
 using System.IO;
@@ -46,19 +46,22 @@ using Android.OS;
 using SanteDB.DisconnectedClient.Android.Core.Services;
 using SanteDB.Core.Diagnostics;
 using A = Android;
-using SanteDB.DisconnectedClient.Core;
+using SanteDB.DisconnectedClient;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Security;
 using SanteDB.DisconnectedClient.Android.Core.Resources;
 using System.Collections.Generic;
+using SanteDB.DisconnectedClient.Configuration;
+using SanteDB.DisconnectedClient.Services;
+using SanteDB.DisconnectedClient.Configuration.Data;
 
 namespace SanteDB.DisconnectedClient.Android.Core
 {
     /// <summary>
     /// Represents an application context for Xamarin Android
     /// </summary>
-    public class AndroidApplicationContext : XamarinApplicationContext
+    public class AndroidApplicationContext : ApplicationContext
     {
 
         // Current activity
@@ -430,31 +433,30 @@ namespace SanteDB.DisconnectedClient.Android.Core
         /// </summary>
         public override bool Confirm(string confirmText)
         {
-            //AutoResetEvent evt = new AutoResetEvent(false);
-            //bool result = false;
+            ManualResetEventSlim evt = new ManualResetEventSlim(false);
+            bool result = false;
+            
+            A.App.Application.SynchronizationContext.Post(_ =>
+            {
+                var alertDialogBuilder = new AlertDialog.Builder(this.CurrentActivity)
+                        .SetMessage(confirmText)
+                        .SetCancelable(false)
+                        .SetPositiveButton(Strings.locale_confirm, (sender, args) =>
+                        {
+                            result = true;
+                            evt.Set();
+                        })
+                        .SetNegativeButton(Strings.locale_cancel, (sender, args) =>
+                        {
+                            result = false;
+                            evt.Set();
+                        });
 
-            //A.App.Application.SynchronizationContext.Post(_ =>
-            //{
-            //    var alertDialogBuilder = new AlertDialog.Builder(this.CurrentActivity)
-            //            .SetMessage(confirmText)
-            //            .SetCancelable(false)
-            //            .SetPositiveButton(Strings.locale_confirm, (sender, args) =>
-            //            {
-            //                result = true;
-            //                evt.Set();
-            //            })
-            //            .SetNegativeButton(Strings.locale_cancel, (sender, args) =>
-            //            {
-            //                result = false;
-            //                evt.Set();
-            //            });
+                alertDialogBuilder.Create().Show();
+            }, null);
 
-            //    alertDialogBuilder.Create().Show();
-            //}, null);
-
-            //evt.WaitOne();
-            //return result;
-            return true;
+            evt.Wait();
+            return result;
         }
 
 
@@ -469,7 +471,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
             //}
 
             
-            //A.Widget.Toast.MakeText(this.CurrentActivity, message, A.Widget.ToastLength.Long);
+            A.Widget.Toast.MakeText(this.CurrentActivity, message, A.Widget.ToastLength.Long);
         }
 
         /// <summary>

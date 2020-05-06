@@ -22,11 +22,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using SanteDB.DisconnectedClient.Core.Synchronization;
+using SanteDB.DisconnectedClient.Synchronization;
 using Android.App;
 using Android.Content;
 using SanteDB.Core.Diagnostics;
-using SanteDB.DisconnectedClient.Core.Services;
+using SanteDB.DisconnectedClient.Services;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Services
 {
@@ -52,7 +52,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
         /// </summary>
         protected override void OnHandleIntent(Intent intent)
         {
-            SanteDB.DisconnectedClient.Core.ApplicationContext.Current.GetService<IQueueManagerService>().ExhaustOutboundQueues();
+            SanteDB.DisconnectedClient.ApplicationContext.Current.GetService<IQueueManagerService>().ExhaustOutboundQueues();
         }
         
     }
@@ -91,7 +91,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
         /// </summary>
         protected override void OnHandleIntent(Intent intent)
         {
-            SanteDB.DisconnectedClient.Core.ApplicationContext.Current.GetService<IQueueManagerService>().ExhaustOutboundQueues();
+            SanteDB.DisconnectedClient.ApplicationContext.Current.GetService<IQueueManagerService>().ExhaustOutboundQueues();
         }
         
         /// <summary>

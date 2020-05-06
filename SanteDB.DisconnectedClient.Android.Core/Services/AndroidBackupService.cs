@@ -28,10 +28,10 @@ using Android.OS;
 using Android.Runtime;
 using Android.Views;
 using Android.Widget;
-using SanteDB.DisconnectedClient.Core;
-using SanteDB.DisconnectedClient.Core.Security;
-using SanteDB.DisconnectedClient.Core.Services;
-using SanteDB.DisconnectedClient.Xamarin.Backup;
+using SanteDB.DisconnectedClient;
+using SanteDB.DisconnectedClient.Security;
+using SanteDB.DisconnectedClient.Services;
+using SanteDB.DisconnectedClient.Backup;
 using A = Android;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Services
@@ -39,7 +39,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
     /// <summary>
     /// Android 
     /// </summary>
-    public class AndroidBackupService : XamarinBackupService
+    public class AndroidBackupService : DefaultBackupService
     {
         /// <summary>
         /// Get backup directory

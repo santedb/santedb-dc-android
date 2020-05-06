@@ -30,9 +30,9 @@ using Android.Views;
 using Android.Widget;
 using SanteDB.Core.Applets.Model;
 using System.IO;
-using SanteDB.DisconnectedClient.Core.Configuration;
-using SanteDB.DisconnectedClient.Xamarin.Services;
-using SanteDB.DisconnectedClient.Core;
+using SanteDB.DisconnectedClient.Configuration;
+using SanteDB.DisconnectedClient.Services;
+using SanteDB.DisconnectedClient;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Services
 {

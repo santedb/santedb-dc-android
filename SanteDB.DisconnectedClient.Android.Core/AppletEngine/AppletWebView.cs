@@ -23,7 +23,7 @@ using Android.Util;
 using Android.Webkit;
 using SanteDB.Core.Diagnostics;
 using SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI;
-using SanteDB.DisconnectedClient.Core;
+using SanteDB.DisconnectedClient;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Tracing;
@@ -88,6 +88,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			this.Settings.SetRenderPriority(WebSettings.RenderPriority.Normal);
 			this.Settings.SetAppCacheEnabled(true);
 			this.Settings.SetSupportMultipleWindows(false);
+            this.Settings.JavaScriptCanOpenWindowsAutomatically = false;
             this.Settings.DomStorageEnabled = true;
             
 			if (A.OS.Build.VERSION.SdkInt >= A.OS.BuildVersionCodes.Kitkat)

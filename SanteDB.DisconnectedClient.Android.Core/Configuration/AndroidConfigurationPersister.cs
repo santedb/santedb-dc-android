@@ -22,44 +22,44 @@ using System.Linq;
 using System.Reflection;
 using System.IO;
 using System.Xml.Serialization;
-using SanteDB.DisconnectedClient.Core.Configuration;
+using SanteDB.DisconnectedClient.Configuration;
 using Android.Content.Res;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using SanteDB.DisconnectedClient.Core.Configuration.Data;
-using SanteDB.DisconnectedClient.Core.Security;
-using SanteDB.DisconnectedClient.Core.Data;
+using SanteDB.DisconnectedClient.Configuration.Data;
+using SanteDB.DisconnectedClient.Security;
+using SanteDB.DisconnectedClient.Data;
 using System.Net.NetworkInformation;
 using System.Security.Cryptography.X509Certificates;
 using AndroidOS = Android.OS;
-using SanteDB.DisconnectedClient.Core.Caching;
+using SanteDB.DisconnectedClient.Caching;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Core.Protocol;
 using SanteDB.DisconnectedClient.Android.Core.Net;
 using SanteDB.DisconnectedClient.Android.Core.Diagnostics;
 using SanteDB.DisconnectedClient.Android.Core.Services;
 using SanteDB.Cdss.Xml;
-using SanteDB.DisconnectedClient.Core.Data.Warehouse;
-using SanteDB.DisconnectedClient.Core.Tickler;
+using SanteDB.DisconnectedClient.Data.Warehouse;
+using SanteDB.DisconnectedClient.Tickler;
 using SharpCompress.Compressors.LZMA;
 using SharpCompress.Compressors.BZip2;
 using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Services;
 using SanteDB.Core.Configuration;
 using SanteDB.DisconnectedClient.Ags;
-using SanteDB.DisconnectedClient.Xamarin.Security;
-using SanteDB.DisconnectedClient.Xamarin.Net;
-using SanteDB.DisconnectedClient.Xamarin.Rules;
-using SanteDB.DisconnectedClient.Xamarin.Threading;
-using SanteDB.DisconnectedClient.Xamarin.Configuration;
-using SanteDB.DisconnectedClient.Core.Services.Local;
-using SanteDB.DisconnectedClient.Xamarin.Services;
-using SanteDB.DisconnectedClient.Xamarin.Diagnostics;
-using SanteDB.DisconnectedClient.Xamarin.Http;
-using SanteDB.DisconnectedClient.Core;
+using SanteDB.DisconnectedClient.Net;
+using SanteDB.DisconnectedClient.Rules;
+using SanteDB.DisconnectedClient.Threading;
+using SanteDB.DisconnectedClient.Services.Local;
+using SanteDB.DisconnectedClient.Services;
+using SanteDB.DisconnectedClient.Diagnostics;
+using SanteDB.DisconnectedClient.Http;
 using SanteDB.BI.Services.Impl;
 using SanteDB.Core.Applets.Services.Impl;
-using SanteDB.DisconnectedClient.Core.Synchronization;
+using SanteDB.DisconnectedClient.Synchronization;
+using SanteDB.DisconnectedClient.Security.Session;
+using SanteDB.Core.Security.Audit;
+using SanteDB.DisconnectedClient.Security.Remote;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Configuration
 {
@@ -152,7 +152,10 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                     new TypeReferenceConfiguration(typeof(DefaultOperatingSystemInfoService)),
                     new TypeReferenceConfiguration(typeof(AppletSubscriptionRepository)),
                     new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
-                    new TypeReferenceConfiguration(typeof(AndroidGeoLocationService))
+                    new TypeReferenceConfiguration(typeof(AndroidGeoLocationService)),
+                    new TypeReferenceConfiguration(typeof(AmiSecurityChallengeProvider)),
+                    new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
+                    new TypeReferenceConfiguration(typeof(DefaultDataSigningService))
                 }
             };
 
