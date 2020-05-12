@@ -149,7 +149,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                     new TypeReferenceConfiguration(typeof(AndroidBackupService)),
                     new TypeReferenceConfiguration(typeof(AndroidAppletManagerService)),
                     new TypeReferenceConfiguration(typeof(AppletBiRepository)),
-                    new TypeReferenceConfiguration(typeof(DefaultOperatingSystemInfoService)),
+                    new TypeReferenceConfiguration(typeof(AndroidOperatingSystemInfoService)),
                     new TypeReferenceConfiguration(typeof(AppletSubscriptionRepository)),
                     new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
                     new TypeReferenceConfiguration(typeof(AndroidGeoLocationService)),

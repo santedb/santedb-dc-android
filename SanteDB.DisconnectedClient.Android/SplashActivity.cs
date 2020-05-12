@@ -99,10 +99,8 @@ namespace SanteDBAndroid
                 typeof(SplashActivity).Assembly.GetName().Version,
                 typeof(SplashActivity).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion
             );
-
             CancellationTokenSource ctSource = new CancellationTokenSource();
             CancellationToken ct = ctSource.Token;
-
             Task startupWork = new Task(() =>
             {
                 if (AndroidApplicationContext.Current == null)

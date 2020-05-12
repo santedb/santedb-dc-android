@@ -91,6 +91,7 @@
     <Compile Include="Activity\AndroidActivityBase.cs" />
     <Compile Include="Services\AndroidBackupService.cs" />
     <Compile Include="Services\AndroidGeoLocationService.cs" />
+    <Compile Include="Services\AndroidOperatingSystemInfoService.cs" />
     <Compile Include="Services\MessageQueueService.cs" />
     <Compile Include="Services\AndroidNetworkInformationService.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
@@ -121,25 +122,25 @@
     <EmbeddedResource Include="Resources\Strings.sw.resx" />
   </ItemGroup>
   <ItemGroup>
-  	<!-- These get over the stupid NUGET "platform not supported" even though both Antlr and ExpressionEvaluator work perfectly fine on MonoAndroid -->
+    <!-- These get over the stupid NUGET "platform not supported" even though both Antlr and ExpressionEvaluator work perfectly fine on MonoAndroid -->
     <PackageReference Include="SanteDB.Cdss.Xml" ExcludeAssets="Compile">
       <Version>2.0.6</Version>
     </PackageReference>
-	<PackageReference Include="SanteDB.BI" ExcludeAssets="Compile">
+    <PackageReference Include="SanteDB.BI" ExcludeAssets="Compile">
       <Version>2.0.6</Version>
     </PackageReference>
-	<Reference Include="SanteDB.Cdss.Xml">
-		<HintPath>$(NuGetPackageRoot)\santedb.cdss.xml\2.0.6\lib\netstandard2.0\SanteDB.Cdss.Xml.dll</HintPath>
-	</Reference>
-	<Reference Include="SanteDB.Cdss.Xml">
-		<HintPath>$(NuGetPackageRoot)\santedb.bi\2.0.6\lib\netstandard2.0\SanteDB.BI.dll</HintPath>
-	</Reference>
-	<Reference Include="Antlr.Runtime">
-		<HintPath>$(NuGetPackageRoot)\antlr\3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
-	</Reference>
-	<Reference Include="ExpressionEvaluator">
-		<HintPath>$(NuGetPackageRoot)\expressionevaluator\2.0.4\lib\net40\ExpressionEvaluator.dll</HintPath>
-	</Reference>
+    <Reference Include="SanteDB.Cdss.Xml">
+      <HintPath>$(NuGetPackageRoot)\santedb.cdss.xml\2.0.6\lib\netstandard2.0\SanteDB.Cdss.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="SanteDB.Cdss.Xml">
+      <HintPath>$(NuGetPackageRoot)\santedb.bi\2.0.6\lib\netstandard2.0\SanteDB.BI.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr.Runtime">
+      <HintPath>$(NuGetPackageRoot)\antlr\3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="ExpressionEvaluator">
+      <HintPath>$(NuGetPackageRoot)\expressionevaluator\2.0.4\lib\net40\ExpressionEvaluator.dll</HintPath>
+    </Reference>
     <PackageReference Include="SanteDB.DisconnectedClient.Ags">
       <Version>2.0.6</Version>
     </PackageReference>
