@@ -146,6 +146,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                     new TypeReferenceConfiguration(typeof(MemoryQueryPersistenceService)),
                     new TypeReferenceConfiguration(typeof(SimpleQueueFileProvider)),
                     new TypeReferenceConfiguration(typeof(SimplePatchService)),
+                    new TypeReferenceConfiguration(typeof(AuditDaemonService)),
                     new TypeReferenceConfiguration(typeof(AndroidBackupService)),
                     new TypeReferenceConfiguration(typeof(AndroidAppletManagerService)),
                     new TypeReferenceConfiguration(typeof(AppletBiRepository)),

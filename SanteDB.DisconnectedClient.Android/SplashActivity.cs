@@ -162,7 +162,7 @@ namespace SanteDBAndroid
                         {
 
                             if (!AndroidApplicationContext.StartTemporary(this, this.ApplicationContext))
-                                throw new InvalidOperationException("Cannot start temporary authentication pricipal");
+                                throw new InvalidOperationException("Cannot start temporary context");
 
                         }
                         catch (Exception e)
