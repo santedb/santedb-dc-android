@@ -120,15 +120,24 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 				{  "X-OIZMagic", ApplicationContext.Current.ExecutionUuid.ToString() }
 			};
 
-			if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
-				base.LoadUrl("http://127.0.0.1:9200/views/errors/404.html", unlockDictionary);
-			else if (uri.IsAbsoluteUri && uri.Host == "127.0.0.1" &&
-				uri.Port == 9200)
-				base.LoadUrl(url, unlockDictionary);
-			else if (!uri.IsAbsoluteUri)
-				base.LoadUrl(new Uri(new Uri("http://127.0.0.1:9200/"), uri.PathAndQuery).ToString(), unlockDictionary);
-			else
-				base.LoadUrl("http://127.0.0.1:9200/views/errors/404.html", unlockDictionary);
+            if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))
+                base.LoadUrl("http://127.0.0.1:9200/views/errors/404.html", unlockDictionary);
+            else if (uri.IsAbsoluteUri && uri.Host == "127.0.0.1" &&
+                uri.Port == 9200)
+                base.LoadUrl(url, unlockDictionary);
+            else if (!uri.IsAbsoluteUri)
+                base.LoadUrl(new Uri(new Uri("http://127.0.0.1:9200/"), uri.PathAndQuery).ToString(), unlockDictionary);
+            else
+            {
+                if (uri.Port == 9200)
+                    base.LoadUrl("http://127.0.0.1:9200/views/errors/404.html", unlockDictionary);
+                else
+                {
+                    // Chrome is not installed
+                    Intent i = new Intent(Intent.ActionView, A.Net.Uri.Parse(url));
+                    this.Context.StartActivity(i);
+                }
+            }
 		}
 
 	

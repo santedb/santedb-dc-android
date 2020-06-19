@@ -49,6 +49,7 @@ using SanteDB.Core.Services;
 using SanteDB.Core.Interfaces;
 using SanteDB.Core;
 using SanteDB.DisconnectedClient.Security;
+using System.Security.Cryptography;
 
 namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
 {
@@ -125,6 +126,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         /// <summary>
         /// Gets the online status
         /// </summary>
+        [Export]
+        [JavascriptInterface]
         public bool IsClinicalAvailable()
         {
             try
@@ -141,6 +144,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         /// <summary>
         /// Gets the online status
         /// </summary>
+        [Export]
+        [JavascriptInterface]
         public bool IsAdminAvailable()
         {
             try
@@ -502,6 +507,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                 String retVal = String.Empty;
                 var result = scanner.Scan().ContinueWith((o) => retVal = o.Result?.Text);
                 result.Wait();
+
+                // TODO: Send this to a barcode validator / parser
                 return retVal;
             }
             catch (Exception e)

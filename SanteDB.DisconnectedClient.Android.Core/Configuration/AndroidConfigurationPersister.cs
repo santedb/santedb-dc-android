@@ -60,6 +60,7 @@ using SanteDB.DisconnectedClient.Synchronization;
 using SanteDB.DisconnectedClient.Security.Session;
 using SanteDB.Core.Security.Audit;
 using SanteDB.DisconnectedClient.Security.Remote;
+using SanteDB.DisconnectedClient.Android.Core.Services.Barcoding;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Configuration
 {
@@ -156,7 +157,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                     new TypeReferenceConfiguration(typeof(AndroidGeoLocationService)),
                     new TypeReferenceConfiguration(typeof(AmiSecurityChallengeProvider)),
                     new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
-                    new TypeReferenceConfiguration(typeof(DefaultDataSigningService))
+                    new TypeReferenceConfiguration(typeof(DefaultDataSigningService)),
+                    new TypeReferenceConfiguration(typeof(QrBarcodeGenerator))
                 }
             };
 
@@ -206,14 +208,9 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
             {
                 TraceWriter = new List<TraceWriterConfiguration>() {
                     new TraceWriterConfiguration () {
-                        Filter = System.Diagnostics.Tracing.EventLevel.Error,
+                        Filter = System.Diagnostics.Tracing.EventLevel.Warning,
                         InitializationData = "SanteDB",
                         TraceWriter = typeof(FileTraceWriter)
-                    },
-                    new TraceWriterConfiguration () {
-                        Filter = System.Diagnostics.Tracing.EventLevel.LogAlways,
-                        InitializationData = "SanteDB",
-                        TraceWriter = typeof(AndroidLogTraceWriter)
                     }
                 }
             };

@@ -74,8 +74,12 @@ namespace SanteDB.DisconnectedClient.Android.Core
             Key = Guid.Parse("5248ea19-369d-4071-8947-413310872b7e"),
             Name = "org.santedb.disconnected_client.android"
         };
-        
-        
+
+        /// <summary>
+        /// Gets the host type
+        /// </summary>
+        public override SanteDBHostType HostType => SanteDBHostType.Client;
+
         /// <summary>
         /// Static CTOR bind to global handlers to log errors
         /// </summary>
@@ -90,7 +94,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     Tracer tracer = Tracer.GetTracer(typeof(AndroidApplicationContext));
                     tracer.TraceEvent(EventLevel.Critical, "Uncaught exception: {0}", e.ExceptionObject.ToString());
                 }
-                Console.WriteLine("AndroindApplicationContext::UncaughtException", e.ExceptionObject.ToString());
+                Console.WriteLine("AndroidApplicationContext::UncaughtException", e.ExceptionObject.ToString());
             };
             AndroidEnvironment.UnhandledExceptionRaiser += (s, e) =>
             {
@@ -99,7 +103,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     Tracer tracer = Tracer.GetTracer(typeof(AndroidApplicationContext));
                     tracer.TraceEvent(EventLevel.Critical, "Uncaught exception: {0}", e.Exception.ToString());
                 }
-                Console.WriteLine("AndroindApplicationContext::UncaughtException", e.Exception.ToString());
+                Console.WriteLine("AndroidApplicationContext::UncaughtException", e.Exception.ToString());
                 e.Handled = true;
             };
         }
@@ -182,7 +186,6 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     {
                         backupSvc.Restore(BackupMedia.Public);
                     }
-
                     // Ignore restoration
                     retVal.Configuration.GetSection<ApplicationServiceContextConfigurationSection>().AppSettings.Add(new AppSettingKeyValuePair()
                     {
