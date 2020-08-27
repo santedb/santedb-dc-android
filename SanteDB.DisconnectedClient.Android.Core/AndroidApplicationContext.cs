@@ -262,15 +262,16 @@ namespace SanteDB.DisconnectedClient.Android.Core
                         try
                         {
                             // If the DB File doesn't exist we have to clear the migrations
-                            if (!File.Exists(retVal.ConfigurationManager.GetConnectionString(retVal.Configuration.GetSection<DcDataConfigurationSection>().MainDataSourceConnectionStringName).Value))
+                            var dbPath = retVal.ConfigurationManager.GetConnectionString("santeDbData").GetComponent("dbfile");
+                            if (!File.Exists(dbPath))
                             {
-                                retVal.m_tracer.TraceWarning("Can't find the SanteDB database, will re-install all migrations");
+                                retVal.m_tracer.TraceWarning("Can't find the SanteDB database at {0}, will re-install all migrations",dbPath);
                                 retVal.Configuration.GetSection<DcDataConfigurationSection>().MigrationLog.Entry.Clear();
                             }
                             retVal.SetProgress(context.GetString(Resource.String.startup_data), 0.6f);
 
-                            DataMigrator migrator = new DataMigrator();
-                            migrator.Ensure();
+                            ConfigurationMigrator migrator = new ConfigurationMigrator();
+                            migrator.Ensure(true);
 
                         }
                         catch (Exception e)
@@ -343,7 +344,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
 
                 retVal.Context = context;
                 retVal.SetProgress(context.GetString(Resource.String.startup_setup), 0);
-                retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
+                //retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
                 ApplicationServiceContext.Current = ApplicationContext.Current = retVal ;
                 retVal.CurrentActivity = launcherActivity;
 
@@ -352,7 +353,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                 foreach (var tr in retVal.Configuration.GetSection<DiagnosticsConfigurationSection>().TraceWriter)
                     Tracer.AddWriter(Activator.CreateInstance(tr.TraceWriter, tr.Filter, tr.InitializationData) as TraceWriter, tr.Filter);
 
-                retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
+                //retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
 
                 AndroidApplicationContext.InstallAppletAssets(retVal);
                 retVal.Start();

@@ -33,6 +33,7 @@ using System.IO;
 using SanteDB.DisconnectedClient.Configuration;
 using SanteDB.DisconnectedClient.Services;
 using SanteDB.DisconnectedClient;
+using SanteDB.Core.Applets;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Services
 {
@@ -61,7 +62,28 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
                                         navigateAsset.Manifest.Info.Id,
                                         navigateAsset.Name);
 
-            return File.ReadAllBytes(itmPath);
+            if (navigateAsset.MimeType == "text/javascript" ||
+                        navigateAsset.MimeType == "text/css" ||
+                        navigateAsset.MimeType == "application/json" ||
+                        navigateAsset.MimeType == "text/xml")
+            {
+                var script = File.ReadAllText(itmPath);
+                return script;
+            }
+            else
+                using (MemoryStream response = new MemoryStream())
+                using (var fs = File.OpenRead(itmPath))
+                {
+                    int br = 8096;
+                    byte[] buffer = new byte[8096];
+                    while (br == 8096)
+                    {
+                        br = fs.Read(buffer, 0, 8096);
+                        response.Write(buffer, 0, br);
+                    }
+
+                    return response.ToArray();
+                }
         }
 
     }
