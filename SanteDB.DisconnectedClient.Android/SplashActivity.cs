@@ -79,7 +79,7 @@ namespace SanteDBAndroid
         /// </summary>
         private void OnProgressUpdated(Object sender, ApplicationProgressEventArgs e)
         {
-            //this.RunOnUiThread(() => this.FindViewById<TextView>(Resource.Id.txt_splash_info).Text = String.Format("{0} {1}", e.ProgressText, e.Progress > 0 ? String.Format("({0:0%})", e.Progress) : null));
+            this.RunOnUiThread(() => this.FindViewById<TextView>(Resource.Id.txt_splash_info).Text = String.Format("{0} {1}", e.ProgressText, e.Progress > 0 ? String.Format("({0:0%})", e.Progress) : null));
         }
 
         /// <summary>
@@ -121,10 +121,10 @@ namespace SanteDBAndroid
                         viewIntent.PutExtra("assetLink", "http://127.0.0.1:9200/");
                         this.StartActivity(viewIntent);
                     };
-                    if (AndroidApplicationContext.Current.GetService<AgsService>().IsRunning)
+                    if (AndroidApplicationContext.Current.IsRunning)
                         doStart();
                     else
-                        AndroidApplicationContext.Current.GetService<AgsService>().Started += (oo, oe) =>
+                        AndroidApplicationContext.Current.Started += (oo, oe) =>
                             doStart();
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -190,10 +190,10 @@ namespace SanteDBAndroid
                                 viewIntent.PutExtra("continueTo", typeof(SplashActivity).AssemblyQualifiedName);
                                 this.StartActivity(viewIntent);
                             };
-                            if (AndroidApplicationContext.Current.GetService<AgsService>().IsRunning)
+                            if (AndroidApplicationContext.Current.IsRunning)
                                 doStart();
                             else
-                                AndroidApplicationContext.Current.GetService<AgsService>().Started += (oo, oe) =>
+                                AndroidApplicationContext.Current.Started += (oo, oe) =>
                                     doStart();
                         }
                     }, TaskScheduler.Current);

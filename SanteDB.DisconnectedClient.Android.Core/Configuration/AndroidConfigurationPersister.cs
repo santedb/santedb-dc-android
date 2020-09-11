@@ -352,6 +352,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
         /// </summary>
         public SanteDBConfiguration Restore()
         {
+
             using (var lzs = new BZip2Stream(File.OpenRead(Path.ChangeExtension(this.m_configPath, "bak.bz2")), SharpCompress.Compressors.CompressionMode.Decompress, false))
             {
                 var retVal = SanteDBConfiguration.Load(lzs);

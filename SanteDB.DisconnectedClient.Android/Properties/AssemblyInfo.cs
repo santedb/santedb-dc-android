@@ -29,7 +29,7 @@ using Android.App;
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("SanteSuite Contributors")]
 [assembly: AssemblyProduct ("SanteDB Disconnected Client")]
-[assembly: AssemblyCopyright ("(C) 2015-2020 SanteSuite Contributors")]
+[assembly: AssemblyCopyright ("(C) 2015-2020 Fyfe Software Inc. and SanteSuite Contributors")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
@@ -37,7 +37,7 @@ using Android.App;
 // The form "{Major}.{Minor}.*" will automatically update the build and revision,
 // and "{Major}.{Minor}.{Build}.*" will update just the revision.
 
-[assembly: AssemblyVersion ("2.0.30.*")]
+[assembly: AssemblyVersion ("2.0.35.*")]
 [assembly: AssemblyInformationalVersion("Langley")]
 
 // The following attributes are used to specify the signing key for the assembly,
