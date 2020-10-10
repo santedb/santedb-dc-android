@@ -71,7 +71,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
         private static readonly SanteDB.Core.Model.Security.SecurityApplication c_application = new SanteDB.Core.Model.Security.SecurityApplication()
         {
             ApplicationSecret = "C5B645B7D30A4E7E81A1C3D8B0E28F4C",
-            Key = Guid.Parse("5248ea19-369d-4071-8947-413310872b7e"),
+            Key = Guid.Parse("a0fdceb2-a2d3-11ea-ae5e-00155d4f0905"),
             Name = "org.santedb.disconnected_client.android"
         };
 
@@ -285,6 +285,8 @@ namespace SanteDB.DisconnectedClient.Android.Core
                         }
 
                     // Start daemons
+                    retVal.SetProgress(context.GetString(Resource.String.startup), 0.8f);
+
                     ApplicationContext.Current.GetService<IUpdateManager>().AutoUpdate();
                     retVal.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o => { retVal.Start(); }, null);
 
@@ -356,6 +358,9 @@ namespace SanteDB.DisconnectedClient.Android.Core
                 //retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
 
                 AndroidApplicationContext.InstallAppletAssets(retVal);
+                // Start daemons
+                retVal.SetProgress(context.GetString(Resource.String.startup), 0.8f);
+
                 retVal.Start();
                 return true;
             }

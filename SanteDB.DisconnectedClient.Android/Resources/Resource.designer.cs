@@ -45,6 +45,7 @@ namespace SanteDBAndroid
 			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.err_token_NotYetValid = global::SanteDBAndroid.Resource.String.err_token_NotYetValid;
 			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.err_token_TokenExpired = global::SanteDBAndroid.Resource.String.err_token_TokenExpired;
 			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.library_name = global::SanteDBAndroid.Resource.String.library_name;
+			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.startup = global::SanteDBAndroid.Resource.String.startup;
 			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.startup_configuration = global::SanteDBAndroid.Resource.String.startup_configuration;
 			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.startup_data = global::SanteDBAndroid.Resource.String.startup_data;
 			global::SanteDB.DisconnectedClient.Android.Core.Resource.String.startup_setup = global::SanteDBAndroid.Resource.String.startup_setup;

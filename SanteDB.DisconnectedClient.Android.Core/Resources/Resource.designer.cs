@@ -124,16 +124,19 @@ namespace SanteDB.DisconnectedClient.Android.Core
 			public static int library_name = 2130903055;
 			
 			// aapt resource value: 0x7F030010
-			public static int startup_configuration = 2130903056;
+			public static int startup = 2130903056;
 			
 			// aapt resource value: 0x7F030011
-			public static int startup_data = 2130903057;
+			public static int startup_configuration = 2130903057;
 			
 			// aapt resource value: 0x7F030012
-			public static int startup_setup = 2130903058;
+			public static int startup_data = 2130903058;
 			
 			// aapt resource value: 0x7F030013
-			public static int startup_update = 2130903059;
+			public static int startup_setup = 2130903059;
+			
+			// aapt resource value: 0x7F030014
+			public static int startup_update = 2130903060;
 			
 			static String()
 			{

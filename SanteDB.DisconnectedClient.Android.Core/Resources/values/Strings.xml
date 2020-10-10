@@ -43,5 +43,6 @@
   <string name="startup_data">Applying Database Changes</string>
   <string name="startup_update">Applying Updates</string>
   <string name="startup_setup">Preparing initial configuration</string>
+  <string name="startup">Starting Up</string>
 
 </resources>

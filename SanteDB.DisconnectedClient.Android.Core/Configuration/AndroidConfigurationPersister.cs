@@ -158,7 +158,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.Configuration
                     new TypeReferenceConfiguration(typeof(AmiSecurityChallengeProvider)),
                     new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
                     new TypeReferenceConfiguration(typeof(DefaultDataSigningService)),
-                    new TypeReferenceConfiguration(typeof(QrBarcodeGenerator))
+                    new TypeReferenceConfiguration(typeof(QrBarcodeGenerator)),
+                    new TypeReferenceConfiguration(typeof(JwsResourcePointerService))
                 }
             };
 
