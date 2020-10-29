@@ -136,16 +136,16 @@
   <ItemGroup>
     <!-- These get over the stupid NUGET "platform not supported" even though both Antlr and ExpressionEvaluator work perfectly fine on MonoAndroid -->
     <PackageReference Include="SanteDB.Cdss.Xml" ExcludeAssets="Compile">
-      <Version>2.0.43</Version>
+      <Version>2.0.45</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.BI" ExcludeAssets="Compile">
-      <Version>2.0.43</Version>
+      <Version>2.0.45</Version>
     </PackageReference>
     <Reference Include="SanteDB.Cdss.Xml">
-      <HintPath>$(NuGetPackageRoot)\santedb.cdss.xml\2.0.43\lib\netstandard2.0\SanteDB.Cdss.Xml.dll</HintPath>
+      <HintPath>$(NuGetPackageRoot)\santedb.cdss.xml\2.0.45\lib\netstandard2.0\SanteDB.Cdss.Xml.dll</HintPath>
     </Reference>
     <Reference Include="SanteDB.Cdss.Xml">
-      <HintPath>$(NuGetPackageRoot)\santedb.bi\2.0.43\lib\netstandard2.0\SanteDB.BI.dll</HintPath>
+      <HintPath>$(NuGetPackageRoot)\santedb.bi\2.0.45\lib\netstandard2.0\SanteDB.BI.dll</HintPath>
     </Reference>
     <Reference Include="Antlr.Runtime">
       <HintPath>$(NuGetPackageRoot)\antlr\3.5.0.2\lib\Antlr3.Runtime.dll</HintPath>
@@ -154,13 +154,13 @@
       <HintPath>$(NuGetPackageRoot)\expressionevaluator\2.0.4\lib\net40\ExpressionEvaluator.dll</HintPath>
     </Reference>
     <PackageReference Include="SanteDB.DisconnectedClient.Ags">
-      <Version>2.0.43</Version>
+      <Version>2.0.45</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient">
-      <Version>2.0.43</Version>
+      <Version>2.0.45</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.SQLite">
-      <Version>2.0.43</Version>
+      <Version>2.0.45</Version>
     </PackageReference>
     <PackageReference Include="ZXing.Net.Mobile">
       <Version>2.4.1</Version>
