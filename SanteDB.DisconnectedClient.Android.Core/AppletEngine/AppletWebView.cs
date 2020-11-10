@@ -90,6 +90,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			this.Settings.SetSupportMultipleWindows(false);
             this.Settings.JavaScriptCanOpenWindowsAutomatically = false;
             this.Settings.DomStorageEnabled = true;
+            this.Settings.SaveFormData = false;
+            this.Settings.SavePassword = false;
             
 			if (A.OS.Build.VERSION.SdkInt >= A.OS.BuildVersionCodes.Kitkat)
 			{
@@ -117,7 +119,8 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine
 			Uri uri = null;
 			var unlockDictionary = new Dictionary<String, String>()
 			{
-				{  "X-OIZMagic", ApplicationContext.Current.ExecutionUuid.ToString() }
+				{  "X-OIZMagic", ApplicationContext.Current.ExecutionUuid.ToString() },
+				{  "X-SDBMagic", ApplicationContext.Current.ExecutionUuid.ToString() }
 			};
 
             if (!Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out uri))

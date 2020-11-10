@@ -50,24 +50,24 @@ namespace SanteDB.DisconnectedClient.Android.Core.Activities
             else
             {
                 this.m_permissionEvent.Reset();
-                String permissionString = String.Empty;
+                String[] permissionString = null;
                 switch (permission)
                 {
                     case PermissionType.FileSystem:
-                        permissionString = A.Manifest.Permission.WriteExternalStorage;
+                        permissionString = new string[] { A.Manifest.Permission.ReadExternalStorage, A.Manifest.Permission.WriteExternalStorage };
                         break;
                     case PermissionType.GeoLocation:
-                        permissionString = A.Manifest.Permission.AccessCoarseLocation;
+                        permissionString = new String[] { A.Manifest.Permission.AccessCoarseLocation, A.Manifest.Permission.AccessFineLocation };
                         break;
                     case PermissionType.Camera:
-                        permissionString = A.Manifest.Permission.Camera;
+                        permissionString = new String[] { A.Manifest.Permission.Camera };
                         break;
                     default:
                         return false;
                 }
-                this.RequestPermissions(new string[] { permissionString }, 0);
+                this.RequestPermissions(permissionString, 0);
                 this.m_permissionEvent.WaitOne();
-                return this.CheckSelfPermission(permissionString) == A.Content.PM.Permission.Granted;
+                return permissionString.Min(a=> this.CheckSelfPermission(a) == A.Content.PM.Permission.Granted);
             }
         }
 
