@@ -50,6 +50,7 @@ using SanteDB.Core.Interfaces;
 using SanteDB.Core;
 using SanteDB.DisconnectedClient.Security;
 using System.Security.Cryptography;
+using Android.Print;
 
 namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
 {
@@ -83,6 +84,31 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             ApplicationContext.ProgressChanged += (o, e) => this.m_applicationStatus = new KeyValuePair<string, float>(e.ProgressText, e.Progress);
             this.m_context = context;
             this.m_view = view;
+        }
+
+        /// <summary>
+        /// Prints the current view
+        /// </summary>
+        [Export]
+        [JavascriptInterface]
+        public void Print()
+        {
+            var tickleService = ApplicationServiceContext.Current.GetService<ITickleService>();
+
+            PrintManager printManager = (PrintManager)this.m_context.GetSystemService(Context.PrintService);
+            PrintDocumentAdapter printAdapter = this.m_view.CreatePrintDocumentAdapter($"SanteDBPrint-{DateTime.Now.ToString("o")}");
+            PrintAttributes.Builder builder = new PrintAttributes.Builder();
+            builder.SetMediaSize(PrintAttributes.MediaSize.IsoA4);
+            PrintJob printJob = printManager.Print("SanteDB Print Job", printAdapter, builder.Build());
+
+            if (printJob.IsCompleted)
+            {
+                tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.success")));
+            }
+            else if (printJob.IsFailed)
+            {
+                tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.fail")));
+            }
         }
 
         /// <summary>
