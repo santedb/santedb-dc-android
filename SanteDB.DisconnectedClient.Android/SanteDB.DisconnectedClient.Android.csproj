@@ -250,5 +250,4 @@
   <ItemGroup>
     <Folder Include="Assets\Applets\" />
   </ItemGroup>
-  
 </Project>

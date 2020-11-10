@@ -19,7 +19,7 @@
  - Date: 2017-9-1
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="2.0.39" package="org.santedb.mobile" android:installLocation="auto">
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="28" />
+	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="29" />
 	<uses-permission android:name="android.permission.STATUS_BAR" />
 	<uses-permission android:name="android.permission.REBOOT" />
 	<uses-permission android:name="android.permission.INTERNET" />
