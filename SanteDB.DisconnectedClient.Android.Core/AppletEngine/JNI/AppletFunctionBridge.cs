@@ -95,19 +95,27 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         {
             var tickleService = ApplicationServiceContext.Current.GetService<ITickleService>();
 
-            PrintManager printManager = (PrintManager)this.m_context.GetSystemService(Context.PrintService);
-            PrintDocumentAdapter printAdapter = this.m_view.CreatePrintDocumentAdapter($"SanteDBPrint-{DateTime.Now.ToString("o")}");
-            PrintAttributes.Builder builder = new PrintAttributes.Builder();
-            builder.SetMediaSize(PrintAttributes.MediaSize.IsoA4);
-            PrintJob printJob = printManager.Print("SanteDB Print Job", printAdapter, builder.Build());
+            try
+            {
 
-            if (printJob.IsCompleted)
-            {
-                tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.success")));
+                PrintManager printManager = (PrintManager)this.m_context.GetSystemService(Context.PrintService);
+                PrintDocumentAdapter printAdapter = this.m_view.CreatePrintDocumentAdapter($"SanteDBPrint-{DateTime.Now.ToString("o")}");
+                PrintAttributes.Builder builder = new PrintAttributes.Builder();
+                builder.SetMediaSize(PrintAttributes.MediaSize.IsoA4);
+                PrintJob printJob = printManager.Print("SanteDB Print Job", printAdapter, builder.Build());
+
+                if (printJob.IsCompleted)
+                {
+                    tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.success")));
+                }
+                else if (printJob.IsFailed)
+                {
+                    tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.fail")));
+                }
             }
-            else if (printJob.IsFailed)
-            {
+            catch(Exception e) { 
                 tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.fail")));
+                this.m_tracer.TraceError("Error Printing: {0}", e);
             }
         }
 
