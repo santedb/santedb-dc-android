@@ -93,30 +93,35 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         [JavascriptInterface]
         public void Print()
         {
-            var tickleService = ApplicationServiceContext.Current.GetService<ITickleService>();
-
-            try
+            Application.SynchronizationContext.Post(_ =>
             {
+                var tickleService = ApplicationServiceContext.Current.GetService<ITickleService>();
 
-                PrintManager printManager = (PrintManager)this.m_context.GetSystemService(Context.PrintService);
-                PrintDocumentAdapter printAdapter = this.m_view.CreatePrintDocumentAdapter($"SanteDBPrint-{DateTime.Now.ToString("o")}");
-                PrintAttributes.Builder builder = new PrintAttributes.Builder();
-                builder.SetMediaSize(PrintAttributes.MediaSize.IsoA4);
-                PrintJob printJob = printManager.Print("SanteDB Print Job", printAdapter, builder.Build());
-
-                if (printJob.IsCompleted)
+                try
                 {
-                    tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.success")));
+
+                    PrintManager printManager = (PrintManager)this.m_context.GetSystemService(Context.PrintService);
+                    PrintDocumentAdapter printAdapter = this.m_view.CreatePrintDocumentAdapter($"SanteDBPrint-{DateTime.Now.ToString("o")}");
+                    PrintAttributes.Builder builder = new PrintAttributes.Builder();
+                    builder.SetMediaSize(PrintAttributes.MediaSize.IsoA4);
+                    PrintJob printJob = printManager.Print("SanteDB Print Job", printAdapter, builder.Build());
+
+                    if (printJob.IsCompleted)
+                    {
+                        tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.success")));
+                    }
+                    else if (printJob.IsFailed)
+                    {
+                        tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.fail")));
+                    }
                 }
-                else if (printJob.IsFailed)
+                catch (Exception e)
                 {
                     tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.fail")));
+                    this.m_tracer.TraceError("Error Printing: {0}", e);
                 }
-            }
-            catch(Exception e) { 
-                tickleService.SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Information, this.GetString("org.santedb.core.print.fail")));
-                this.m_tracer.TraceError("Error Printing: {0}", e);
-            }
+            }, null);
+
         }
 
         /// <summary>
@@ -204,7 +209,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             {
                 return String.Format("[\"{0}\",{1}]", this.m_applicationStatus.Key, this.m_applicationStatus.Value);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting app status: {0}", e);
                 return String.Empty;
@@ -250,7 +255,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             {
                 return AndroidApplicationContext.Current.GetService<IAppletManagerService>().Applets.GetTemplateDefinition(templateId)?.Form;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting template {0}: {1}", templateId, e);
                 return String.Empty;
@@ -288,12 +293,12 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             {
                 return $"[{String.Join(",", ApplicationContext.Current.GetService<IAppletManagerService>().Applets.SelectMany(o => o.Templates).Where(o => o.Public).Select(o => $"\"{o.Mnemonic}\""))}]";
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting template list : {0}", e);
                 return String.Empty;
             }
-}
+        }
 
 
         /// <summary>
@@ -344,7 +349,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             {
                 return (this.m_view as AppletWebView).ThreadSafeTitle;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting asset title: {0}", e);
                 return String.Empty;
@@ -366,7 +371,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                 return String.Format("{0} ({1})", this.m_appAssembly.GetName().Version,
                     this.m_appAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting application version: {0}", e);
                 return String.Empty;
@@ -401,7 +406,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                 else
                     return ApplicationContext.Current.GetService(serviceType)?.GetType().Name;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting service {0} : {1}", serviceName, e);
                 return String.Empty;
@@ -419,7 +424,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
 
                 return networkInformationService.IsNetworkAvailable.ToString();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error getting network status: {0}", e);
                 return String.Empty;
@@ -443,10 +448,10 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                     this.m_view.LoadUrl(String.Format("app://santedb.org/applet/{0}/", appletId));
                 }, null);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error navigating to {0} : {1}", appletId, e);
-                
+
             }
         }
 
@@ -510,10 +515,10 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                     ApplicationContext.Current.Stop();
                     AppletCollection.ClearCaches();
                     ApplicationContext.Current.Exit();
-                //(this.m_context as Activity).Finish();
-            }, null);
+                    //(this.m_context as Activity).Finish();
+                }, null);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("Error closing application: {0}", e);
             }
@@ -584,7 +589,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                     return sw.ToString();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 this.m_tracer.TraceError("error getting strings for {0}: {1}", locale, e);
                 return String.Empty;
