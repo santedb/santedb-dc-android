@@ -7,6 +7,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.DisconnectedClient.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanteDB.DisconnectedClient.Android.Core", "SanteDB.DisconnectedClient.Android.Core\SanteDB.DisconnectedClient.Android.Core.csproj", "{00EE5306-AAE5-4145-B430-6BA3FB07054B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Resources", "Solution Resources", "{E7A2D001-BF75-4365-8F5F-C3EBB4E22270}"
+	ProjectSection(SolutionItems) = preProject
+		Privacy Policy.md = Privacy Policy.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
