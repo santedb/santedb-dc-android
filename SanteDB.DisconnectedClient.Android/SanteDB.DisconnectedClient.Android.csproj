@@ -88,10 +88,10 @@
     <AndroidEnableMultiDex>False</AndroidEnableMultiDex>
     <EnableProguard>False</EnableProguard>
     <AndroidLinkSkip>System.Xml.Linq;mscorlib;System</AndroidLinkSkip>
-    <AndroidSupportedAbis>armeabi-v7a;x86;arm64-v8a</AndroidSupportedAbis>
+    <AndroidSupportedAbis>armeabi-v7a;x86;x86_64;arm64-v8a</AndroidSupportedAbis>
     <AndroidStoreUncompressedFileExtensions>.pak</AndroidStoreUncompressedFileExtensions>
     <DebugSymbols>False</DebugSymbols>
-    <JavaMaximumHeapSize>512m</JavaMaximumHeapSize>
+    <JavaMaximumHeapSize>1024m</JavaMaximumHeapSize>
     <UseShortFileNames>True</UseShortFileNames>
     <IntermediateOutputPath>C:\temp\santedb-dc-android</IntermediateOutputPath>
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>

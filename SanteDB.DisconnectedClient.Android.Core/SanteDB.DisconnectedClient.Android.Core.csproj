@@ -90,6 +90,7 @@
     <Reference Include="Mono.Android.Export" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AndroidApplicationInfo.cs" />
     <Compile Include="AppletEngine\JNI\JniUtil.cs" />
     <Compile Include="Configuration\Migrations\ResourcePointerMigration.cs" />
     <Compile Include="Diagnostics\AndroidLogTraceWriter.cs" />

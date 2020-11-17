@@ -70,9 +70,9 @@ namespace SanteDB.DisconnectedClient.Android.Core
         // The application
         private static readonly SanteDB.Core.Model.Security.SecurityApplication c_application = new SanteDB.Core.Model.Security.SecurityApplication()
         {
-            ApplicationSecret = "C5B645B7D30A4E7E81A1C3D8B0E28F4C",
-            Key = Guid.Parse("a0fdceb2-a2d3-11ea-ae5e-00155d4f0905"),
-            Name = "org.santedb.disconnected_client.android"
+            ApplicationSecret = AndroidApplicationInfo.DefaultSecret,
+            Key = Guid.Parse(AndroidApplicationInfo.ApplicationKey),
+            Name = AndroidApplicationInfo.ApplicationId
         };
 
         /// <summary>
