@@ -14,7 +14,7 @@
     <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
     <AssemblyName>SanteDB.DisconnectedClient.Android.Core</AssemblyName>
     <TargetFrameworkVersion>v10.0</TargetFrameworkVersion>
-	<PackageTargetFallback>$(PackageTargetFallback);net40</PackageTargetFallback>
+    <PackageTargetFallback>$(PackageTargetFallback);net40</PackageTargetFallback>
     <AndroidLinkMode>None</AndroidLinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -27,7 +27,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.0</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>false</Optimize>
@@ -36,14 +36,14 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <RunCodeAnalysis>false</RunCodeAnalysis>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.0</LangVersion>
     <DefineConstants>DEV_MODE;NOCRYPT</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'SignedRelease|AnyCPU'">
     <OutputPath>bin\SignedRelease\</OutputPath>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <DefineConstants>NOCRYPT</DefineConstants>
@@ -55,7 +55,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -64,7 +64,7 @@
     <DefineConstants>NOCRYPT</DefineConstants>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -74,7 +74,7 @@
     <DebugType>portable</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <LangVersion>6</LangVersion>
+    <LangVersion>7.0</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -137,11 +137,12 @@
   </ItemGroup>
   <ItemGroup>
     <!-- These get over the stupid NUGET "platform not supported" even though both Antlr and ExpressionEvaluator work perfectly fine on MonoAndroid -->
-    <PackageReference Include="SanteDB.Cdss.Xml" ExcludeAssets="Compile">
-      <Version>2.0.58</Version>
+    <PackageReference Include="SanteDB.BI">
+      <Version>2.0.59</Version>
     </PackageReference>
-    <PackageReference Include="SanteDB.BI" ExcludeAssets="Compile">
-      <Version>2.0.58</Version>
+    <PackageReference Include="SanteDB.Cdss.Xml" ExcludeAssets="Compile">
+      <Version>2.0.59</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <Reference Include="SanteDB.Cdss.Xml">
       <HintPath>$(NuGetPackageRoot)\santedb.cdss.xml\2.0.58\lib\netstandard2.0\SanteDB.Cdss.Xml.dll</HintPath>
@@ -156,13 +157,13 @@
       <HintPath>$(NuGetPackageRoot)\expressionevaluator\2.0.4\lib\net40\ExpressionEvaluator.dll</HintPath>
     </Reference>
     <PackageReference Include="SanteDB.DisconnectedClient.Ags">
-      <Version>2.0.58</Version>
+      <Version>2.0.59</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient">
-      <Version>2.0.58</Version>
+      <Version>2.0.59</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.SQLite">
-      <Version>2.0.58</Version>
+      <Version>2.0.59</Version>
     </PackageReference>
     <PackageReference Include="ZXing.Net.Mobile">
       <Version>2.4.1</Version>

@@ -51,6 +51,9 @@ using SanteDB.Core;
 using SanteDB.DisconnectedClient.Security;
 using System.Security.Cryptography;
 using Android.Print;
+using SanteDB.Core.Model.Serialization;
+using SanteDB.Core.Model.Query;
+using SanteDB.Core.Api.Services;
 
 namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
 {
@@ -525,6 +528,46 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         }
 
         /// <summary>
+        /// Share the specified image and text via MMS
+        /// </summary>
+        /// <remarks>
+        /// The <paramref name="imageUrl"/> can be an arbitrary resource available by HTTP get or 
+        /// a CDR object in the format: cdr://type/id?authority=X
+        /// </remarks>
+        [Export]
+        [JavascriptInterface]
+        public void SendBarcode(String toAddress, String message, String barcodeData)
+        {
+
+            try
+            {
+                // Fetch the image from stream URI
+                var barcodeService = ApplicationServiceContext.Current.GetService<IBarcodeProviderService>();
+                var fileDirectory = $"{A.OS.Environment.ExternalStorageDirectory.AbsolutePath}{Java.IO.File.PathSeparator}bcd";
+                if (!Directory.Exists(fileDirectory))
+                    Directory.CreateDirectory(fileDirectory);
+                else foreach (var f in Directory.GetFiles(fileDirectory, "*.png")) // clear out the files
+                        File.Delete(f);
+
+                var filePath = $"{fileDirectory}{Java.IO.File.PathSeparator}{Guid.NewGuid()}.png";
+                using (var fs = File.Create(filePath))
+                    barcodeService.Generate(barcodeData).CopyTo(fs);
+
+                var sendIntent = new Intent(Intent.ActionSend, A.Net.Uri.Parse(toAddress));
+                sendIntent.PutExtra(Intent.ExtraText, message);
+                sendIntent.PutExtra(Intent.ExtraStream, A.Net.Uri.FromFile(new Java.IO.File(filePath)));
+                sendIntent.SetType("image/*");
+                this.m_context.StartActivity(sendIntent);
+            }
+            catch (Exception e)
+            {
+                this.ShowToast(e.Message);
+                this.m_tracer.TraceError("Error sending MMS message - {0}", e);
+            }
+
+        }
+
+        /// <summary>
         /// Performs a barcode scan
         /// </summary>
         [Export]
@@ -543,9 +586,22 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
                     this.m_zxingInitialized = true;
                 }
                 var scanner = new ZXing.Mobile.MobileBarcodeScanner();
+                // TODO: Grab from the manifest
                 String retVal = String.Empty;
-                var result = scanner.Scan().ContinueWith((o) => retVal = o.Result?.Text);
-                result.Wait();
+                var result = scanner.Scan(new ZXing.Mobile.MobileBarcodeScanningOptions()
+                {
+                    AutoRotate = true,
+                    DisableAutofocus = false,
+                    TryHarder = true,
+                    TryInverted = true,
+                    UseNativeScanning = true
+                }).ContinueWith((o) => retVal = o.Result?.Text);
+
+                while (!result.IsCompleted)
+                {
+                    result.Wait(2000);
+                    scanner.AutoFocus();
+                }
 
                 // TODO: Send this to a barcode validator / parser
                 return retVal;

@@ -65,27 +65,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services.Barcoding
 
                 // Generate the pointer
                 var identityToken = pointerService.GeneratePointer(identifers);
-                // Now generate the token
-                var writer = new BarcodeWriter()
-                {
-                    Format = BarcodeFormat.QR_CODE,
-                    Options = new QrCodeEncodingOptions()
-                    {
-                        Width = 300,
-                        Height = 300,
-                        PureBarcode = true,
-                        Margin = 1
-
-                    }
-                };
-
-                using (var bmp = writer.Write(identityToken.ToString()))
-                {
-                    var retVal = new MemoryStream();
-                    bmp.Compress(A.Graphics.Bitmap.CompressFormat.Png, 30, retVal);
-                    retVal.Seek(0, SeekOrigin.Begin);
-                    return retVal;
-                }
+                return this.Generate(identityToken.ToString());
             }
             catch (Exception e)
             {
@@ -93,5 +73,32 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services.Barcoding
             }
         }
 
+        /// <summary>
+        /// Generate a barcode from raw data
+        /// </summary>
+        public Stream Generate(string rawData)
+        {
+            // Now generate the token
+            var writer = new BarcodeWriter()
+            {
+                Format = BarcodeFormat.QR_CODE,
+                Options = new QrCodeEncodingOptions()
+                {
+                    Width = 300,
+                    Height = 300,
+                    PureBarcode = true,
+                    Margin = 1
+
+                }
+            };
+
+            using (var bmp = writer.Write(rawData))
+            {
+                var retVal = new MemoryStream();
+                bmp.Compress(A.Graphics.Bitmap.CompressFormat.Png, 30, retVal);
+                retVal.Seek(0, SeekOrigin.Begin);
+                return retVal;
+            }
+        }
     }
 }
