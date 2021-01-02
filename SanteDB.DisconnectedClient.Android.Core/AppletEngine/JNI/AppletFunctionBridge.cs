@@ -54,6 +54,8 @@ using Android.Print;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Model.Query;
 using SanteDB.Core.Api.Services;
+using Android.OS;
+using Android.Support.V4.Content;
 
 namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
 {
@@ -230,7 +232,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         {
             try
             {
-                String logFileBase = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "log", logId);
+                String logFileBase = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "log", logId);
                 var email = new Intent(A.Content.Intent.ActionSend);
                 email.PutExtra(A.Content.Intent.ExtraEmail, new string[] { "medic@mohawkcollege.ca" });
                 email.PutExtra(A.Content.Intent.ExtraSubject, "Mobile Application Log File");
@@ -314,7 +316,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         {
             try
             {
-                String logFileBase = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "log");
+                String logFileBase = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "log");
                 List<String> files = new List<string>();
                 foreach (var f in Directory.GetFiles(logFileBase))
                     files.Add(Path.GetFileName(f));
@@ -530,10 +532,6 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
         /// <summary>
         /// Share the specified image and text via MMS
         /// </summary>
-        /// <remarks>
-        /// The <paramref name="imageUrl"/> can be an arbitrary resource available by HTTP get or 
-        /// a CDR object in the format: cdr://type/id?authority=X
-        /// </remarks>
         [Export]
         [JavascriptInterface]
         public void SendBarcode(String toAddress, String message, String barcodeData)
@@ -542,26 +540,46 @@ namespace SanteDB.DisconnectedClient.Android.Core.AppletEngine.JNI
             try
             {
                 // Fetch the image from stream URI
-                var barcodeService = ApplicationServiceContext.Current.GetService<IBarcodeProviderService>();
-                var fileDirectory = $"{A.OS.Environment.ExternalStorageDirectory.AbsolutePath}{Java.IO.File.PathSeparator}bcd";
-                if (!Directory.Exists(fileDirectory))
-                    Directory.CreateDirectory(fileDirectory);
-                else foreach (var f in Directory.GetFiles(fileDirectory, "*.png")) // clear out the files
-                        File.Delete(f);
+                var permService = ApplicationServiceContext.Current.GetService<IOperatingSystemSecurityService>();
+                if (permService.HasPermission(PermissionType.FileSystem) || permService.RequestPermission(PermissionType.FileSystem))
+                {
 
-                var filePath = $"{fileDirectory}{Java.IO.File.PathSeparator}{Guid.NewGuid()}.png";
-                using (var fs = File.Create(filePath))
-                    barcodeService.Generate(barcodeData).CopyTo(fs);
+                    var barcodeService = ApplicationServiceContext.Current.GetService<IBarcodeProviderService>();
+                    var filePath = this.m_context.ExternalCacheDir.AbsolutePath; //  A.App.Application.Context.GetExternalFilesDir(A.OS.Environment.DirectoryDcim).AbsolutePath;
+                    if (!System.IO.Directory.Exists(filePath))
+                        System.IO.Directory.CreateDirectory(filePath);
+                    filePath = Path.Combine(filePath, $"{Guid.NewGuid()}.sms.png");
 
-                var sendIntent = new Intent(Intent.ActionSend, A.Net.Uri.Parse(toAddress));
-                sendIntent.PutExtra(Intent.ExtraText, message);
-                sendIntent.PutExtra(Intent.ExtraStream, A.Net.Uri.FromFile(new Java.IO.File(filePath)));
-                sendIntent.SetType("image/*");
-                this.m_context.StartActivity(sendIntent);
+                    // TODO: Clean up this directory
+                    using (var fs = File.Create(filePath))
+                        barcodeService.Generate(barcodeData).CopyTo(fs);
+
+                    // Send message
+                    var defaultSmsPackageName = A.Provider.Telephony.Sms.GetDefaultSmsPackage(this.m_context);
+                    var sendIntent = new Intent(Intent.ActionSend);
+                    sendIntent.PutExtra("address", toAddress);
+                    sendIntent.PutExtra("sms_body", message);
+                    if(!String.IsNullOrEmpty(defaultSmsPackageName))
+                        sendIntent.SetPackage(defaultSmsPackageName);
+
+                    if((int)Build.VERSION.SdkInt < 24)
+                        sendIntent.PutExtra(Intent.ExtraStream, A.Net.Uri.FromFile(new Java.IO.File(filePath)));
+                    else
+                    {
+                        sendIntent.PutExtra(Intent.ExtraStream, FileProvider.GetUriForFile(Application.Context,
+                                    Application.Context.PackageName + ".fileprovider",
+                                    new Java.IO.File(filePath)));
+                    }
+                    sendIntent.SetType("image/png");
+                    this.m_context.StartActivity(sendIntent);
+                }
+                else
+                    throw new InvalidOperationException("Must grant permission to external storage for sharing barcodes to work");
+
             }
             catch (Exception e)
             {
-                this.ShowToast(e.Message);
+                ApplicationServiceContext.Current.GetService<ITickleService>().SendTickle(new Tickler.Tickle(Guid.Empty, Tickler.TickleType.Toast, e.Message));
                 this.m_tracer.TraceError("Error sending MMS message - {0}", e);
             }
 

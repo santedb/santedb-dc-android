@@ -32,7 +32,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Activities
                 switch (permission)
                 {
                     case PermissionType.FileSystem:
-                        return this.CheckSelfPermission(A.Manifest.Permission.WriteExternalStorage) == (int)A.Content.PM.Permission.Granted;
+                        return this.CheckSelfPermission(A.Manifest.Permission.WriteExternalStorage) == (int)A.Content.PM.Permission.Granted && this.CheckSelfPermission(A.Manifest.Permission.ReadExternalStorage) == (int)A.Content.PM.Permission.Granted;
                     case PermissionType.GeoLocation:
                         return this.CheckSelfPermission(A.Manifest.Permission.AccessCoarseLocation) == (int)A.Content.PM.Permission.Granted;
                     default:
