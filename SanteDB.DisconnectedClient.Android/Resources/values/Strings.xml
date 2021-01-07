@@ -33,6 +33,7 @@
   <string name="cancel">Cancel</string>
   <!-- Errors -->
 	<!-- Setup screen -->
+  <string name="confirm_force_launch">Service startup is taking longer than expected, would you like to continue to the login screen anyways?</string>
 	<string name="setup_title">Welcome to SanteDB!</string>
 	<string name="setup_subTitle">Before you can use SanteDB you need to configure it. First, you\'ll need to join this app to an SanteDB and setup some security controls.</string>
 	<string name="setup_title_sec">Security</string>

@@ -188,40 +188,40 @@
   <ItemGroup>
     <!-- These get over the stupid NUGET "platform not supported" even though both Antlr and ExpressionEvaluator work perfectly fine on MonoAndroid -->
     <PackageReference Include="SanteDB.BI">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Cdss.Xml">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="RestSrvr">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="Phonix">
       <Version>1.0.2</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Api">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Applets">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Model">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Model.AMI">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.Core.Model.RISI">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.Ags">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.SQLite">
-      <Version>2.0.59</Version>
+      <Version>2.0.60</Version>
     </PackageReference>
     <PackageReference Include="SQLite.Net-PCL.MEDIC">
       <Version>3.1.1</Version>

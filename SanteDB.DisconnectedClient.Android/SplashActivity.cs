@@ -48,6 +48,7 @@ using SanteDB.DisconnectedClient.Ags;
 using SanteDB.DisconnectedClient.Android.Core;
 using SanteDB.DisconnectedClient.Services;
 using SanteDB.DisconnectedClient.Android.Core.Activities;
+using SanteDB.Core.Services;
 
 namespace SanteDBAndroid
 {
@@ -91,6 +92,7 @@ namespace SanteDBAndroid
             
             base.OnCreate(savedInstanceState);
 
+            bool hasLaunched = false;
             this.SetContentView(Resource.Layout.Splash);
 
             SanteDB.DisconnectedClient.ApplicationContext.Current = null;
@@ -115,17 +117,27 @@ namespace SanteDBAndroid
                 {
                     Action doStart = () =>
                     {
+                        hasLaunched = true;
                         AndroidApplicationContext.ProgressChanged -= this.OnProgressUpdated;
                         Intent viewIntent = new Intent(this, typeof(AppletActivity));
                         var appletConfig = AndroidApplicationContext.Current.Configuration.GetSection<AppletConfigurationSection>();
                         viewIntent.PutExtra("assetLink", "http://127.0.0.1:9200/");
                         this.StartActivity(viewIntent);
                     };
-                    if (AndroidApplicationContext.Current.IsRunning)
+                    if (AndroidApplicationContext.Current.IsRunning || AndroidApplicationContext.Current.GetService<AgsService>().IsRunning)
                         doStart();
                     else
-                        AndroidApplicationContext.Current.Started += (oo, oe) =>
+                    {
+                        AndroidApplicationContext.Current.GetService<AgsService>().Started += (oo, oe) =>
                             doStart();
+
+                        // At most wait for 30 seconds for the view to launch
+                        AndroidApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(new TimeSpan(0, 0, 60), (oo) =>
+                        {
+                            if (!hasLaunched && AndroidApplicationContext.Current.Confirm(Resources.GetString(Resource.String.confirm_force_launch)))
+                                this.RunOnUiThread(() => doStart());
+                        }, null);
+                    }
                 }
             }, TaskScheduler.FromCurrentSynchronizationContext());
 
