@@ -147,10 +147,10 @@
       <Version>2.0.66</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient">
-      <Version>2.0.66.0</Version>
+      <Version>2.0.66.1</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.SQLite">
-      <Version>2.0.66</Version>
+      <Version>2.0.66.2</Version>
     </PackageReference>
     <PackageReference Include="ZXing.Net.Mobile">
       <Version>2.4.1</Version>

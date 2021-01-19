@@ -218,10 +218,10 @@
       <Version>2.0.66</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient">
-      <Version>2.0.66.0</Version>
+      <Version>2.0.66.1</Version>
     </PackageReference>
     <PackageReference Include="SanteDB.DisconnectedClient.SQLite">
-      <Version>2.0.66</Version>
+      <Version>2.0.66.2</Version>
     </PackageReference>
     <PackageReference Include="SQLite.Net-PCL.MEDIC">
       <Version>3.1.1</Version>
