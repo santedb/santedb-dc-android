@@ -55,6 +55,7 @@ using System.Collections.Generic;
 using SanteDB.DisconnectedClient.Configuration;
 using SanteDB.DisconnectedClient.Services;
 using SanteDB.DisconnectedClient.Configuration.Data;
+using SanteDB.Core.Interfaces;
 
 namespace SanteDB.DisconnectedClient.Android.Core
 {
@@ -132,9 +133,9 @@ namespace SanteDB.DisconnectedClient.Android.Core
             set
             {
                 if (value != this.m_currentActivity && this.m_currentActivity != null)
-                    this.RemoveServiceProvider(this.m_currentActivity);
+                    this.GetService<IServiceManager>().RemoveServiceProvider(this.m_currentActivity.GetType());
                 this.m_currentActivity = value;
-                this.AddServiceProvider(this.m_currentActivity);
+                this.GetService<IServiceManager>().AddServiceProvider(this.m_currentActivity);
             }
         }
 
@@ -176,7 +177,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                         else
                             throw;
                     }
-                    retVal.AddServiceProvider(typeof(AndroidBackupService));
+                    retVal.GetService<IServiceManager>().AddServiceProvider(typeof(AndroidBackupService));
 
                     // Is there a backup, and if so, does the user want to restore from that backup?
                     var backupSvc = retVal.GetService<IBackupService>();
@@ -507,13 +508,6 @@ namespace SanteDB.DisconnectedClient.Android.Core
             //evt.WaitOne();
         }
 
-        /// <summary>
-        /// Output performanc log info
-        /// </summary>
-        public override void PerformanceLog(string className, string methodName, string tagName, TimeSpan counter)
-        {
-            Log.Info("SanteDB_PERF", $"{className}.{methodName}@{tagName} - {counter}");
-        }
 
         #endregion implemented abstract members of ApplicationContext
 
