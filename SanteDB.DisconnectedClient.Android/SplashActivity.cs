@@ -132,8 +132,9 @@ namespace SanteDBAndroid
                             doStart();
 
                         // At most wait for 30 seconds for the view to launch
-                        AndroidApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem(new TimeSpan(0, 0, 60), (oo) =>
+                        AndroidApplicationContext.Current.GetService<IThreadPoolService>().QueueUserWorkItem((oo) =>
                         {
+                            Thread.Sleep(30000);
                             if (!hasLaunched && AndroidApplicationContext.Current.Confirm(Resources.GetString(Resource.String.confirm_force_launch)))
                                 this.RunOnUiThread(() => doStart());
                         }, null);

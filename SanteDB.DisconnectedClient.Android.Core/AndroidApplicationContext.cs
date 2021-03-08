@@ -65,6 +65,8 @@ namespace SanteDB.DisconnectedClient.Android.Core
     public class AndroidApplicationContext : ApplicationContext
     {
 
+        private SanteDBHostType m_hostType = SanteDBHostType.Client;
+
         // Current activity
         private A.Content.Context m_currentActivity;
 
@@ -79,7 +81,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
         /// <summary>
         /// Gets the host type
         /// </summary>
-        public override SanteDBHostType HostType => SanteDBHostType.Client;
+        public override SanteDBHostType HostType => this.m_hostType;
 
         /// <summary>
         /// Static CTOR bind to global handlers to log errors
@@ -147,7 +149,6 @@ namespace SanteDB.DisconnectedClient.Android.Core
             var retVal = new AndroidApplicationContext();
             retVal.Context = context;
             retVal.AndroidApplication = application;
-
             // Not configured
             if (!retVal.ConfigurationPersister.IsConfigured)
             {
@@ -289,7 +290,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                     retVal.SetProgress(context.GetString(Resource.String.startup), 0.8f);
 
                     ApplicationContext.Current.GetService<IUpdateManager>().AutoUpdate();
-                    retVal.GetService<IThreadPoolService>().QueueNonPooledWorkItem(o => { retVal.Start(); }, null);
+                    retVal.GetService<IThreadPoolService>().QueueUserWorkItem(o => { retVal.Start(); }, null);
 
                 }
                 catch (Exception e)
@@ -344,7 +345,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
             try
             {
                 var retVal = new AndroidApplicationContext();
-
+                retVal.m_hostType = SanteDBHostType.Configuration;
                 retVal.Context = context;
                 retVal.SetProgress(context.GetString(Resource.String.startup_setup), 0);
                 //retVal.ThreadDefaultPrincipal = AuthenticationContext.SystemPrincipal;
@@ -530,14 +531,5 @@ namespace SanteDB.DisconnectedClient.Android.Core
 #endif
         }
 
-        /// <summary>
-        /// Get all types from the app domain
-        /// </summary>
-        public override IEnumerable<Type> GetAllTypes()
-        {
-            return AppDomain.CurrentDomain.GetAssemblies()
-                .Where(a => !a.IsDynamic)
-                .SelectMany(a => a.ExportedTypes);
-        }
     }
 }

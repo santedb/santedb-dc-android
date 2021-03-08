@@ -17,7 +17,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Services
     /// <summary>
     /// Operating system information service
     /// </summary>
-    public class AndroidOperatingSystemInfoService : IOperatingSystemInfoService
+    public class AndroidOperatingSystemInfoService : SanteDB.Core.Services.IOperatingSystemInfoService
     {
         /// <summary>
         /// Gets the current version of the operatin
