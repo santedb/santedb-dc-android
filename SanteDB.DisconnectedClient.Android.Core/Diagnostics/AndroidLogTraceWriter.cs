@@ -20,6 +20,7 @@
 using Android.Util;
 using SanteDB.Core.Diagnostics;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
 
 namespace SanteDB.DisconnectedClient.Android.Core.Diagnostics
@@ -34,7 +35,7 @@ namespace SanteDB.DisconnectedClient.Android.Core.Diagnostics
 		/// </summary>
 		/// <param name="filter">The filter.</param>
 		/// <param name="initializationData">The initialization data.</param>
-		public AndroidLogTraceWriter(EventLevel filter, string initializationData) : base(filter, initializationData)
+		public AndroidLogTraceWriter(EventLevel filter, string initializationData, IDictionary<String, EventLevel> settings) : base(filter, initializationData, settings)
 		{
 		}
 

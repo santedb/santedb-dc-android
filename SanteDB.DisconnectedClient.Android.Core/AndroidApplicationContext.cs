@@ -297,7 +297,7 @@ namespace SanteDB.DisconnectedClient.Android.Core
                 {
                     retVal.m_tracer?.TraceError(e.ToString());
                     //ApplicationContext.Current = null;
-                    AuthenticationContext.Current = new AuthenticationContext(AuthenticationContext.SystemPrincipal);
+                    AuthenticationContext.EnterSystemContext();
                     throw;
                 }
 

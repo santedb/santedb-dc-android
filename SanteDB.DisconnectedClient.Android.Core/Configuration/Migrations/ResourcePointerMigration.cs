@@ -10,7 +10,6 @@ using Android.Runtime;
 using Android.Views;
 using Android.Widget;
 using SanteDB.Core;
-using SanteDB.Core.Api.Services;
 using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.DisconnectedClient.Android.Core.Services.Barcoding;

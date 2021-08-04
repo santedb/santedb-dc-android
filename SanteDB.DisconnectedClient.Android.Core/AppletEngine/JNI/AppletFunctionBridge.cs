@@ -53,7 +53,6 @@ using System.Security.Cryptography;
 using Android.Print;
 using SanteDB.Core.Model.Serialization;
 using SanteDB.Core.Model.Query;
-using SanteDB.Core.Api.Services;
 using Android.OS;
 using Android.Support.V4.Content;
 
