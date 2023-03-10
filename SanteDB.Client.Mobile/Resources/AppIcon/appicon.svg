@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px"
+	 viewBox="0 0 108 108" style="enable-background:new 0 0 108 108;">
+<style type="text/css">
+	.b{fill:url(#bgg);}
+</style>
+<defs>
+	<linearGradient id="bgg" gradientUnits="userSpaceOnUse" x1="-50" y1="-50" x2="108" y2="108">
+			<stop  offset="0" style="stop-color:#003399"/>
+			<stop  offset="1" style="stop-color:#002060"/>
+    </linearGradient>
+</defs>
+<g id="Background">
+	<rect id="background-rect" y="0" class="b" width="108" height="108"/>
+</g>
+</svg>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 27.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1024 1024" style="enable-background:new 0 0 1024 1024;" xml:space="preserve">
+<style type="text/css">
+	.st0{filter:url(#BackgroundFilter);}
+	.st1{fill:url(#SVGID_1_);}
+	.st2{fill:url(#SVGID_00000092447158243309989270000008214018939469246094_);}
+	.st3{fill:url(#SVGID_00000047060289098409652650000012711279265763984825_);}
+	.st4{fill:url(#SVGID_00000145023675609273879700000016434796579228336545_);}
+	.st5{fill:url(#SVGID_00000173141503830750609600000006779117111080532902_);}
+	.st6{fill:url(#SVGID_00000101085610855881402920000000542909373100220860_);}
+	.st7{fill:url(#SVGID_00000015343154902385573860000018348988653832638353_);}
+	.st8{filter:url(#ForegroundFilter);}
+</style>
+<filter  filterUnits="objectBoundingBox" id="BackgroundFilter">
+	<feTurbulence in="SourceGraphic"  baseFrequency="1,1" numOctaves="2" result="turbulence" seed="379" stitchTiles="noStitch" type="fractalNoise">
+		</feTurbulence>
+	<feComposite  in="turbulence" in2="SourceGraphic" k1="0.6" k2="0" k3="1" k4="0" operator="arithmetic"></feComposite>
+</filter>
+<filter  filterUnits="objectBoundingBox" id="ForegroundFilter">
+	<feDiffuseLighting  in="SourceGraphic" lighting-color="white" result="light">
+		<fePointLight  x="0" y="0" z="60" />
+	</feDiffuseLighting>
+	<feComposite  in="light" in2="SourceGraphic" k1="0.4" k2="0" k3="0.8" k4="0" operator="arithmetic" result="lightOutput" />
+	<feTurbulence in="SourceGraphic"  baseFrequency="1,1" numOctaves="2" result="turbulence" seed="379" stitchTiles="noStitch" type="fractalNoise" />
+	<feComposite  in="turbulence" in2="SourceGraphic" k1="0.6" k2="0" k3="1" k4="0" operator="arithmetic" result="noiseOutput" />
+	<feComposite in="noiseOutput" in2="lightOutput" operator="arithmetic" k1="0" k2="0.6" k3="0.4" k4="0" />
+</filter>
+
+<g id="Background">
+	<g class="st0">
+		<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="149.9613" y1="149.9613" x2="874.0387" y2="874.0386">
+			<stop  offset="0" style="stop-color:#003399"/>
+			<stop  offset="1" style="stop-color:#002060"/>
+		</linearGradient>
+		<polygon class="st1" points="1024,402 777.6,402 951.8,227.7 796.3,72.2 622,246.4 622,0 402,0 402,246.4 227.7,72.2 72.2,227.7 
+			246.4,402 0,402 0,622 246.4,622 72.2,796.3 227.7,951.8 402,777.6 402,1024 622,1024 622,777.6 796.3,951.8 951.8,796.3 
+			777.6,622 1024,622 		"/>
+	</g>
+</g>
+<g id="Foreground">
+	<g class="st8">
+		<g>
+			
+				<linearGradient id="SVGID_00000062171286901469350110000008231283689775693958_" gradientUnits="userSpaceOnUse" x1="349.2292" y1="675.787" x2="674.7708" y2="675.787">
+				<stop  offset="0" style="stop-color:#30C8FF"/>
+				<stop  offset="1" style="stop-color:#258BD9"/>
+			</linearGradient>
+			<path style="fill:url(#SVGID_00000062171286901469350110000008231283689775693958_);" d="M512,624.5
+				c-89.9,0-162.8-15.8-162.8-35.4v137.9c0,19.5,72.9,35.4,162.8,35.4c89.9,0,162.8-15.8,162.8-35.4V589.2
+				C674.8,608.7,601.9,624.5,512,624.5z"/>
+			
+				<linearGradient id="SVGID_00000002371408635533112450000014542411936775499678_" gradientUnits="userSpaceOnUse" x1="428.6999" y1="505.8573" x2="595.3001" y2="672.4576">
+				<stop  offset="0" style="stop-color:#008FE8"/>
+				<stop  offset="1" style="stop-color:#1B6BCF"/>
+			</linearGradient>
+			
+				<ellipse style="fill:url(#SVGID_00000002371408635533112450000014542411936775499678_);" cx="512" cy="589.2" rx="162.8" ry="35.4"/>
+		</g>
+		<g>
+			
+				<linearGradient id="SVGID_00000135655350317884512370000015547033771631517371_" gradientUnits="userSpaceOnUse" x1="349.2292" y1="529.6754" x2="674.7708" y2="529.6754">
+				<stop  offset="0" style="stop-color:#30C8FF"/>
+				<stop  offset="1" style="stop-color:#258BD9"/>
+			</linearGradient>
+			<path style="fill:url(#SVGID_00000135655350317884512370000015547033771631517371_);" d="M512,478.4
+				c-89.9,0-162.8-15.8-162.8-35.4V581c0,19.5,72.9,35.4,162.8,35.4c89.9,0,162.8-15.8,162.8-35.4V443
+				C674.8,462.6,601.9,478.4,512,478.4z"/>
+			
+				<linearGradient id="SVGID_00000043434159804755553510000001874351159868740789_" gradientUnits="userSpaceOnUse" x1="428.6999" y1="359.7456" x2="595.3001" y2="526.3459">
+				<stop  offset="0" style="stop-color:#008FE8"/>
+				<stop  offset="1" style="stop-color:#1B6BCF"/>
+			</linearGradient>
+			
+				<ellipse style="fill:url(#SVGID_00000043434159804755553510000001874351159868740789_);" cx="512" cy="443" rx="162.8" ry="35.4"/>
+		</g>
+		<g>
+			
+				<linearGradient id="SVGID_00000080183195795646024350000007577809438125545401_" gradientUnits="userSpaceOnUse" x1="349.2292" y1="383.5638" x2="674.7708" y2="383.5638">
+				<stop  offset="0" style="stop-color:#30C8FF"/>
+				<stop  offset="1" style="stop-color:#258BD9"/>
+			</linearGradient>
+			<path style="fill:url(#SVGID_00000080183195795646024350000007577809438125545401_);" d="M512,332.3
+				c-89.9,0-162.8-15.8-162.8-35.4v137.9c0,19.5,72.9,35.4,162.8,35.4c89.9,0,162.8-15.8,162.8-35.4V296.9
+				C674.8,316.5,601.9,332.3,512,332.3z"/>
+			
+				<linearGradient id="SVGID_00000100350972804917042530000005647432235912217753_" gradientUnits="userSpaceOnUse" x1="428.6999" y1="213.634" x2="595.3001" y2="380.2343">
+				<stop  offset="0" style="stop-color:#008FE8"/>
+				<stop  offset="1" style="stop-color:#1B6BCF"/>
+			</linearGradient>
+			
+				<ellipse style="fill:url(#SVGID_00000100350972804917042530000005647432235912217753_);" cx="512" cy="296.9" rx="162.8" ry="35.4"/>
+		</g>
+	</g>
+</g>
+</svg>
