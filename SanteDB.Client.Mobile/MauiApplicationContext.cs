@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
-    public class DisconnectedClientApplicationContext : ClientApplicationContextBase
+    public class MauiApplicationContext : ClientApplicationContextBase
     {
-        public DisconnectedClientApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
+        public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
         {
 
@@ -33,6 +33,7 @@ namespace SanteDB.Client.Mobile
 
             DependencyServiceManager.AddServiceProvider(new MauiInteractionProvider(startupPage));
             DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider(bridgeScript));
+            DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
         }
 
         public override void Start()

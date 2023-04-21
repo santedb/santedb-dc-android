@@ -159,7 +159,7 @@ public partial class StartupPage : ContentPage
 
                 //var configmanager = new SanteDB.Client.Batteries.Configuration.DefaultDcdrConfigurationProvider();
 
-                var context = new DisconnectedClientApplicationContext("DEFAULT", configmanager, this, bridgescript);
+                var context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
 
                 ServiceUtil.Start(Guid.NewGuid(), context);
 
