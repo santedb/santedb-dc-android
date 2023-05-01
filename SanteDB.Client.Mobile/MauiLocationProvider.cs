@@ -1,5 +1,6 @@
 ﻿using SanteDB.Client.Services;
 using SanteDB.Core.Model.DataTypes;
+using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,9 +9,10 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
+    [PreferredService(typeof(IGeographicLocationProvider))]
     public class MauiLocationProvider : IGeographicLocationProvider
     {
-        public string ServiceName => throw new NotImplementedException();
+        public string ServiceName => nameof(MauiLocationProvider);
 
         public GeoTag GetCurrentPosition()
         {
