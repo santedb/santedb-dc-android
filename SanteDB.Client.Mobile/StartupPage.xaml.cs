@@ -13,6 +13,7 @@ using System.Reflection;
 using SanteDB.Client.Shared;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Core.Services;
+using SanteDB.Rest.WWW;
 
 namespace SanteDB.Client.Mobile;
 
@@ -28,7 +29,7 @@ public partial class StartupPage : ContentPage
     {
         base.OnAppearing();
 
-        var directoryprovider = new Shared.LocalAppDirectoryProvider();
+        var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
 
         if (!directoryprovider.IsConfigFilePresent())
         {
@@ -38,7 +39,7 @@ public partial class StartupPage : ContentPage
             using (var sr = new StreamReader(appletslist))
             {
                 string line;
-                while ((line = await sr.ReadLineAsync()) != null)
+                while (!string.IsNullOrWhiteSpace((line = await sr.ReadLineAsync())))
                 {
                     applets.Add(line);
                 }
@@ -88,6 +89,8 @@ public partial class StartupPage : ContentPage
             //        m_window.ShowSplashStatusText(string.Format("Error loading assembly {0}: {1}", itm, e));
             //    }
             //});
+
+            
 
             Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
             List<Assembly> loadedassemblies = new();

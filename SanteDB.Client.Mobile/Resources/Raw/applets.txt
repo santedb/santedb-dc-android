@@ -1,1 +1,8 @@
-﻿santedb.core.sln.pak
+﻿org.santedb.admin.pak
+org.santedb.bicore.pak
+org.santedb.config.init.pak
+org.santedb.config.pak
+org.santedb.core.pak
+org.santedb.i18n.en.pak
+org.santedb.uicore.pak
+
