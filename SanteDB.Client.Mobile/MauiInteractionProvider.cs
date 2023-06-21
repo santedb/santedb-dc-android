@@ -34,7 +34,11 @@ namespace SanteDB.Client.Mobile
         }
 
         public void SetStatus(string statusText, float progressIndicator)
+            => SetStatus(string.Empty, statusText, progressIndicator);
+
+        public void SetStatus(string taskIdentifier, string statusText, float progressIndicator)
         {
+            //throw new NotImplementedException();
         }
     }
 }

@@ -3,6 +3,6 @@ org.santedb.bicore.pak
 org.santedb.config.init.pak
 org.santedb.config.pak
 org.santedb.core.pak
-org.santedb.i18n.en.pak
+org.santedb.en.pak
 org.santedb.uicore.pak
 
