@@ -34,6 +34,13 @@
     <TrimMode>partial</TrimMode>
 	</PropertyGroup>
 
+  <ItemGroup>
+    <TrimmedRootAssembly Include="SanteDB.Core.Api" />
+    <TrimmedRootAssembly Include="SanteDB.Core.Applets" />
+    <TrimmedRootAssembly Include="SanteDB.Core.Model" />
+    <TrimmedRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" />
+    <TrimmedRootAssembly Include="SanteDB.OrmLite" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -95,7 +102,5 @@
 	    <CopyToOutputDirectory></CopyToOutputDirectory>
 	  </MauiAsset>
 	</ItemGroup>
-
-	<ProjectExtensions><VisualStudio><UserProperties XamarinHotReloadDebuggerTimeoutExceptionSanteDBClientMobileHideInfoBar="True" /></VisualStudio></ProjectExtensions>
 
 </Project>

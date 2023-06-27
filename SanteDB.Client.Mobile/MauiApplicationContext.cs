@@ -16,7 +16,7 @@ namespace SanteDB.Client.Mobile
         {
 
 #if DEBUG
-            configurationManager.GetSection<ApplicationServiceContextConfigurationSection>().AllowUnsignedAssemblies = true;
+            //configurationManager.GetSection<ApplicationServiceContextConfigurationSection>().AllowUnsignedAssemblies = true;
 #endif
 
             configurationManager.Configuration.AddSection<SecurityConfigurationSection>(new SecurityConfigurationSection
@@ -34,6 +34,7 @@ namespace SanteDB.Client.Mobile
             DependencyServiceManager.AddServiceProvider(new MauiInteractionProvider(startupPage));
             DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider(bridgeScript));
             DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
+            DependencyServiceManager.AddServiceProvider(new MauiPlatformSecurityProvider());
         }
 
         public override void Start()

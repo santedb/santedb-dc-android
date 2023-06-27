@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Rest.HDSI;
 using System.Diagnostics;
 using System.Runtime.Loader;
@@ -10,14 +11,7 @@ namespace SanteDB.Client.Mobile
     {
         public static MauiApp CreateMauiApp()
         {
-            try
-            {
-                SanteDB.Core.Security.SecurityExtensions.InstallCertsForChain();
-            }
-            catch (Exception ex) {
-                Debugger.Break();
-            }
-
+            FileSystemAppletManagerService fsams = new FileSystemAppletManagerService(null, null);
             //try
             //{
             //    SQLitePCL.Batteries_V2.Init();
