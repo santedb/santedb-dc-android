@@ -81,6 +81,11 @@ namespace SanteDB.Client.Mobile
             }
         }
 
+        public bool IsCertificateTrusted(X509Certificate2 certificate)
+        {
+            return _InternalChain.ValidateCertificate(certificate);
+        }
+
         ///<inheritdoc />
         public bool TryGetCertificate(X509FindType findType, object findValue, out X509Certificate2 certificate)
         {

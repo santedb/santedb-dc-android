@@ -11,7 +11,6 @@ namespace SanteDB.Client.Mobile
     {
         public static MauiApp CreateMauiApp()
         {
-            FileSystemAppletManagerService fsams = new FileSystemAppletManagerService(null, null);
             //try
             //{
             //    SQLitePCL.Batteries_V2.Init();
