@@ -55,7 +55,7 @@ else {
         let arr = [];
 
         for (let i = 0; i < 32; i++) {
-            arr.push(chars.at(Math.random() * chars.length));
+            arr.push(chars[Math.random() * chars.length]);
         }
         arr.splice(20, 0, '-')
         arr.splice(16, 0, '-')

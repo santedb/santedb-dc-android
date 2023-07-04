@@ -149,7 +149,7 @@ namespace SanteDB.Client.Mobile
 
                     var certtext = certificate.Export(X509ContentType.Pfx, password);
 
-                    var importcert = new X509Certificate2(certtext, password, X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable);
+                    var importcert = new X509Certificate2(certtext, password);
 
                     store.Add(importcert);
 
