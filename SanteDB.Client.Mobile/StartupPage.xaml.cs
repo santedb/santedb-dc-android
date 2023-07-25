@@ -95,6 +95,8 @@ public partial class StartupPage : ContentPage
             Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
             List<Assembly> loadedassemblies = new();
 
+            assemblies.Push(typeof(SanteDB.Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
+
             while (assemblies.TryPop(out var assemblyname))
             {
                 try

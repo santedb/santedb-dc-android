@@ -28,5 +28,9 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+
+  <key>NSCameraUsageDescription</key>
+  <string>SanteDB requires access to your phone's camera to scan barcodes.</string>
+
 </dict>
 </plist>
