@@ -35,6 +35,8 @@ namespace SanteDB.Client.Mobile
             DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider(bridgeScript));
             DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
             DependencyServiceManager.AddServiceProvider(new MauiPlatformSecurityProvider());
+
+            SanteDB.Core.Model.Map.ModelMapper.UseReflectionOnly = true; //This is a hack for now until we can rewrite the model mapper to use source generators.
         }
 
         public override void Start()

@@ -24,9 +24,7 @@ namespace SanteDB.Client.Mobile
         {
             var handler = WebView.Handler;
 
-            var platformview = handler?.PlatformView;
-
-            if (platformview is Android.Webkit.WebView awebview)
+            if ((handler?.PlatformView) is Android.Webkit.WebView awebview)
             {
                 awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}";
                 awebview.Settings.JavaScriptEnabled = true;
@@ -35,6 +33,10 @@ namespace SanteDB.Client.Mobile
                 awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
                 
                 //TODO: Additional platform initialization
+            }
+            else
+            {
+                throw new InvalidOperationException("Platform not supported");
             }
 
         }
