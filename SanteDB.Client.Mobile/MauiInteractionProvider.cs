@@ -38,7 +38,11 @@ namespace SanteDB.Client.Mobile
 
         public void SetStatus(string taskIdentifier, string statusText, float progressIndicator)
         {
-            //throw new NotImplementedException();
+            if (_StartupPage.IsStarting)
+            {
+                _StartupPage.SetStatus(taskIdentifier, statusText, progressIndicator);
+            }
+
         }
     }
 }

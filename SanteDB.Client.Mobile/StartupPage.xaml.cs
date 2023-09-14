@@ -24,16 +24,38 @@ public partial class StartupPage : ContentPage
         InitializeComponent();
     }
 
+    public bool IsStarting { get; }
+
+
+    public void SetStatus(string identifier, string status, float progress)
+    {
+        if (!string.IsNullOrEmpty(identifier) && identifier != nameof(DependencyServiceManager))
+            return;
+
+        if (progress < 0)
+            progress = 0;
+        else if (progress > 1)
+            progress = 1;
+        
+        Dispatcher.Dispatch(() =>
+        {
+            StatusLabel.Text = status;
+            StatusProgress.Progress = progress;
+        });
+    }
+
     [RequiresUnreferencedCode("Loads types from AppDomain.CurrentDomain")]
     protected override async void OnAppearing()
     {
         base.OnAppearing();
 
+        
+
         var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
 
         if (!directoryprovider.IsConfigFilePresent())
         {
-            ShowStatusText("Preparing Default Applets");
+            //ShowStatusText("Preparing Default Applets");
             List<string> applets = new();
             using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
             using (var sr = new StreamReader(appletslist))
@@ -52,7 +74,7 @@ public partial class StartupPage : ContentPage
 
             foreach(var applet in applets)
             {
-                ShowStatusText($"Preparing {applet}");
+                //ShowStatusText($"Preparing {applet}");
                 using var appletstream = await FileSystem.OpenAppPackageFileAsync(applet);
                 using var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite);
 
@@ -68,9 +90,10 @@ public partial class StartupPage : ContentPage
 
         var bridgescript = await reader.ReadToEndAsync();
 
-        await Task.Run(async () =>
+        var task = Task.Run(async () =>
         {
             await Task.Yield(); //Yield back to move off the main thread.
+
 
             //var splashwriter = new SplashScreenTraceWriter(m_window);
             //SanteDB.Core.Diagnostics.Tracer.AddWriter(splashwriter, System.Diagnostics.Tracing.EventLevel.Verbose);
@@ -90,10 +113,9 @@ public partial class StartupPage : ContentPage
             //    }
             //});
 
-            
-
             Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
             List<Assembly> loadedassemblies = new();
+
 
             assemblies.Push(typeof(SanteDB.Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
 
@@ -112,11 +134,12 @@ public partial class StartupPage : ContentPage
                         }
                     }
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     
                 }
             }
+
 
             try
             {
@@ -127,6 +150,7 @@ public partial class StartupPage : ContentPage
             {
 
             }
+
 
 
             try
@@ -162,11 +186,14 @@ public partial class StartupPage : ContentPage
                     configmanager = new InitialConfigurationManager(SanteDBHostType.Client, "DEFAULT", directoryprovider.GetConfigFilePath());
                 }
 
+
                 //var configmanager = new SanteDB.Client.Batteries.Configuration.DefaultDcdrConfigurationProvider();
 
                 var context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
 
+
                 ServiceUtil.Start(Guid.NewGuid(), context);
+
 
                 var magic = context.ActivityUuid.ToByteArray().HexEncode();
 
@@ -179,6 +206,7 @@ public partial class StartupPage : ContentPage
                     InitialConfigurationManager => "http://127.0.0.1:9200/#!/config/initialSettings",
                     _ => "http://127.0.0.1:9200/#!/"
                 };
+
 
                 this.Dispatcher.Dispatch(() =>
                 {
@@ -197,19 +225,6 @@ public partial class StartupPage : ContentPage
 
     }
 
-    public void ShowStatusText(string text)
-    {
-        if (Dispatcher.IsDispatchRequired)
-        {
-            string capturedtext = text;
-            Dispatcher.Dispatch(() =>
-            {
-                StatusText.Text = capturedtext;
-            });
-        }
-        else
-        {
-            StatusText.Text = text;
-        }
-    }
+   
+
 }

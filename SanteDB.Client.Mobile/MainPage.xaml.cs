@@ -28,40 +28,19 @@ namespace SanteDB.Client.Mobile
             {
                 awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}";
                 awebview.Settings.JavaScriptEnabled = true;
+                awebview.Settings.SetGeolocationEnabled(true);
 
                 var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this);
                 awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
                 
                 //TODO: Additional platform initialization
+
+                
             }
             else
             {
                 throw new InvalidOperationException("Platform not supported");
             }
-
         }
-
-        //private void WebView_HandlerChanging(object sender, HandlerChangingEventArgs e)
-        //{
-        //    var handler = e.NewHandler;
-            
-        //    var platformview = handler?.PlatformView;
-
-        //    Debugger.Break();
-        //}
-
-
-
-        //private void OnCounterClicked(object sender, EventArgs e)
-        //{
-        //    count++;
-
-        //    if (count == 1)
-        //        CounterBtn.Text = $"Clicked {count} time";
-        //    else
-        //        CounterBtn.Text = $"Clicked {count} times";
-
-        //    SemanticScreenReader.Announce(CounterBtn.Text);
-        //}
     }
 }
