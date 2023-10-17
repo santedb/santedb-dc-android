@@ -93,16 +93,21 @@ public partial class StartupPage : ContentPage
             
 
             Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
-            List<Assembly> loadedassemblies = new();
+            List<(AssemblyName, Assembly)> loadedassemblies = new();
 
             assemblies.Push(typeof(SanteDB.Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
 
             while (assemblies.TryPop(out var assemblyname))
             {
+                if (loadedassemblies.Any(tuple => assemblyname.FullName.Equals(tuple.Item1.FullName, StringComparison.Ordinal)))
+                {
+                    continue;
+                }
+
                 try
                 {
                     var assembly = Assembly.Load(assemblyname);
-                    loadedassemblies.Add(assembly);
+                    loadedassemblies.Add((assemblyname, assembly));
 
                     if (assemblyname.Name.StartsWith("SanteDB"))
                     {
