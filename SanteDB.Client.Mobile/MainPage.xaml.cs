@@ -34,7 +34,7 @@ namespace SanteDB.Client.Mobile
                 awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
                 
                 //TODO: Additional platform initialization
-
+                
                 
             }
             else
