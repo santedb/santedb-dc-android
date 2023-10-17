@@ -35,11 +35,13 @@
 	</PropertyGroup>
 
   <ItemGroup>
+		<!-- https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trimming-options?pivots=dotnet-7-0#root-assemblies -->
     <TrimmedRootAssembly Include="SanteDB.Core.Api" />
     <TrimmedRootAssembly Include="SanteDB.Core.Applets" />
     <TrimmedRootAssembly Include="SanteDB.Core.Model" />
     <TrimmedRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" />
     <TrimmedRootAssembly Include="SanteDB.OrmLite" />
+    <TrimmedRootAssembly Include="SanteDB.Core.i18n" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -69,10 +71,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.5" />
+		<PackageReference Include="BarcodeScanner.Mobile.Maui" Version="7.0.0.1-pre" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.12" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
-		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.4" />
+		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.6" />
+	</ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0-android'">
+    <PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.7.2.1" />
+    <PackageReference Include="Xamarin.Google.MLKit.BarcodeScanning" Version="117.1.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -86,6 +95,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="NotificationBar.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="StartupPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

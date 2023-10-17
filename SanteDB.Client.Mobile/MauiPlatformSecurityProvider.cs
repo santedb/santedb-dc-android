@@ -81,7 +81,7 @@ namespace SanteDB.Client.Mobile
             }
         }
 
-        public bool IsCertificateTrusted(X509Certificate2 certificate)
+        public bool IsCertificateTrusted(X509Certificate2 certificate, DateTimeOffset? asOfDate = null)
         {
             return _InternalChain.ValidateCertificate(certificate);
         }
