@@ -73,6 +73,7 @@
 	<ItemGroup>
 		<PackageReference Include="BarcodeScanner.Mobile.Maui" Version="7.0.0.1-pre" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="6.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="3.3.0" />
 		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.12" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />

@@ -5,6 +5,8 @@ using SanteDB.Rest.HDSI;
 using System.Diagnostics;
 using System.Runtime.Loader;
 using System.Security.Cryptography.X509Certificates;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Markup;
 
 namespace SanteDB.Client.Mobile
 {
@@ -26,6 +28,8 @@ namespace SanteDB.Client.Mobile
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
+                .UseMauiCommunityToolkitMarkup()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
