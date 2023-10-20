@@ -14,6 +14,8 @@ namespace SanteDB.Client.Mobile
     {
         readonly StartupPage _StartupPage;
 
+        private MauiInteractionProvider _InteractionProvider;
+
         public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
         {
@@ -35,8 +37,8 @@ namespace SanteDB.Client.Mobile
                     }
                 }
             });
-
-            DependencyServiceManager.AddServiceProvider(new MauiInteractionProvider(startupPage));
+            _InteractionProvider = new MauiInteractionProvider(startupPage);
+            DependencyServiceManager.AddServiceProvider(_InteractionProvider);
             DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider(bridgeScript));
             DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
             DependencyServiceManager.AddServiceProvider(new MauiPlatformSecurityProvider());
@@ -58,7 +60,19 @@ namespace SanteDB.Client.Mobile
 
         protected override void OnRestartRequested(object sender)
         {
-            Debugger.Break();
+            if (Application.Current?.Dispatcher is IDispatcher dispatcher)
+            {
+                dispatcher.Dispatch(() =>
+                {
+                    Application.Current.Quit();
+                });
+            }
         }
+
+        /// <summary>
+        /// Gets the interaction provider used to broker communication between SanteDB and the user interface shell.
+        /// </summary>
+        /// <returns></returns>
+        internal MauiInteractionProvider GetInteractionProvider() => _InteractionProvider;
     }
 }

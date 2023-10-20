@@ -36,7 +36,7 @@ public partial class StartupPage : ContentPage
             progress = 0;
         else if (progress > 1)
             progress = 1;
-        
+
         Dispatcher.Dispatch(() =>
         {
             StatusLabel.Text = status;
@@ -49,7 +49,7 @@ public partial class StartupPage : ContentPage
     {
         base.OnAppearing();
 
-        
+
 
         var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
 
@@ -70,9 +70,9 @@ public partial class StartupPage : ContentPage
             var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
 
             Directory.CreateDirectory(pakdirectory);
-            
 
-            foreach(var applet in applets)
+
+            foreach (var applet in applets)
             {
                 //ShowStatusText($"Preparing {applet}");
                 using var appletstream = await FileSystem.OpenAppPackageFileAsync(applet);
@@ -141,7 +141,7 @@ public partial class StartupPage : ContentPage
                 }
                 catch (Exception)
                 {
-                    
+
                 }
             }
 
@@ -169,7 +169,7 @@ public partial class StartupPage : ContentPage
                     Name = "org.santedb.disconnected_client.android"
                 };
 
-                
+
 
                 SanteDB.Client.Batteries.ClientBatteries.Initialize(directoryprovider.GetDataDirectory(), directoryprovider.GetConfigDirectory(), new Client.Configuration.Upstream.UpstreamCredentialConfiguration()
                 {
@@ -215,7 +215,7 @@ public partial class StartupPage : ContentPage
 
                 this.Dispatcher.Dispatch(() =>
                 {
-                    App.Current.MainPage = new MainPage(starturl, magic);
+                    App.Current.MainPage = new MainPage(starturl, magic, context);
                 });
 
 
@@ -230,6 +230,6 @@ public partial class StartupPage : ContentPage
 
     }
 
-   
+
 
 }

@@ -7,10 +7,21 @@ namespace SanteDB.Client.Mobile
     public partial class MainPage : ContentPage
     {
         int count = 0;
-        private string? _HttpMagic;
+        private string _HttpMagic;
+        readonly MauiApplicationContext _ApplicationContext;
 
-        public MainPage(string sourceUrl, string httpMagicValue)
+        public MainPage(string sourceUrl, string httpMagicValue, MauiApplicationContext applicationContext)
         {
+            _ApplicationContext = applicationContext;
+
+            _ApplicationContext.GetInteractionProvider().SetStatusCallback = (task, message, progress) =>
+            {
+                Dispatcher.DispatchAsync(async () =>
+                {
+                    await NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress);
+                });
+            };
+
             InitializeComponent();
 
             _HttpMagic = httpMagicValue;

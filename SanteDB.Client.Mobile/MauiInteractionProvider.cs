@@ -42,7 +42,13 @@ namespace SanteDB.Client.Mobile
             {
                 _StartupPage.SetStatus(taskIdentifier, statusText, progressIndicator);
             }
+            else if (null != SetStatusCallback)
+            {
+                SetStatusCallback(taskIdentifier, statusText, progressIndicator);
+            }
 
         }
+
+        public Action<string, string, float> SetStatusCallback { get; set; }
     }
 }
