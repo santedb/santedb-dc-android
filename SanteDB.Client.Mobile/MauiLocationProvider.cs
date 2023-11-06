@@ -30,6 +30,14 @@ namespace SanteDB.Client.Mobile
         {
             try
             {
+                if ((await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>()) != PermissionStatus.Granted)
+                {
+                    if ((await Permissions.RequestAsync<Permissions.LocationWhenInUse>() != PermissionStatus.Granted))
+                    {
+                        return null;
+                    }
+                }
+
                 var result = await Geolocation.Default.GetLastKnownLocationAsync();
 
                 if (result != null && (DateTimeOffset.UtcNow - result.Timestamp) < TimeSpan.FromMinutes(2))
