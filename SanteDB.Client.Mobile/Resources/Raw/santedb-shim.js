@@ -79,7 +79,7 @@ __SanteDBAppService.IsClinicalAvailable = function () {
 };
 
 __SanteDBAppService.BarcodeScan = function () {
-    return null;
+    return __sdb_bridge.ScanBarcode();
 };
 
 __SanteDBAppService.ShowToast = function (text) {

@@ -3,14 +3,7 @@ using Java.Interop;
 using Newtonsoft.Json;
 using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Core;
-using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 #nullable enable
 
@@ -162,5 +155,12 @@ namespace SanteDB.Client.Mobile
         [Export]
         [JavascriptInterface]
         public string? GetVersion() => GetAssemblyVersion();
+
+        [Export]
+        [JavascriptInterface]
+        public string ScanBarcode()
+        {
+            return Nito.AsyncEx.AsyncContext.Run(async () => await _MainPage.ScanBarcodeAsync());
+        }
     }
 }

@@ -8,7 +8,7 @@ using CommunityToolkit.Maui.Markup;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 using System.Drawing.Printing;
 
-namespace SanteDB.Client.Mobile;
+namespace SanteDB.Client.Mobile.Controls;
 
 public partial class NotificationBar : ContentView, INotifyPropertyChanged
 {
@@ -202,6 +202,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
                 new Button()
                     .Row(2).Column(0)
                     .Text("Close")
+                    .CenterHorizontal()
                     .Margins(10, 20, 10, 5)
                     .Assign(out Button closebutton)
             },
