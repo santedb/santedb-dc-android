@@ -1,4 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+ - Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ - Portions Copyright 2019-2024 SanteSuite Contributors (See NOTICE)
+ - 
+ - 
+ - Licensed under the Apache License, Version 2.0 (the "License"); you 
+ - may not use this file except in compliance with the License. You may 
+ - obtain a copy of the License at 
+ - 
+ - http://www.apache.org/licenses/LICENSE-2.0 
+ - 
+ - Unless required by applicable law or agreed to in writing, software
+ - distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ - WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ - License for the specific language governing permissions and limitations under 
+ - the License.
+ - 
+ - User: trevor
+ - Date: 2023-4-19
+ -->
 <manifest package="maui-application-id-placeholder" version="0.0.0" api-version="7" xmlns="http://tizen.org/ns/packages">
   <profile name="common" />
   <ui-application appid="maui-application-id-placeholder" exec="SanteDB.Client.Mobile.dll" multiple="false" nodisplay="false" taskmanage="true" type="dotnet" launch_mode="single">
