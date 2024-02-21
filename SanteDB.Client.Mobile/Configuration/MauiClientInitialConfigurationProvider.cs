@@ -22,7 +22,13 @@ namespace SanteDB.Client.Mobile.Configuration
             String macAddress = Guid.NewGuid().ToString();
             if (wlan != null)
             {
-                macAddress = wlan.GetPhysicalAddress().ToString();
+                var mac = wlan.GetPhysicalAddress().ToString();
+
+                if (!string.IsNullOrWhiteSpace(mac))
+                {
+                    macAddress = wlan.GetPhysicalAddress().ToString();
+                }
+
             }
 
             // Upstream default configuration
