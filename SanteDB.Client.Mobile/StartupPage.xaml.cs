@@ -167,8 +167,10 @@ public partial class StartupPage : ContentPage
 
             try
             {
-                SQLitePCL.Batteries_V2.Init();
+                SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3mc());
                 SqliteConnection.ClearAllPools(); //Force-load sqlite.
+
+                SanteDB.OrmLite.Providers.Sqlite.SqliteSpellfixExtensionLoader.SetLibraryInformation("libe_sqlite3mc", "sqlite3_spellfix_init");
             }
             catch
             {
