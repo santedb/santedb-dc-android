@@ -17,10 +17,30 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using SanteDB.BI.Services.Impl;
+using SanteDB.BusinessRules.JavaScript;
+using SanteDB.Caching.Memory.Session;
+using SanteDB.Caching.Memory;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Configuration.Upstream;
+using SanteDB.Client.Disconnected.Services;
+using SanteDB.Client.OAuth;
+using SanteDB.Client.Tickles;
+using SanteDB.Client.Upstream.Management;
+using SanteDB.Client.Upstream.Repositories;
+using SanteDB.Client.Upstream.Security;
+using SanteDB.Client.Upstream;
+using SanteDB.Client.UserInterface.Impl;
 using SanteDB.Core;
+using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Data.Backup;
+using SanteDB.Core.Data;
+using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Security.Privacy;
+using SanteDB.Core.Security;
+using SanteDB.Core.Services.Impl;
+using SanteDB.Security.Certs.BouncyCastle;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +56,79 @@ namespace SanteDB.Client.Mobile.Configuration
 
         public SanteDBConfiguration Provide(SanteDBHostType hostContextType, SanteDBConfiguration configuration)
         {
+            var appServiceSection = configuration.GetSection<ApplicationServiceContextConfigurationSection>();
+            var instanceName = appServiceSection.InstanceName;
+            var localDataPath = AppDomain.CurrentDomain.GetData("DataDirectory")?.ToString();
+
+            if (null == localDataPath)
+            {
+                throw new ApplicationException("Application bug exists. DataDirectory was not set before configuration provider was called. Ensure the DataDirectory data variable in the app domain is set before the config provider is initialized.");
+            }
+
+            appServiceSection.ServiceProviders.AddRange(new List<TypeReferenceConfiguration>() {
+                    new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)),
+                    new TypeReferenceConfiguration(typeof(InMemoryTickleService)),
+                    new TypeReferenceConfiguration(typeof(DefaultNetworkInformationService)),
+                    new TypeReferenceConfiguration(typeof(SHA256PasswordHashingService)),
+                    new TypeReferenceConfiguration(typeof(DefaultPolicyDecisionService)),
+                    new TypeReferenceConfiguration(typeof(MemoryAdhocCacheService)),
+                    new TypeReferenceConfiguration(typeof(AppletLocalizationService)),
+                    new TypeReferenceConfiguration(typeof(AppletBusinessRulesDaemon)),
+                    new TypeReferenceConfiguration(typeof(DefaultUpstreamManagementService)),
+                    new TypeReferenceConfiguration(typeof(DefaultUpstreamIntegrationService)),
+                    new TypeReferenceConfiguration(typeof(DefaultUpstreamAvailabilityProvider)),
+                    new TypeReferenceConfiguration(typeof(MemoryCacheService)),
+                    new TypeReferenceConfiguration(typeof(DefaultThreadPoolService)),
+                    new TypeReferenceConfiguration(typeof(MauiInteractionProvider)),
+                    new TypeReferenceConfiguration(typeof(MemoryQueryPersistenceService)),
+                    new TypeReferenceConfiguration(typeof(FileSystemDispatcherQueueService)),
+                    new TypeReferenceConfiguration(typeof(SimplePatchService)),
+                    new TypeReferenceConfiguration(typeof(DefaultBackupManager)),
+                    new TypeReferenceConfiguration(typeof(AppletBiRepository)),
+                    new TypeReferenceConfiguration(typeof(OAuthClient)),
+                    new TypeReferenceConfiguration(typeof(MemorySessionManagerService)),
+                    new TypeReferenceConfiguration(typeof(UpstreamUpdateManagerService)), // AmiUpdateManager
+                    new TypeReferenceConfiguration(typeof(UpstreamIdentityProvider)),
+                    new TypeReferenceConfiguration(typeof(UpstreamApplicationIdentityProvider)),
+                    new TypeReferenceConfiguration(typeof(UpstreamSecurityChallengeProvider)), // AmiSecurityChallengeProvider
+                    new TypeReferenceConfiguration(typeof(UpstreamRoleProviderService)),
+                    new TypeReferenceConfiguration(typeof(UpstreamSecurityRepository)),
+                    new TypeReferenceConfiguration(typeof(UpstreamRepositoryFactory)),
+                    new TypeReferenceConfiguration(typeof(UpstreamPolicyInformationService)),
+                    new TypeReferenceConfiguration(typeof(DataPolicyFilterService)),
+                    new TypeReferenceConfiguration(typeof(MauiOperatingSystemInfoService)),
+                    new TypeReferenceConfiguration(typeof(AppletSubscriptionRepository)),
+                    new TypeReferenceConfiguration(typeof(InMemoryPivotProvider)),
+                    new TypeReferenceConfiguration(typeof(AuditDaemonService)),
+                    new TypeReferenceConfiguration(typeof(DefaultDataSigningService)),
+                    new TypeReferenceConfiguration(typeof(DefaultBarcodeProviderService)),
+                    new TypeReferenceConfiguration(typeof(FileSystemDispatcherQueueService)),
+                    new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)),
+                    new TypeReferenceConfiguration(typeof(RepositoryEntitySource)),
+                    new TypeReferenceConfiguration(typeof(FileSystemCdssLibraryRepository)),
+                    new TypeReferenceConfiguration(typeof(MauiPlatformSecurityProvider)),
+            });
+
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("input.name", "simple"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("input.address", "text"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("optional.patient.address.city", "true"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("optional.patient.address.county", "true"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("optional.patient.address.state", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("optional.patient.name.family", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("optional.patient.address.given", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.address.state", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.address.county", "true"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.address.city", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.address.precinct", "true"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.name.prefix", "true"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.name.suffix", "true"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.name.family", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("forbid.patient.name.given", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("allow.patient.religion", "false"));
+            appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("allow.patient.ethnicity", "false"));
+            appServiceSection.AppSettings = appServiceSection.AppSettings.OrderBy(o => o.Key).ToList();
+
+
             // Security configuration
             var wlan = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(o => o.NetworkInterfaceType == NetworkInterfaceType.Ethernet || o.Description.StartsWith("wlan"));
             String macAddress = Guid.NewGuid().ToString();

@@ -32,6 +32,9 @@
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>-->
 
     <TrimMode>partial</TrimMode>
+
+    <AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
+    <AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
 	</PropertyGroup>
 
   <ItemGroup>
@@ -71,22 +74,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="BarcodeScanner.Mobile.Maui" Version="7.0.0.1-pre" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
-		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="3.3.1" />
-		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="7.0.19" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="BarcodeScanner.Mobile.Maui" Version="8.0.40.1" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
+		<PackageReference Include="CommunityToolkit.Maui.Markup" Version="4.1.0" />
+		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
+    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
+    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.4.1" />
+    
+    
 	</ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
-    <PackageReference Include="Xamarin.Google.MLKit.BarcodeScanning" Version="117.2.0.4" />
-    <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3mc" Version="2.1.8" Exclude="Build,Analyzers" />
+		<PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.9.1.1" />
+    <PackageReference Include="Xamarin.Google.MLKit.BarcodeScanning" Version="117.2.0.7" />
+    <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3mc" Version="2.1.9" Exclude="Build,Analyzers" />
 		<PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc.android" Version="2.2.1" Exclude="Build,Analyzers" />
-    <PackageReference Include="Xamarin.AndroidX.Collection" Version="1.4.0.3" />
-    <PackageReference Include="Xamarin.AndroidX.Collection.Ktx" Version="1.4.0.2" />
 	</ItemGroup>
 
 	<ItemGroup>
