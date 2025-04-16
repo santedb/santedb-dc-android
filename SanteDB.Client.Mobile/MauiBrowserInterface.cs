@@ -22,6 +22,7 @@ using Java.Interop;
 using Newtonsoft.Json;
 using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Core;
+using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 
 #nullable enable
@@ -36,6 +37,8 @@ namespace SanteDB.Client.Mobile
         readonly string? _DeviceId;
         readonly string? _ClientId;
         readonly string? _RealmId;
+        readonly string? _FacilityId;
+        readonly string? _OwnerId;
 
         static string? _Version;
         private static string? GetAssemblyVersion()
@@ -59,9 +62,16 @@ namespace SanteDB.Client.Mobile
             var devicecredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Device);
             var appcredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Application);
 
+            var securityconfig = _ConfigManager?.GetSection<SecurityConfigurationSection>();
+
+
             _DeviceId = devicecredential?.CredentialName;
-            _ClientId = appcredential?.CredentialName;
+            _ClientId = upstreamconfig?.Realm == null ? null : appcredential?.CredentialName;
             _RealmId = upstreamconfig?.Realm?.DomainName;
+
+            _FacilityId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedFacilityUuid).ToString();
+            _OwnerId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedOwnerUuid).ToString();
+
         }
 
         [Export]
@@ -77,7 +87,9 @@ namespace SanteDB.Client.Mobile
                 Magic = GetMagic(),
                 Online = GetOnlineState(),
                 Realm = GetRealm(),
-                Version = GetAssemblyVersion()
+                Version = GetAssemblyVersion(),
+                FacilityId = _FacilityId,
+                OwnerId = _OwnerId,
             };
 
             return JsonConvert.SerializeObject(state);
@@ -109,6 +121,20 @@ namespace SanteDB.Client.Mobile
         public string? GetClientId()
         {
             return _ClientId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetAssignedFacilityId()
+        {
+            return _FacilityId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetAssignedOwnerId()
+        {
+            return _OwnerId;
         }
 
         [Export]

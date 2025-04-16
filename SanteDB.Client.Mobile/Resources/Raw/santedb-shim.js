@@ -152,3 +152,10 @@ __SanteDBAppService.GetMagic = function () {
     return __sdb_bridge.GetMagic();
 };
 
+__SanteDBAppService.GetAssignedFacilityId = function () {
+    return __sdb_bridge.GetAssignedFacilityId();
+};
+
+__SanteDBAppService.GetAssignedOwnerId = function () {
+    return __sdb_bridge.GetAssignedOwnerId();
+};

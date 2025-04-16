@@ -93,7 +93,7 @@ public partial class StartupPage : ContentPage
 
             foreach (var applet in applets)
             {
-                //ShowStatusText($"Preparing {applet}");
+                SetStatus(null, $"Preparing {applet}", 0f);
                 using var appletstream = await FileSystem.OpenAppPackageFileAsync(applet);
                 using var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite);
 
