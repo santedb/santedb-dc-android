@@ -104,7 +104,7 @@ public partial class StartupPage : ContentPage
             }
         }
 
-        using var stream = await FileSystem.OpenAppPackageFileAsync("santedb-shim.js");
+        using var stream = await FileSystem.OpenAppPackageFileAsync("santedb_shim.js");
         using var reader = new StreamReader(stream);
 
         var bridgescript = await reader.ReadToEndAsync();
