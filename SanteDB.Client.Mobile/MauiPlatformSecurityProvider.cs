@@ -106,19 +106,19 @@ namespace SanteDB.Client.Mobile
         }
 
         ///<inheritdoc />
-        public bool TryGetCertificate(X509FindType findType, object findValue, out X509Certificate2 certificate)
+        public bool TryGetCertificate(X509FindType findType, object findValue, out X509Certificate2 certificate, bool validOnly = true)
         {
-            return TryGetCertificate(findType, findValue, StoreName.My, StoreLocation.CurrentUser, out certificate);
+            return TryGetCertificate(findType, findValue, StoreName.My, StoreLocation.CurrentUser, out certificate, validOnly);
         }
 
         ///<inheritdoc />
-        public bool TryGetCertificate(X509FindType findType, object findValue, StoreName storeName, out X509Certificate2 certificate)
+        public bool TryGetCertificate(X509FindType findType, object findValue, StoreName storeName, out X509Certificate2 certificate, bool validOnly = true)
         {
-            return TryGetCertificate(findType, findValue, storeName, StoreLocation.CurrentUser, out certificate);
+            return TryGetCertificate(findType, findValue, storeName, StoreLocation.CurrentUser, out certificate, validOnly);
         }
 
         ///<inheritdoc />
-        public bool TryGetCertificate(X509FindType findType, object findValue, StoreName storeName, StoreLocation storeLocation, out X509Certificate2 certificate)
+        public bool TryGetCertificate(X509FindType findType, object findValue, StoreName storeName, StoreLocation storeLocation, out X509Certificate2 certificate, bool validOnly = true)
         {
             if (findValue == null)
             {
@@ -131,7 +131,7 @@ namespace SanteDB.Client.Mobile
                 {
                     store.Open(OpenFlags.ReadOnly);
 
-                    var certs = store.Certificates.Find(findType, findValue, validOnly: false); // since the user is asking for a specific certificate allow for searching of invalid certificates
+                    var certs = store.Certificates.Find(findType, findValue, validOnly: validOnly); // since the user is asking for a specific certificate allow for searching of invalid certificates
 
                     if (certs.Count == 0)
                     {

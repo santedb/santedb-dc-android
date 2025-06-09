@@ -5,6 +5,7 @@ VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Resources", "Solution Resources", "{E7A2D001-BF75-4365-8F5F-C3EBB4E22270}"
 	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
 		Privacy Policy.md = Privacy Policy.md
 	EndProjectSection
 EndProject
