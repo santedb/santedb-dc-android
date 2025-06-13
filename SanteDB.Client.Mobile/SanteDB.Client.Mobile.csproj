@@ -97,15 +97,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="SanteDB.Client.Shared" Version="$(VersionNumber)" />
+		<!--<PackageReference Include="SanteDB.Client.Shared" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Persistence.Data" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Persistence.Data.Synchronization" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Persistence.Data.Auditing" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Client" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Matcher" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Client.Batteries" Version="$(VersionNumber)" />
-		<PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />
-	  <!--<ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />-->
+		<PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />-->
+	  <ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
