@@ -136,7 +136,7 @@ public partial class StartupPage : ContentPage
             List<(AssemblyName, Assembly)> loadedassemblies = new();
 
 
-            assemblies.Push(typeof(SanteDB.Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
+            assemblies.Push(typeof(Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
 
             while (assemblies.TryPop(out var assemblyname))
             {

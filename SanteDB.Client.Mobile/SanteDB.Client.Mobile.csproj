@@ -45,7 +45,9 @@
     <TrimmedRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" />
     <TrimmedRootAssembly Include="SanteDB.OrmLite" />
     <TrimmedRootAssembly Include="SanteDB.Core.i18n" />
-	</ItemGroup>
+	  <TrimmedRootAssembly Include="ZXing.Windows.Compatibility" />
+
+  </ItemGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -80,9 +82,9 @@
 		<PackageReference Include="Microsoft.Data.Sqlite.Core" Version="8.0.8" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 		<PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
-    <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
-    <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
-    <PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.4.1" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
+		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.4.1" />
     
     
 	</ItemGroup>
@@ -95,7 +97,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />
+		<PackageReference Include="SanteDB.Client.Shared" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Persistence.Data" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Persistence.Data.Synchronization" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Persistence.Data.Auditing" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Client" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Matcher" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Client.Batteries" Version="$(VersionNumber)" />
+		<PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />
+	  <!--<ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />-->
 	</ItemGroup>
 
 	<ItemGroup>
