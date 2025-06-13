@@ -1,0 +1,8 @@
+﻿org.santedb.admin.pak
+org.santedb.bicore.pak
+org.santedb.config.init.pak
+org.santedb.config.pak
+org.santedb.core.pak
+org.santedb.en.pak
+org.santedb.uicore.pak
+

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SanteDB.Client.Mobile.StartupPage"
+             Title="StartupPage">
+    <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+        <Image Source="Resources/Images/santedb_render.png" MaximumWidthRequest="192" Margin="10,0,10,5" />
+        <Label 
+            x:Name="StatusLabel"
+            Text="Starting SanteDB"
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+        <ProgressBar 
+            x:Name="StatusProgress"
+            Progress="0" />
+    </VerticalStackLayout>
+</ContentPage>

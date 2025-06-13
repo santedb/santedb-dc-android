@@ -1,0 +1,211 @@
+﻿/*
+ * Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ * Portions Copyright 2019-2024 SanteSuite Contributors (See NOTICE)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: trevor
+ * Date: 2023-4-19
+ */
+using Android.Webkit;
+using Java.Interop;
+using Newtonsoft.Json;
+using SanteDB.Client.Configuration.Upstream;
+using SanteDB.Core;
+using SanteDB.Core.Security.Configuration;
+using SanteDB.Core.Services;
+
+#nullable enable
+
+namespace SanteDB.Client.Mobile
+{
+    public class MauiBrowserInterface : Java.Lang.Object
+    {
+        readonly IApplicationServiceContext _Context;
+        readonly MainPage _MainPage;
+        readonly IConfigurationManager? _ConfigManager;
+        readonly string? _DeviceId;
+        readonly string? _ClientId;
+        readonly string? _RealmId;
+        readonly string? _FacilityId;
+        readonly string? _OwnerId;
+
+        static string? _Version;
+        private static string? GetAssemblyVersion()
+        {
+            if (null != _Version)
+            {
+                return _Version;
+            }
+            _Version = typeof(MauiBrowserInterface)?.Assembly?.GetName()?.Version?.ToString();
+            return _Version;
+        }
+
+        public MauiBrowserInterface(IApplicationServiceContext context, MainPage mainPage)
+        {
+            _Context = context;
+            _ConfigManager = SanteDB.Core.ApplicationServiceContext.GetService<IConfigurationManager>(context);
+            _MainPage = mainPage;
+
+            var upstreamconfig = _ConfigManager?.GetSection<UpstreamConfigurationSection>();
+
+            var devicecredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Device);
+            var appcredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Application);
+
+            var securityconfig = _ConfigManager?.GetSection<SecurityConfigurationSection>();
+
+
+            _DeviceId = devicecredential?.CredentialName;
+            _ClientId = upstreamconfig?.Realm == null ? null : appcredential?.CredentialName;
+            _RealmId = upstreamconfig?.Realm?.DomainName;
+
+            _FacilityId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedFacilityUuid).ToString();
+            _OwnerId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedOwnerUuid).ToString();
+
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string GetServiceState()
+        {
+            var state = new Shared.AppServiceStateResponse
+            {
+                Ami = IsAdminAvailable(),
+                ClientId = _ClientId,
+                DeviceId = _DeviceId,
+                Hdsi = IsClinicalAvailable(),
+                Magic = GetMagic(),
+                Online = GetOnlineState(),
+                Realm = GetRealm(),
+                Version = GetAssemblyVersion(),
+                FacilityId = _FacilityId,
+                OwnerId = _OwnerId,
+            };
+
+            return JsonConvert.SerializeObject(state);
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public bool GetOnlineState()
+        {
+            return true;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public bool IsAdminAvailable()
+        {
+            return true;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public bool IsClinicalAvailable()
+        {
+            return true;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetClientId()
+        {
+            return _ClientId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetAssignedFacilityId()
+        {
+            return _FacilityId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetAssignedOwnerId()
+        {
+            return _OwnerId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetDeviceId()
+        {
+            return _DeviceId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetRealm()
+        {
+            return _RealmId;
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string GetLocale()
+        {
+            return "en"; //TODO
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public void SetLocale(string locale)
+        {
+            //TODO: Fix this.
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public String GetString(String stringId)
+        {
+            try
+            {
+                var appletResource = SanteDB.Core.ApplicationServiceContext.GetService<ILocalizationService>(_Context).GetStrings(this.GetLocale()).FirstOrDefault(o => o.Key == stringId).Value;
+                if (appletResource != null)
+                    return appletResource;
+                else
+                {
+                    //var androidStringId = this.m_context.Resources.GetIdentifier(stringId, "string", this.m_context.PackageName);
+                    //if (androidStringId > 0)
+                    //    return this.m_context.Resources.GetString(androidStringId);
+                    //else
+                        return stringId;
+                }
+            }
+            catch (Exception e)
+            {
+                //this.m_tracer.TraceWarning("Error retreiving string {0}", stringId);
+                return stringId;
+            }
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string GetMagic()
+        {
+            return _Context.ActivityUuid.ToString();
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public string? GetVersion() => GetAssemblyVersion();
+
+        [Export]
+        [JavascriptInterface]
+        public string ScanBarcode()
+        {
+            return Nito.AsyncEx.AsyncContext.Run(async () => await _MainPage.ScanBarcodeAsync());
+        }
+    }
+}
