@@ -128,6 +128,8 @@ namespace SanteDB.Client.Mobile.Configuration
             appServiceSection.AppSettings.Add(new AppSettingKeyValuePair("allow.patient.ethnicity", "false"));
             appServiceSection.AppSettings = appServiceSection.AppSettings.OrderBy(o => o.Key).ToList();
 
+            // On android the user cannot dynamically load asms
+            appServiceSection.AllowUnsignedAssemblies = true;
 
             // Security configuration
             var wlan = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(o => o.NetworkInterfaceType == NetworkInterfaceType.Ethernet || o.Description.StartsWith("wlan"));

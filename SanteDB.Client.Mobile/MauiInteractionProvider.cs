@@ -18,6 +18,7 @@
  * Date: 2023-4-19
  */
 using SanteDB.Client.UserInterface;
+using SanteDB.Core.i18n;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,17 +40,20 @@ namespace SanteDB.Client.Mobile
 
         public void Alert(string message)
         {
-            
+            // JF- TODO: Fix this to look up from the i18n 
+            _StartupPage.DisplayAlert("Alert", message, "OK").Wait();
         }
 
         public bool Confirm(string message)
         {
-            return false;
+            // JF - TODO: Fix this to look up from the i18n
+            return _StartupPage.DisplayAlert("Confirm", message, "OK", "Cancel").Result;
         }
 
         public string Prompt(string message, bool maskEntry = false)
         {
-            return null;
+            // JF - TODO: Fix this to look up from the i18n
+            return _StartupPage.DisplayPromptAsync("Prompt", message).Result;
         }
 
         public void SetStatus(string statusText, float progressIndicator)

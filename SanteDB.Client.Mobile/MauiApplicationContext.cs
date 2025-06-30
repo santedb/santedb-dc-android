@@ -34,7 +34,7 @@ namespace SanteDB.Client.Mobile
         readonly StartupPage _StartupPage;
 
         private MauiInteractionProvider _InteractionProvider;
-
+        
         public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
         {
