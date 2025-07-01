@@ -66,7 +66,7 @@ namespace SanteDB.Client.Mobile.Configuration
             }
 
             appServiceSection.ServiceProviders.AddRange(new List<TypeReferenceConfiguration>() {
-                    new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)),
+                    new TypeReferenceConfiguration(typeof(NullSymmetricCryptographicProvider)),
                     new TypeReferenceConfiguration(typeof(InMemoryTickleService)),
                     new TypeReferenceConfiguration(typeof(DefaultNetworkInformationService)),
                     new TypeReferenceConfiguration(typeof(SHA256PasswordHashingService)),
@@ -103,7 +103,7 @@ namespace SanteDB.Client.Mobile.Configuration
                     new TypeReferenceConfiguration(typeof(DefaultDataSigningService)),
                     new TypeReferenceConfiguration(typeof(DefaultBarcodeProviderService)),
                     new TypeReferenceConfiguration(typeof(FileSystemDispatcherQueueService)),
-                    new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)),
+                    //new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)),
                     new TypeReferenceConfiguration(typeof(RepositoryEntitySource)),
                     new TypeReferenceConfiguration(typeof(FileSystemCdssLibraryRepository)),
                     new TypeReferenceConfiguration(typeof(MauiPlatformSecurityProvider)),

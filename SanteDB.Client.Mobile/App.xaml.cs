@@ -17,6 +17,8 @@
  * User: trevor
  * Date: 2023-8-24
  */
+using Microsoft.Maui.Controls;
+
 namespace SanteDB.Client.Mobile
 {
     public partial class App : Application

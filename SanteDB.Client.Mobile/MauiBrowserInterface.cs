@@ -24,6 +24,8 @@ using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Core;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
+using System;
+using System.Linq;
 
 #nullable enable
 

@@ -22,6 +22,9 @@ namespace SanteDB.Client.Mobile.Controls;
 using BarcodeScanner.Mobile;
 using CommunityToolkit.Maui.Markup;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Maui.Controls;
+using System;
+using System.Linq;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 public class BarcodeScannerPopup : Popup, IDisposable
