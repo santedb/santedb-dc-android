@@ -41,10 +41,6 @@ namespace SanteDB.Client.Mobile
 
             _StartupPage = startupPage;
 
-#if DEBUG
-            //configurationManager.GetSection<ApplicationServiceContextConfigurationSection>().AllowUnsignedAssemblies = true;
-#endif
-
             configurationManager.Configuration.AddSection<SecurityConfigurationSection>(new SecurityConfigurationSection
             {
                 Signatures = new List<SecuritySignatureConfiguration>
@@ -79,11 +75,20 @@ namespace SanteDB.Client.Mobile
 
         protected override void OnRestartRequested(object sender)
         {
+            var reason = sender switch
+            {
+                SanteDB.Core.Services.Impl.FileConfigurationService => Constants.REASONKEY_FILECONFIGURATION,
+                SanteDB.Client.Configuration.InitialConfigurationManager => Constants.REASONKEY_INITIALCONFIGURATION,
+                SanteDB.Client.Upstream.UpstreamUpdateManagerService => Constants.REASONKEY_UPDATE,
+                SanteDB.Core.Data.Backup.DefaultBackupManager => Constants.REASONKEY_RESTORE,
+                _ => Constants.REASONKEY_DEFAULT
+            };
+
             if (Application.Current?.Dispatcher is IDispatcher dispatcher)
             {
-                dispatcher.Dispatch(() =>
+                _ = dispatcher.DispatchAsync(() =>
                 {
-                    Application.Current.Quit();
+                    return Shell.Current?.GoToAsync($"//AppRestart?reason={reason}");
                 });
             }
         }

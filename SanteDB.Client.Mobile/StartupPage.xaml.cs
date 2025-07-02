@@ -237,6 +237,7 @@ public partial class StartupPage : ContentPage
 
                 this.Dispatcher.Dispatch(() =>
                 {
+                    var shell = Shell.Current;
                     App.Current.MainPage = new MainPage(starturl, magic, context);
                 });
 

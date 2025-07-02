@@ -22,7 +22,7 @@
 
 		<!-- Versions -->
 		<ApplicationDisplayVersion>3.0.0</ApplicationDisplayVersion>
-		<ApplicationVersion>3.0</ApplicationVersion>
+		<ApplicationVersion>2005</ApplicationVersion>
 
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>-->
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>-->
@@ -35,6 +35,15 @@
 
     <AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
     <AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<AotAssemblies>false</AotAssemblies>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	  <DebugSymbols>True</DebugSymbols>
 	</PropertyGroup>
 
   <ItemGroup>
@@ -116,6 +125,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Controls\NotificationBar.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="RestartPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="StartupPage.xaml">

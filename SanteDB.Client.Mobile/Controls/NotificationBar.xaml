@@ -12,7 +12,7 @@
                         <Button Grid.Column="1" Text="Dismiss" Background="DarkGoldenrod" Margin="10,5" Clicked="DismissedButton_Clicked" />
                     </Grid>
                     <ProgressBar Progress="{Binding NotificationProgress}" WidthRequest="150" HorizontalOptions="Start" VerticalOptions="Center" Margin="10,5" ProgressColor="DarkGoldenrod" InputTransparent="True" />
-                    <Label HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" Text="{Binding NotificationText}" />
+                    <Label HorizontalOptions="Center" VerticalOptions="Center" InputTransparent="True" Text="{Binding NotificationText}" TextColor="Black" />
                 </Grid>
             </Border>
         </ControlTemplate>

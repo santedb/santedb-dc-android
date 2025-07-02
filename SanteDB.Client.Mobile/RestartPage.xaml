@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SanteDB.Client.Mobile.RestartPage"
+             Title="{x:Binding ContentPageTitle}">
+    <VerticalStackLayout VerticalOptions="Center">
+        <VerticalStackLayout>
+            <Label 
+                x:Name="TitleLabel"
+                FontSize="Title"
+                Text="{x:Binding TitleLabelText}"
+                VerticalOptions="Center" 
+                HorizontalOptions="Center" Margin="0,0,0,20" /> 
+            <Label
+                x:Name="ContentLabel"
+                FontSize="Body"
+                Text="{x:Binding ContentLabelText}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center" />
+            <Button
+                x:Name="QuitButton"
+                Text="{x:Binding QuitButtonText}"
+                VerticalOptions="Center"
+                HorizontalOptions="Center"
+                Padding="50,10"
+                Margin="20"
+                FontSize="Large"
+                Clicked="QuitButton_Clicked"/>
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>
