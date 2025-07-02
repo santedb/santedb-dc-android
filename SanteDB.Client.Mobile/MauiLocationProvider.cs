@@ -17,6 +17,8 @@
  * User: trevor
  * Date: 2023-4-28
  */
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Devices.Sensors;
 using SanteDB.Client.Services;
 using SanteDB.Core.Model.DataTypes;
 using SanteDB.Core.Services;

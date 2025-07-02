@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-    <VersionNumber Condition="'$(VersionNumber)'==''">3.0-debug</VersionNumber>
+		<VersionNumber Condition="'$(VersionNumber)'==''">3.0-debug</VersionNumber>
 		<!--<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
-    <TargetFrameworks>net8.0-android</TargetFrameworks>
+		<TargetFrameworks>net8.0-android</TargetFrameworks>
 		<!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>-->
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
@@ -11,7 +11,7 @@
 		<RootNamespace>SanteDB.Client.Mobile</RootNamespace>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<ImplicitUsings>disable</ImplicitUsings>
 
 		<!-- Display name -->
 		<ApplicationTitle>SanteDB</ApplicationTitle>
@@ -19,9 +19,9 @@
 		<!-- App Identifier -->
 		<ApplicationId>org.santedb.mobile</ApplicationId>
 		<ApplicationIdGuid>43d0ddbb-d6ef-4887-b48e-001fe8b290c4</ApplicationIdGuid>
-
+		<UseInterpreter Condition="'$(Configuration)'=='Debug'">false</UseInterpreter>
 		<!-- Versions -->
-		<ApplicationDisplayVersion>3.0.0</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>3.0.2005</ApplicationDisplayVersion>
 		<ApplicationVersion>2005</ApplicationVersion>
 
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>-->
@@ -30,11 +30,16 @@
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>-->
 		<!--<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>-->
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>-->
+		<AndroidEnableProfiler>true</AndroidEnableProfiler>
+		<TrimMode>partial</TrimMode>
+		<AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
+		<AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
+		<TrimmerRootDescriptor>ILink.Descriptors.xml</TrimmerRootDescriptor>
+	</PropertyGroup>
 
-    <TrimMode>partial</TrimMode>
-
-    <AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
-    <AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+		<RunAOTCompilation>False</RunAOTCompilation>
+		<DebugSymbols>False</DebugSymbols>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -48,15 +53,14 @@
 
   <ItemGroup>
 		<!-- https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trimming-options?pivots=dotnet-7-0#root-assemblies -->
-    <TrimmedRootAssembly Include="SanteDB.Core.Api" />
-    <TrimmedRootAssembly Include="SanteDB.Core.Applets" />
-    <TrimmedRootAssembly Include="SanteDB.Core.Model" />
-    <TrimmedRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" />
-    <TrimmedRootAssembly Include="SanteDB.OrmLite" />
-    <TrimmedRootAssembly Include="SanteDB.Core.i18n" />
-	  <TrimmedRootAssembly Include="ZXing.Windows.Compatibility" />
+		<TrimmedRootAssembly Include="SanteDB.Core.Api" />
+		<TrimmedRootAssembly Include="SanteDB.Core.Applets" />
+		<TrimmedRootAssembly Include="SanteDB.Core.Model" />
+		<TrimmedRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" />
+		<TrimmedRootAssembly Include="SanteDB.OrmLite" />
+		<TrimmedRootAssembly Include="SanteDB.Core.i18n" />
 
-  </ItemGroup>
+	</ItemGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
@@ -64,7 +68,7 @@
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
-    <!--<MauiSplashScreen Include="Resources\Images\santedb_render.png" Color="#FFFFFF" BaseSize="128,128" Resize="True" />-->
+		<!--<MauiSplashScreen Include="Resources\Images\santedb_render.png" Color="#FFFFFF" BaseSize="128,128" Resize="True" />-->
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -78,10 +82,17 @@
 
 
 	<ItemGroup>
-	  <None Remove="Resources\Images\santedb_render.png" />
-	  <None Remove="Resources\Raw\applets.txt" />
-	  <None Remove="Resources\Raw\santedb-shim.js" />
-	  <None Remove="Resources\Raw\santedb.core.sln.pak" />
+		<None Remove="Resources\Images\santedb_render.png" />
+		<None Remove="Resources\Raw\applets.txt" />
+		<None Remove="Resources\Raw\santedb-shim.js" />
+		<None Remove="Resources\Raw\santedb.core.sln.pak" />
+	</ItemGroup>
+
+
+	<ItemGroup>
+		<LinkDescription Include="ILink.Descriptors.xml">
+			<LogicalName>ILLink.Descriptors.xml</LogicalName>
+		</LinkDescription>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -94,14 +105,14 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.4.1" />
-    
-    
+
+
 	</ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
+	<ItemGroup Condition="'$(TargetFramework)' == 'net8.0-android'">
 		<PackageReference Include="Xamarin.AndroidX.Activity.Ktx" Version="1.9.1.1" />
-    <PackageReference Include="Xamarin.Google.MLKit.BarcodeScanning" Version="117.2.0.7" />
-    <PackageReference Include="SQLitePCLRaw.provider.e_sqlite3mc" Version="2.1.9" Exclude="Build,Analyzers" />
+		<PackageReference Include="Xamarin.Google.MLKit.BarcodeScanning" Version="117.2.0.7" />
+		<PackageReference Include="SQLitePCLRaw.provider.e_sqlite3mc" Version="2.1.9" Exclude="Build,Analyzers" />
 		<PackageReference Include="SQLiteSpellfix.lib.e_sqlite3mc.android" Version="2.2.1" Exclude="Build,Analyzers" />
 	</ItemGroup>
 
@@ -114,13 +125,13 @@
 		<PackageReference Include="SanteDB.Matcher" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Client.Batteries" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />-->
-	  <ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />
+		<ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="StartupPage.xaml.cs">
-	    <DependentUpon>StartupPage.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="StartupPage.xaml.cs">
+			<DependentUpon>StartupPage.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -136,15 +147,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiAsset Update="Resources\Raw\santedb.core.sln.pak">
-	    <CopyToOutputDirectory></CopyToOutputDirectory>
-	  </MauiAsset>
+		<MauiAsset Update="Resources\Raw\santedb.core.sln.pak">
+			<CopyToOutputDirectory></CopyToOutputDirectory>
+		</MauiAsset>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiAsset Update="Resources\Raw\santedb.core.sln.pak">
-	    <CopyToOutputDirectory></CopyToOutputDirectory>
-	  </MauiAsset>
+		<MauiAsset Update="Resources\Raw\santedb.core.sln.pak">
+			<CopyToOutputDirectory></CopyToOutputDirectory>
+		</MauiAsset>
 	</ItemGroup>
 
 </Project>

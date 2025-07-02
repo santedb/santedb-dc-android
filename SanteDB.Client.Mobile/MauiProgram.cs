@@ -26,11 +26,19 @@ using System.Runtime.Loader;
 using System.Security.Cryptography.X509Certificates;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
-
+using System.Diagnostics.CodeAnalysis;
+using System.Xml.Linq;
+using Microsoft.Maui.Hosting;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Data.Sqlite;
 namespace SanteDB.Client.Mobile
 {
+
     public static class MauiProgram
     {
+        // JF - These lines are to prevent the Linker from trimming assemblies in release mode - Microsoft Apparently has inconsistent/incorrect documentation about the linker configuration files
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(XElement))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SqliteConnection))]
         public static MauiApp CreateMauiApp()
         {
             //try

@@ -4,14 +4,25 @@
              x:Class="SanteDB.Client.Mobile.StartupPage"
              Title="StartupPage">
     <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
-        <Image Source="Resources/Images/santedb_render.png" MaximumWidthRequest="192" Margin="10,0,10,5" />
+        <Image Source="Resources/Images/santedb_render.png" MaximumWidthRequest="256" Margin="10,0,10,5" />
         <Label 
             x:Name="StatusLabel"
             Text="Starting SanteDB"
-            VerticalOptions="Center" 
+            HorizontalTextAlignment="Center"
             HorizontalOptions="Center" />
         <ProgressBar 
             x:Name="StatusProgress"
             Progress="0" />
+        <Label x:Name="VersionLabel"
+               HorizontalTextAlignment="Center"
+               HorizontalOptions="Center" />
+        <Label 
+             x:Name="ErrorLabel"
+             IsVisible="False"
+             TextColor="Red"
+             LineBreakMode="WordWrap"
+             HorizontalTextAlignment="Center"
+             HorizontalOptions="Center" />
     </VerticalStackLayout>
+   
 </ContentPage>

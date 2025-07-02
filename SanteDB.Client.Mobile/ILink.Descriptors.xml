@@ -1,0 +1,6 @@
+﻿<linker>
+	<assembly fullname="System.Xml.Linq" preserve="all" />
+	<assembly fullname="System" preserve="all" />
+	<assembly fullname="mscorlib" preserve="all" />
+	<assembly fullname="Microsoft.Data.Sqlite" preserve="all" />
+</linker>

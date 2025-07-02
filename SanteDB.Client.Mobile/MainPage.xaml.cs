@@ -19,9 +19,16 @@
  */
 using CommunityToolkit.Maui.Views;
 using Hl7.Fhir.ElementModel.Types;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Handlers;
 using SanteDB.Core;
+using System;
+using System.Configuration;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using static Android.Webkit.WebSettings;
 
 namespace SanteDB.Client.Mobile
 {
@@ -43,6 +50,7 @@ namespace SanteDB.Client.Mobile
                 });
             };
 
+            applicationContext.GetInteractionProvider().CurrentContentPage = this;
             InitializeComponent();
 
             _HttpMagic = httpMagicValue;
@@ -61,13 +69,28 @@ namespace SanteDB.Client.Mobile
                 awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}";
                 awebview.Settings.JavaScriptEnabled = true;
                 awebview.Settings.SetGeolocationEnabled(true);
-
+                awebview.Settings.BuiltInZoomControls = false;
+                awebview.Settings.DisplayZoomControls = false;
+                awebview.Settings.PluginsEnabled = false;
+                awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false;
+                awebview.Settings.SetRenderPriority(RenderPriority.High);
+                awebview.Settings.SetSupportMultipleWindows(false);
+                awebview.Settings.SetAppCacheEnabled(true);
+                awebview.SetScrollContainer(true);
+                awebview.ScrollBarStyle = Android.Views.ScrollbarStyles.InsideOverlay;
                 var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this);
                 awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
+                
+                if(Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.Kitkat)
+                {
+                    awebview.SetLayerType(Android.Views.LayerType.Hardware, null);
+                }
 
+                awebview.SetWebChromeClient(new MauiChromeClient());
+#if !DISABLE_WEBVIEW_DEBUGGING
                 //TODO: Additional platform initialization
-
-
+                Android.Webkit.WebView.SetWebContentsDebuggingEnabled(true);
+#endif 
             }
             else
             {

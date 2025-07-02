@@ -17,6 +17,8 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Dispatching;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
@@ -34,8 +36,8 @@ namespace SanteDB.Client.Mobile
         readonly StartupPage _StartupPage;
 
         private MauiInteractionProvider _InteractionProvider;
-
-        public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
+        
+        public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
         {
 
@@ -54,7 +56,7 @@ namespace SanteDB.Client.Mobile
             });
             _InteractionProvider = new MauiInteractionProvider(startupPage);
             DependencyServiceManager.AddServiceProvider(_InteractionProvider);
-            DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider(bridgeScript));
+            DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider());
             DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
             DependencyServiceManager.AddServiceProvider(new MauiPlatformSecurityProvider());
 

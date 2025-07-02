@@ -33,18 +33,29 @@ using SanteDB.Client.Shared;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Core.Services;
 using SanteDB.Rest.WWW;
+using Microsoft.Maui.Controls;
+using System.Collections.Generic;
+using System.IO;
+using Microsoft.Maui.Storage;
+using System.Threading.Tasks;
+using System.Linq;
+using System;
 
 namespace SanteDB.Client.Mobile;
 
 public partial class StartupPage : ContentPage
 {
+
+    // JF - Reduce the number of dispatching to the UI thread
+    private string m_lastStatusText = string.Empty;
+    private float m_lastStatusProgress = 0.0f;
+
     public StartupPage()
     {
         InitializeComponent();
     }
 
-    public bool IsStarting { get; }
-
+    public bool IsStarting { get; private set; }
 
     public void SetStatus(string identifier, string status, float progress)
     {
@@ -56,11 +67,16 @@ public partial class StartupPage : ContentPage
         else if (progress > 1)
             progress = 1;
 
-        Dispatcher.Dispatch(() =>
+        if (this.m_lastStatusText != status || this.m_lastStatusProgress != progress)
         {
-            StatusLabel.Text = status;
-            StatusProgress.Progress = progress;
-        });
+            this.m_lastStatusText = status;
+            this.m_lastStatusProgress = progress;
+            Dispatcher.Dispatch(() =>
+            {
+                StatusLabel.Text = status;
+                StatusProgress.Progress = progress;
+            });
+        }
     }
 
     [RequiresUnreferencedCode("Loads types from AppDomain.CurrentDomain")]
@@ -68,21 +84,25 @@ public partial class StartupPage : ContentPage
     {
         base.OnAppearing();
 
-
+        this.VersionLabel.Text = $"v.{this.GetType().Assembly.GetName().Version}";
 
         var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
 
         if (!directoryprovider.IsConfigFilePresent())
         {
+            this.StatusLabel.Text = "Preparing Initial Configuration";
             //ShowStatusText("Preparing Default Applets");
             List<string> applets = new();
             using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
             using (var sr = new StreamReader(appletslist))
             {
-                string line;
-                while (!string.IsNullOrWhiteSpace((line = await sr.ReadLineAsync())))
+                while (!sr.EndOfStream) // JF - Refactored to prevent Java.Lang.AssetStreamClosed exception
                 {
-                    applets.Add(line);
+                    var line = sr.ReadLine();
+                    if (!System.String.IsNullOrEmpty(line))
+                    {
+                        applets.Add(line);
+                    }
                 }
             }
 
@@ -90,10 +110,10 @@ public partial class StartupPage : ContentPage
 
             Directory.CreateDirectory(pakdirectory);
 
-
+            var appletsPrepared = 0;
             foreach (var applet in applets)
             {
-                SetStatus(null, $"Preparing {applet}", 0f);
+                SetStatus(null, $"Preparing Initial Configuration", (float)appletsPrepared++ / (float)applets.Count);
                 using var appletstream = await FileSystem.OpenAppPackageFileAsync(applet);
                 using var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite);
 
@@ -104,15 +124,9 @@ public partial class StartupPage : ContentPage
             }
         }
 
-        using var stream = await FileSystem.OpenAppPackageFileAsync("santedb_shim.js");
-        using var reader = new StreamReader(stream);
-
-        var bridgescript = await reader.ReadToEndAsync();
-
         var task = Task.Run(async () =>
         {
             await Task.Yield(); //Yield back to move off the main thread.
-
 
             //var splashwriter = new SplashScreenTraceWriter(m_window);
             //SanteDB.Core.Diagnostics.Tracer.AddWriter(splashwriter, System.Diagnostics.Tracing.EventLevel.Verbose);
@@ -132,107 +146,119 @@ public partial class StartupPage : ContentPage
             //    }
             //});
 
-            Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
-            List<(AssemblyName, Assembly)> loadedassemblies = new();
-
-
-            assemblies.Push(typeof(Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
-
-            while (assemblies.TryPop(out var assemblyname))
+            // JF - Allow startup to set status on the startup page
+            try
             {
-                if (loadedassemblies.Any(tuple => assemblyname.FullName.Equals(tuple.Item1.FullName, StringComparison.Ordinal)))
+                this.IsStarting = true;
+                // Allow set status
+                Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
+                List<(AssemblyName, Assembly)> loadedassemblies = new();
+                assemblies.Push(typeof(Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
+
+                // JF - Keep track for showing progress to the user 
+                int totalAssemblies = assemblies.Count(), processedAssemblies = 0;
+
+                while (assemblies.TryPop(out var assemblyname))
                 {
-                    continue;
+                    SetStatus(null, "Loading SanteDB References", (float)processedAssemblies++ / (float)totalAssemblies);
+
+                    if (loadedassemblies.Any(tuple => assemblyname.FullName.Equals(tuple.Item1.FullName, StringComparison.Ordinal)))
+                    {
+                        continue;
+                    }
+
+
+                    try
+                    {
+                        var assembly = Assembly.Load(assemblyname);
+                        loadedassemblies.Add((assemblyname, assembly));
+
+                        if (assemblyname.Name.StartsWith("SanteDB"))
+                        {
+                            foreach (var refassembly in assembly.GetReferencedAssemblies())
+                            {
+                                assemblies.Push(refassembly);
+                            }
+                        }
+                    }
+                    catch (Exception)
+                    {
+
+                    }
+                }
+
+
+                SetStatus(null, "Initializing SQLite Provider", 0f);
+
+                try
+                {
+                    SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3mc());
+                    SQLitePCL.raw.FreezeProvider(true);
+                    SqliteConnection.ClearAllPools(); //Force-load sqlite.
+
+                    SanteDB.OrmLite.Providers.Sqlite.SqliteSpellfixExtensionLoader.SetLibraryInformation("libe_sqlite3mc", "sqlite3_spellfix_init");
+                }
+                catch
+                {
+
                 }
 
                 try
                 {
-                    var assembly = Assembly.Load(assemblyname);
-                    loadedassemblies.Add((assemblyname, assembly));
-
-                    if (assemblyname.Name.StartsWith("SanteDB"))
+                    var applicationidentity = new SecurityApplication
                     {
-                        foreach (var refassembly in assembly.GetReferencedAssemblies())
-                        {
-                            assemblies.Push(refassembly);
-                        }
+                        Key = Guid.Parse("a0fdceb2-a2d3-11ea-ae5e-00155d4f0905"),
+                        //ApplicationSecret = Parameters.ApplicationSecret ?? "FE78825ADB56401380DBB406411221FD"
+                        //Name = Parameters.ApplicationName ?? "org.santedb.disconnected_client.win32"
+                        ApplicationSecret = "C5B645B7D30A4E7E81A1C3D8B0E28F4C",
+                        Name = "org.santedb.disconnected_client.android"
+                    };
+
+
+
+                    SanteDB.Client.Batteries.ClientBatteries.Initialize(directoryprovider.GetDataDirectory(), directoryprovider.GetConfigDirectory(), new Client.Configuration.Upstream.UpstreamCredentialConfiguration()
+                    {
+                        CredentialType = SanteDB.Client.Configuration.Upstream.UpstreamCredentialType.Application,
+                        CredentialName = applicationidentity.Name,
+                        CredentialSecret = applicationidentity.ApplicationSecret
+                    });
+
+                    AppDomain.CurrentDomain.SetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA, "http://127.0.0.1:9200");
+
+                    IConfigurationManager configmanager = null;
+
+                    if (directoryprovider.IsConfigFilePresent())
+                    {
+                        configmanager = new FileConfigurationService(directoryprovider.GetConfigFilePath(), isReadonly: true);
                     }
-                }
-                catch (Exception)
-                {
-
-                }
-            }
+                    else
+                    {
+                        configmanager = new InitialConfigurationManager(SanteDBHostType.Client, "DEFAULT", directoryprovider.GetConfigFilePath());
+                    }
 
 
-            try
-            {
-                SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3mc());
-                SQLitePCL.raw.FreezeProvider(true);
-                SqliteConnection.ClearAllPools(); //Force-load sqlite.
+                    //var configmanager = new SanteDB.Client.Batteries.Configuration.DefaultDcdrConfigurationProvider();
 
-                SanteDB.OrmLite.Providers.Sqlite.SqliteSpellfixExtensionLoader.SetLibraryInformation("libe_sqlite3mc", "sqlite3_spellfix_init");
-            }
-            catch
-            {
+                    var context = new MauiApplicationContext("DEFAULT", configmanager, this);
 
-            }
+                    SetStatus(null, "Starting SanteDB Service Context", 0f);
+
+                    ServiceUtil.Start(Guid.NewGuid(), context);
 
 
+                    var magic = context.ActivityUuid.ToByteArray().HexEncode();
 
-            try
-            {
-                var applicationidentity = new SecurityApplication
-                {
-                    Key = Guid.Parse("a0fdceb2-a2d3-11ea-ae5e-00155d4f0905"),
-                    //ApplicationSecret = Parameters.ApplicationSecret ?? "FE78825ADB56401380DBB406411221FD"
-                    //Name = Parameters.ApplicationName ?? "org.santedb.disconnected_client.win32"
-                    ApplicationSecret = "C5B645B7D30A4E7E81A1C3D8B0E28F4C",
-                    Name = "org.santedb.disconnected_client.android"
-                };
+                    //splashwriter.TraceInfo(string.Empty, string.Empty);
 
+                    //SanteDB.Core.Diagnostics.Tracer.RemoveWriter(splashwriter);
 
+                    // Install the packages to the local applet manager
 
-                SanteDB.Client.Batteries.ClientBatteries.Initialize(directoryprovider.GetDataDirectory(), directoryprovider.GetConfigDirectory(), new Client.Configuration.Upstream.UpstreamCredentialConfiguration()
-                {
-                    CredentialType = SanteDB.Client.Configuration.Upstream.UpstreamCredentialType.Application,
-                    CredentialName = applicationidentity.Name,
-                    CredentialSecret = applicationidentity.ApplicationSecret
-                });
-
-                AppDomain.CurrentDomain.SetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA, "http://127.0.0.1:9200");
-
-                IConfigurationManager configmanager = null;
-
-                if (directoryprovider.IsConfigFilePresent())
-                {
-                    configmanager = new FileConfigurationService(directoryprovider.GetConfigFilePath(), isReadonly: true);
-                }
-                else
-                {
-                    configmanager = new InitialConfigurationManager(SanteDBHostType.Client, "DEFAULT", directoryprovider.GetConfigFilePath());
-                }
-
-
-                //var configmanager = new SanteDB.Client.Batteries.Configuration.DefaultDcdrConfigurationProvider();
-
-                var context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
-
-
-                ServiceUtil.Start(Guid.NewGuid(), context);
-
-
-                var magic = context.ActivityUuid.ToByteArray().HexEncode();
-
-                //splashwriter.TraceInfo(string.Empty, string.Empty);
-
-                //SanteDB.Core.Diagnostics.Tracer.RemoveWriter(splashwriter);
-
-                var starturl = configmanager switch
-                {
-                    InitialConfigurationManager => "http://127.0.0.1:9200/#!/config/initialSettings",
-                    _ => "http://127.0.0.1:9200/#!/"
-                };
+                    var starturl = configmanager switch
+                    {
+                        InitialConfigurationManager => "http://127.0.0.1:9200/#!/config/initialSettings",
+                        _ => "http://127.0.0.1:9200/#!/"
+                    };
 
 
                 this.Dispatcher.Dispatch(() =>
@@ -242,12 +268,26 @@ public partial class StartupPage : ContentPage
                 });
 
 
-            }
-            catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
-            {
-                Debugger.Break();
-            }
+                }
+                catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
+                {
+                    // JF- Throws exception if no debugger attached
+                    if (Debugger.IsAttached)
+                    {
+                        Debugger.Break();
+                    }
 
+                    Dispatcher.Dispatch(() =>
+                    {
+                        this.ErrorLabel.IsVisible = true;
+                        this.ErrorLabel.Text = ex.ToHumanReadableString();
+                    });
+                }
+            }
+            finally
+            {
+                this.IsStarting = false;
+            }
         });
 
 

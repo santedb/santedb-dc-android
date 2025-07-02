@@ -20,6 +20,7 @@
 using SanteDB.Client.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -30,9 +31,12 @@ namespace SanteDB.Client.Mobile
     {
         private string _BridgeScript;
 
-        public MauiBridgeProvider(string bridgeScript)
+        public MauiBridgeProvider()
         {
-            _BridgeScript = bridgeScript;
+            using (var str = new StreamReader(typeof(MauiBridgeProvider).Assembly.GetManifestResourceStream("SanteDB.Client.Mobile.Bridge.santedb_shim.js")))
+            {
+                _BridgeScript = str.ReadToEnd();
+            }
         }
 
         public string GetBridgeScript()

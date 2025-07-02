@@ -17,6 +17,7 @@
  * User: trevor
  * Date: 2023-4-20
  */
+using Microsoft.Maui.Devices;
 using SanteDB.Core;
 using SanteDB.Core.Services;
 using System;

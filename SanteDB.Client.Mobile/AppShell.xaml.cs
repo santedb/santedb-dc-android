@@ -17,6 +17,8 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Microsoft.Maui.Controls;
+
 namespace SanteDB.Client.Mobile
 {
     public partial class AppShell : Shell

@@ -26,6 +26,11 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 using System.Drawing.Printing;
+using Microsoft.Maui.Controls;
+using System.Linq;
+using System;
+using System.Threading.Tasks;
+using Microsoft.Maui.Dispatching;
 
 namespace SanteDB.Client.Mobile.Controls;
 

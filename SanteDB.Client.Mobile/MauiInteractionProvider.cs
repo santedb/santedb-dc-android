@@ -17,12 +17,10 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Microsoft.Maui.Controls;
 using SanteDB.Client.UserInterface;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 
 namespace SanteDB.Client.Mobile
 {
@@ -30,26 +28,59 @@ namespace SanteDB.Client.Mobile
     {
         public string ServiceName => "SanteDB Multiplatform Interaction Provider";
 
-        StartupPage _StartupPage;
+        // Interaction event callback
+        private readonly ManualResetEventSlim m_interactionResetEvent = new ManualResetEventSlim(false);
+
+        /// <summary>
+        /// JF- Allows the Maui application to push the currently visible content page
+        /// </summary>
+        internal ContentPage CurrentContentPage { get; set; }
 
         public MauiInteractionProvider(StartupPage startupPage)
         {
-            _StartupPage = startupPage;
+            this.CurrentContentPage = startupPage;
         }
 
         public void Alert(string message)
         {
-            
+            // JF- TODO: Fix this to look up from the i18n 
+            this.m_interactionResetEvent.Reset();
+            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            {
+                await Application.Current!.MainPage!.DisplayAlert("Alert", message, "OK");
+                this.m_interactionResetEvent.Set();
+            });
+            this.m_interactionResetEvent.Wait();
         }
 
         public bool Confirm(string message)
         {
-            return false;
+            
+            // JF - TODO: Fix this to look up from the i18n
+            bool result = false;
+            this.m_interactionResetEvent.Reset();
+            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            {
+                result = await Application.Current!.MainPage!.DisplayAlert("Confirm", message, "OK", "Cancel");
+                this.m_interactionResetEvent.Set();
+            });
+            this.m_interactionResetEvent.Wait();
+            return result;
         }
 
         public string Prompt(string message, bool maskEntry = false)
         {
-            return null;
+            string result = String.Empty;
+            this.m_interactionResetEvent.Reset();
+            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            {
+                result = await Application.Current!.MainPage!.DisplayPromptAsync("Prompt", message);
+                // JF - TODO: Fix this to look up from the i18n
+                this.m_interactionResetEvent.Set();
+            });
+            this.m_interactionResetEvent.Wait();
+            return result;
+
         }
 
         public void SetStatus(string statusText, float progressIndicator)
@@ -57,9 +88,10 @@ namespace SanteDB.Client.Mobile
 
         public void SetStatus(string taskIdentifier, string statusText, float progressIndicator)
         {
-            if (_StartupPage.IsStarting)
+            
+            if (this.CurrentContentPage is StartupPage sp && sp.IsStarting)
             {
-                _StartupPage.SetStatus(taskIdentifier, statusText, progressIndicator);
+                sp.SetStatus(taskIdentifier, statusText, progressIndicator);
             }
             else if (null != SetStatusCallback)
             {
