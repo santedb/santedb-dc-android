@@ -31,12 +31,9 @@ namespace SanteDB.Client.Mobile
     {
         private string _BridgeScript;
 
-        public MauiBridgeProvider()
+        public MauiBridgeProvider(string bridgeScript)
         {
-            using (var str = new StreamReader(typeof(MauiBridgeProvider).Assembly.GetManifestResourceStream("SanteDB.Client.Mobile.Bridge.santedb_shim.js")))
-            {
-                _BridgeScript = str.ReadToEnd();
-            }
+            _BridgeScript = bridgeScript;
         }
 
         public string GetBridgeScript()

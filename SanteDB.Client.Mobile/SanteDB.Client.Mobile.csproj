@@ -31,35 +31,32 @@
 		<!--<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>-->
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>-->
 		<AndroidEnableProfiler>true</AndroidEnableProfiler>
-		<TrimMode>partial</TrimMode>
 		<AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
 		<AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
-		<TrimmerRootDescriptor>ILink.Descriptors.xml</TrimmerRootDescriptor>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
 		<RunAOTCompilation>False</RunAOTCompilation>
 		<DebugSymbols>False</DebugSymbols>
+		<AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
-	  <DebugSymbols>True</DebugSymbols>
-	</PropertyGroup>
-
-  <ItemGroup>
+	<ItemGroup>
 		<!-- https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trimming-options?pivots=dotnet-7-0#root-assemblies -->
-		<TrimmedRootAssembly Include="SanteDB.Core.Api" />
-		<TrimmedRootAssembly Include="SanteDB.Core.Applets" />
-		<TrimmedRootAssembly Include="SanteDB.Core.Model" />
-		<TrimmedRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" />
-		<TrimmedRootAssembly Include="SanteDB.OrmLite" />
-		<TrimmedRootAssembly Include="SanteDB.Core.i18n" />
-
+		<TrimmerRootAssembly Include="SanteDB.Core.Api" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Core.Applets" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Core.Model" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.OrmLite" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Core.i18n" RootMode="library" />
+		<TrimmerRootAssembly Include="System.Xml.Linq" RootMode="all" />
+		<TrimmerRootAssembly Include="System" RootMode="all" />
+		<TrimmerRootAssembly Include="mscorlib" RootMode="all" />
+		<TrimmerRootAssembly Include="Microsoft.Data.Sqlite" RootMode="all" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -86,13 +83,6 @@
 		<None Remove="Resources\Raw\applets.txt" />
 		<None Remove="Resources\Raw\santedb-shim.js" />
 		<None Remove="Resources\Raw\santedb.core.sln.pak" />
-	</ItemGroup>
-
-
-	<ItemGroup>
-		<LinkDescription Include="ILink.Descriptors.xml">
-			<LogicalName>ILLink.Descriptors.xml</LogicalName>
-		</LinkDescription>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -144,18 +134,6 @@
 	  <MauiXaml Update="StartupPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	</ItemGroup>
-
-	<ItemGroup>
-		<MauiAsset Update="Resources\Raw\santedb.core.sln.pak">
-			<CopyToOutputDirectory></CopyToOutputDirectory>
-		</MauiAsset>
-	</ItemGroup>
-
-	<ItemGroup>
-		<MauiAsset Update="Resources\Raw\santedb.core.sln.pak">
-			<CopyToOutputDirectory></CopyToOutputDirectory>
-		</MauiAsset>
 	</ItemGroup>
 
 </Project>

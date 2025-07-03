@@ -34,11 +34,13 @@ namespace SanteDB.Client.Mobile
         /// <summary>
         /// JF- Allows the Maui application to push the currently visible content page
         /// </summary>
-        internal ContentPage CurrentContentPage { get; set; }
+        internal Page CurrentPage => _Application.MainPage;
 
-        public MauiInteractionProvider(StartupPage startupPage)
+        readonly Application _Application;
+
+        public MauiInteractionProvider(Application application, StartupPage startupPage)
         {
-            this.CurrentContentPage = startupPage;
+            _Application = application;
         }
 
         public void Alert(string message)
@@ -89,7 +91,7 @@ namespace SanteDB.Client.Mobile
         public void SetStatus(string taskIdentifier, string statusText, float progressIndicator)
         {
             
-            if (this.CurrentContentPage is StartupPage sp && sp.IsStarting)
+            if (this.CurrentPage is StartupPage sp && sp.IsStarting)
             {
                 sp.SetStatus(taskIdentifier, statusText, progressIndicator);
             }

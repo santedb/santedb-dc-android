@@ -17,20 +17,21 @@
  * User: trevor
  * Date: 2023-11-3
  */
+using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Markup;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Platform;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
-using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Markup;
-using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 using System.Drawing.Printing;
-using Microsoft.Maui.Controls;
 using System.Linq;
-using System;
 using System.Threading.Tasks;
-using Microsoft.Maui.Dispatching;
+using static CommunityToolkit.Maui.Markup.GridRowsColumns;
 
 namespace SanteDB.Client.Mobile.Controls;
 
@@ -200,9 +201,26 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
     {
         var popup = new Popup();
 
+        var heightrequest = DeviceDisplay.MainDisplayInfo.Height / DeviceDisplay.MainDisplayInfo.Density;
+
+#if ANDROID
+
+        var resources = Android.App.Application.Context.Resources;
+
+        var resourceid = resources?.GetIdentifier("navigation_bar_height", "dimen", "android");
+
+        if (resourceid > 0)
+        {
+            var dimen = resources!.GetDimensionPixelSize(resourceid.Value) / DeviceDisplay.MainDisplayInfo.Density;
+
+
+            heightrequest -= dimen;
+        }
+#endif
 
         popup.Content = new Grid()
         {
+            HeightRequest = heightrequest,
             RowDefinitions = Rows.Define(Auto, Stars(1), Auto),
             Children =
             {

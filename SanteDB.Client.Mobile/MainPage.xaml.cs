@@ -44,13 +44,9 @@ namespace SanteDB.Client.Mobile
 
             _ApplicationContext.GetInteractionProvider().SetStatusCallback = (task, message, progress) =>
             {
-                Dispatcher.DispatchAsync(async () =>
-                {
-                    await NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress);
-                });
+                Nito.AsyncEx.AsyncContext.Run(() => NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress));
             };
 
-            applicationContext.GetInteractionProvider().CurrentContentPage = this;
             InitializeComponent();
 
             _HttpMagic = httpMagicValue;
@@ -71,17 +67,17 @@ namespace SanteDB.Client.Mobile
                 awebview.Settings.SetGeolocationEnabled(true);
                 awebview.Settings.BuiltInZoomControls = false;
                 awebview.Settings.DisplayZoomControls = false;
-                awebview.Settings.PluginsEnabled = false;
+                //awebview.Settings.PluginsEnabled = false;
                 awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false;
-                awebview.Settings.SetRenderPriority(RenderPriority.High);
+                //awebview.Settings.SetRenderPriority(RenderPriority.High);
                 awebview.Settings.SetSupportMultipleWindows(false);
-                awebview.Settings.SetAppCacheEnabled(true);
+                //awebview.Settings.SetAppCacheEnabled(true);
                 awebview.SetScrollContainer(true);
                 awebview.ScrollBarStyle = Android.Views.ScrollbarStyles.InsideOverlay;
                 var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this);
                 awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
-                
-                if(Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.Kitkat)
+
+                if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.Kitkat)
                 {
                     awebview.SetLayerType(Android.Views.LayerType.Hardware, null);
                 }

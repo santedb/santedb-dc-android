@@ -2,24 +2,25 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SanteDB.Client.Mobile.RestartPage"
-             Title="{x:Binding ContentPageTitle}">
+             xmlns:my="SanteDB.Client.Mobile"
+             Title="App Restart Required">
     <VerticalStackLayout VerticalOptions="Center">
         <VerticalStackLayout>
             <Label 
                 x:Name="TitleLabel"
                 FontSize="Title"
-                Text="{x:Binding TitleLabelText}"
+                Text="App Restart Required"
                 VerticalOptions="Center" 
                 HorizontalOptions="Center" Margin="0,0,0,20" /> 
             <Label
                 x:Name="ContentLabel"
                 FontSize="Body"
-                Text="{x:Binding ContentLabelText}"
+                Text="The App needs to be restarted. Click the Quit button below, and then re-launch the app."
                 VerticalOptions="Center"
                 HorizontalOptions="Center" />
             <Button
                 x:Name="QuitButton"
-                Text="{x:Binding QuitButtonText}"
+                Text="Quit"
                 VerticalOptions="Center"
                 HorizontalOptions="Center"
                 Padding="50,10"

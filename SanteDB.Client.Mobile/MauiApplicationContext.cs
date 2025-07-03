@@ -17,6 +17,8 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Acornima.Ast;
+using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
 using SanteDB.Core.Configuration;
@@ -34,13 +36,15 @@ namespace SanteDB.Client.Mobile
     public class MauiApplicationContext : ClientApplicationContextBase
     {
         readonly StartupPage _StartupPage;
+        readonly Application _Application;
+        readonly MauiInteractionProvider _InteractionProvider;
 
-        private MauiInteractionProvider _InteractionProvider;
+
         
-        public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage)
+        public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
         {
-
+            _Application = Application.Current ?? throw new NullReferenceException("Application.Current is null.");
             _StartupPage = startupPage;
 
             configurationManager.Configuration.AddSection<SecurityConfigurationSection>(new SecurityConfigurationSection
@@ -54,9 +58,11 @@ namespace SanteDB.Client.Mobile
                     }
                 }
             });
-            _InteractionProvider = new MauiInteractionProvider(startupPage);
+
+
+            _InteractionProvider = new MauiInteractionProvider(_Application, startupPage);
             DependencyServiceManager.AddServiceProvider(_InteractionProvider);
-            DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider());
+            DependencyServiceManager.AddServiceProvider(new MauiBridgeProvider(bridgeScript));
             DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
             DependencyServiceManager.AddServiceProvider(new MauiPlatformSecurityProvider());
 
@@ -77,6 +83,7 @@ namespace SanteDB.Client.Mobile
 
         protected override void OnRestartRequested(object sender)
         {
+            //Translate the sender to a specific reason that corresponds to appropriate language.
             var reason = sender switch
             {
                 SanteDB.Core.Services.Impl.FileConfigurationService => Constants.REASONKEY_FILECONFIGURATION,
@@ -86,13 +93,22 @@ namespace SanteDB.Client.Mobile
                 _ => Constants.REASONKEY_DEFAULT
             };
 
-            if (Application.Current?.Dispatcher is IDispatcher dispatcher)
-            {
-                _ = dispatcher.DispatchAsync(() =>
+                _ = MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    return Shell.Current?.GoToAsync($"//AppRestart?reason={reason}");
+                    //We do not use the shell so we need to replace the main page in the app.
+                    var restartpage = new RestartPage(this);
+
+                    _Application.MainPage = restartpage;
+
+                    //Support the routing query parameter contract by calling the reason in.
+                    restartpage.ApplyQueryAttributes(new Dictionary<string, object>
+                    {
+                        { "reason", reason }
+                    });
+
+                    return Task.CompletedTask;
                 });
-            }
+            
         }
 
         /// <summary>

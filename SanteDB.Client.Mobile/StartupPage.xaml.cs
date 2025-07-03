@@ -40,6 +40,7 @@ using Microsoft.Maui.Storage;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Microsoft.Maui.ApplicationModel;
 
 namespace SanteDB.Client.Mobile;
 
@@ -96,10 +97,18 @@ public partial class StartupPage : ContentPage
             using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
             using (var sr = new StreamReader(appletslist))
             {
-                while (!sr.EndOfStream) // JF - Refactored to prevent Java.Lang.AssetStreamClosed exception
+                while (!sr.EndOfStream)
                 {
-                    var line = sr.ReadLine();
-                    if (!System.String.IsNullOrEmpty(line))
+                    var line = await sr.ReadLineAsync();
+
+                    var commentmarker = line.IndexOf('#');
+
+                    if (commentmarker != -1)
+                    {
+                        line = line.Substring(0, commentmarker)?.Trim();
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(line))
                     {
                         applets.Add(line);
                     }
@@ -160,7 +169,7 @@ public partial class StartupPage : ContentPage
 
                 while (assemblies.TryPop(out var assemblyname))
                 {
-                    SetStatus(null, "Loading SanteDB References", (float)processedAssemblies++ / (float)totalAssemblies);
+                    SetStatus(null, "Loading Core Modules", (float)processedAssemblies++ / (float)totalAssemblies);
 
                     if (loadedassemblies.Any(tuple => assemblyname.FullName.Equals(tuple.Item1.FullName, StringComparison.Ordinal)))
                     {
@@ -239,7 +248,17 @@ public partial class StartupPage : ContentPage
 
                     //var configmanager = new SanteDB.Client.Batteries.Configuration.DefaultDcdrConfigurationProvider();
 
-                    var context = new MauiApplicationContext("DEFAULT", configmanager, this);
+                    string bridgescript = null;
+
+                    using (var bridgestream = await FileSystem.OpenAppPackageFileAsync("santedb_shim.js"))
+                    {
+                        using (var sr = new StreamReader(bridgestream))
+                        {
+                            bridgescript = await sr.ReadToEndAsync();
+                        }
+                    }
+
+                    var context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
 
                     SetStatus(null, "Starting SanteDB Service Context", 0f);
 
@@ -261,11 +280,11 @@ public partial class StartupPage : ContentPage
                     };
 
 
-                this.Dispatcher.Dispatch(() =>
-                {
-                    var shell = Shell.Current;
-                    App.Current.MainPage = new MainPage(starturl, magic, context);
-                });
+                    this.Dispatcher.Dispatch(() =>
+                    {
+                        var shell = Shell.Current;
+                        App.Current.MainPage = new MainPage(starturl, magic, context);
+                    });
 
 
                 }
@@ -292,7 +311,4 @@ public partial class StartupPage : ContentPage
 
 
     }
-
-
-
 }
