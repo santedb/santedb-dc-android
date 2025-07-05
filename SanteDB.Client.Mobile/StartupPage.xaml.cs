@@ -86,51 +86,60 @@ public partial class StartupPage : ContentPage
         base.OnAppearing();
 
         this.VersionLabel.Text = $"v.{this.GetType().Assembly.GetName().Version}";
-
         var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
 
-        if (!directoryprovider.IsConfigFilePresent())
+        try
         {
-            this.StatusLabel.Text = "Preparing Initial Configuration";
-            //ShowStatusText("Preparing Default Applets");
-            List<string> applets = new();
-            using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
-            using (var sr = new StreamReader(appletslist))
+
+            if (!directoryprovider.IsConfigFilePresent())
             {
-                while (!sr.EndOfStream)
+                this.StatusLabel.Text = "Preparing Initial Configuration";
+                //ShowStatusText("Preparing Default Applets");
+                List<string> applets = new();
+                using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
+                using (var sr = new StreamReader(appletslist))
                 {
-                    var line = await sr.ReadLineAsync();
-
-                    var commentmarker = line.IndexOf('#');
-
-                    if (commentmarker != -1)
+                    while (!sr.EndOfStream)
                     {
-                        line = line.Substring(0, commentmarker)?.Trim();
+                        // JF - Receiving an AssetStreamIsClosed exception when using async read line
+                        var line = sr.ReadLine();
+
+                        var commentmarker = line.IndexOf('#');
+
+                        if (commentmarker != -1)
+                        {
+                            line = line.Substring(0, commentmarker)?.Trim();
+                        }
+
+                        if (!string.IsNullOrWhiteSpace(line))
+                        {
+                            applets.Add(line);
+                        }
                     }
+                }
 
-                    if (!string.IsNullOrWhiteSpace(line))
+                var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
+
+                Directory.CreateDirectory(pakdirectory);
+
+                var appletsPrepared = 0;
+                foreach (var applet in applets)
+                {
+                    SetStatus(null, $"Preparing Initial Configuration", (float)appletsPrepared++ / (float)applets.Count);
+                    using (var appletstream = await FileSystem.OpenAppPackageFileAsync(applet))
                     {
-                        applets.Add(line);
+                        using (var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite))
+                        {
+                            appletstream.CopyTo(fs);
+                        }
                     }
                 }
             }
-
-            var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
-
-            Directory.CreateDirectory(pakdirectory);
-
-            var appletsPrepared = 0;
-            foreach (var applet in applets)
-            {
-                SetStatus(null, $"Preparing Initial Configuration", (float)appletsPrepared++ / (float)applets.Count);
-                using var appletstream = await FileSystem.OpenAppPackageFileAsync(applet);
-                using var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite);
-
-                await appletstream.CopyToAsync(fs);
-
-                fs.Close();
-                appletstream.Close();
-            }
+        }
+        catch (Exception ex)
+        {
+            this.ErrorLabel.IsVisible = true;
+            this.ErrorLabel.Text = ex.ToHumanReadableString();
         }
 
         var task = Task.Run(async () =>

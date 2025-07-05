@@ -17,28 +17,32 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using AndroidX.AppCompat.Widget;
 using SanteDB.BI.Services.Impl;
 using SanteDB.BusinessRules.JavaScript;
-using SanteDB.Caching.Memory.Session;
 using SanteDB.Caching.Memory;
+using SanteDB.Caching.Memory.Session;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Client.Disconnected.Services;
 using SanteDB.Client.OAuth;
+using SanteDB.Client.Services;
 using SanteDB.Client.Tickles;
+using SanteDB.Client.Upstream;
 using SanteDB.Client.Upstream.Management;
 using SanteDB.Client.Upstream.Repositories;
 using SanteDB.Client.Upstream.Security;
-using SanteDB.Client.Upstream;
+using SanteDB.Client.UserInterface;
 using SanteDB.Client.UserInterface.Impl;
 using SanteDB.Core;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
-using SanteDB.Core.Data.Backup;
 using SanteDB.Core.Data;
+using SanteDB.Core.Data.Backup;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Privacy;
-using SanteDB.Core.Security;
+using SanteDB.Core.Services;
 using SanteDB.Core.Services.Impl;
 using SanteDB.Security.Certs.BouncyCastle;
 using System;
@@ -52,7 +56,7 @@ namespace SanteDB.Client.Mobile.Configuration
 {
     public class MauiClientInitialConfigurationProvider : IInitialConfigurationProvider
     {
-        public int Order => int.MinValue;
+        public int Order => int.MaxValue;
 
         public SanteDBConfiguration Provide(SanteDBHostType hostContextType, SanteDBConfiguration configuration)
         {
@@ -65,7 +69,15 @@ namespace SanteDB.Client.Mobile.Configuration
                 throw new ApplicationException("Application bug exists. DataDirectory was not set before configuration provider was called. Ensure the DataDirectory data variable in the app domain is set before the config provider is initialized.");
             }
 
-            appServiceSection.ServiceProviders.AddRange(new List<TypeReferenceConfiguration>() {
+            appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)));
+            appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IAppletHostBridgeProvider));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IUserInterfaceInteractionProvider));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IGeographicLocationProvider));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IOperatingSystemInfoService));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IPlatformSecurityProvider));
+
+            appServiceSection.AddServices(new List<TypeReferenceConfiguration>() {
                     new TypeReferenceConfiguration(typeof(NullSymmetricCryptographicProvider)),
                     new TypeReferenceConfiguration(typeof(InMemoryTickleService)),
                     new TypeReferenceConfiguration(typeof(DefaultNetworkInformationService)),
