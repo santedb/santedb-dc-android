@@ -17,22 +17,30 @@
  * User: trevor
  * Date: 2023-5-16
  */
+using Android.App;
+using Kotlin.Contracts;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Dispatching;
 using SanteDB.Client.Shared;
-using SanteDB.Core.Model.Audit;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.i18n;
+using SanteDB.Core.Model.Audit;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Security;
+using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
-using SanteDB.Core.Diagnostics;
+using ZstdSharp.Unsafe;
 
 namespace SanteDB.Client.Mobile
 {
@@ -41,6 +49,7 @@ namespace SanteDB.Client.Mobile
     {
         readonly SanteDBChain _InternalChain;
         readonly Tracer _Tracer;
+        private readonly ManualResetEventSlim _AsyncCallback = new ManualResetEventSlim(false);
 
         public MauiPlatformSecurityProvider()
         {
@@ -276,5 +285,66 @@ namespace SanteDB.Client.Mobile
                 .WithLocalDestination()
                 .WithPrincipal()
                 .WithSystemObjects(Core.Model.Audit.AuditableObjectRole.SecurityResource, Core.Model.Audit.AuditableObjectLifecycle.PermanentErasure, certificate);
+
+
+        /// <summary>
+        /// Perform the task of reqesting permission
+        /// </summary>
+        private async Task<bool> DemandPlatformServicePermissionInternal<TPlatformPermission>() where TPlatformPermission : Permissions.BasePlatformPermission, new()
+        {
+            try
+            {
+                if ((await Permissions.CheckStatusAsync<TPlatformPermission>()) != PermissionStatus.Granted)
+                {
+                    if ((await Permissions.RequestAsync<TPlatformPermission>() != PermissionStatus.Granted))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch(Exception ex)
+            {
+                this._Tracer.TraceError("Error obtaining security permission - {0}", ex.ToHumanReadableString());
+                return false;
+            }
+        }
+
+        /// <inheritdoc/>
+        /// <remarks>This is not required on Windows or Linux</remarks>
+        public bool DemandPlatformServicePermission(PlatformServicePermission platformServicePermission)
+        {
+            try
+            {
+                _AsyncCallback.Reset();
+                bool result = false;
+                Task.Run(async () =>
+                {
+                    switch (platformServicePermission)
+                    {
+                        case PlatformServicePermission.Camera:
+                            result = await this.DemandPlatformServicePermissionInternal<Permissions.Camera>();
+                            break;
+                        case PlatformServicePermission.Geolocation:
+                            result = await this.DemandPlatformServicePermissionInternal<Permissions.LocationWhenInUse>();
+                            break;
+                        case PlatformServicePermission.ExternalMedia:
+                            result = await this.DemandPlatformServicePermissionInternal<Permissions.Media>();
+                            break;
+                        case PlatformServicePermission.Bluetooth:
+                            result = await this.DemandPlatformServicePermissionInternal<Permissions.Bluetooth>();
+                            break;
+                    }
+                    _AsyncCallback.Set();
+                });
+                _AsyncCallback.Wait(10_000);
+                return result;
+            }
+            catch(Exception ex)
+            {
+                throw new SecurityException(ErrorMessages.PLATFORM_SECURITY_ERROR, ex);
+            }
+        }
+
     }
 }

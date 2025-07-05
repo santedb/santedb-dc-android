@@ -84,64 +84,7 @@ public partial class StartupPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
         this.VersionLabel.Text = $"v.{this.GetType().Assembly.GetName().Version}";
-        var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
-
-        try
-        {
-
-            if (!directoryprovider.IsConfigFilePresent())
-            {
-                this.StatusLabel.Text = "Preparing Initial Configuration";
-                //ShowStatusText("Preparing Default Applets");
-                List<string> applets = new();
-                using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
-                using (var sr = new StreamReader(appletslist))
-                {
-                    while (!sr.EndOfStream)
-                    {
-                        // JF - Receiving an AssetStreamIsClosed exception when using async read line
-                        var line = sr.ReadLine();
-
-                        var commentmarker = line.IndexOf('#');
-
-                        if (commentmarker != -1)
-                        {
-                            line = line.Substring(0, commentmarker)?.Trim();
-                        }
-
-                        if (!string.IsNullOrWhiteSpace(line))
-                        {
-                            applets.Add(line);
-                        }
-                    }
-                }
-
-                var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
-
-                Directory.CreateDirectory(pakdirectory);
-
-                var appletsPrepared = 0;
-                foreach (var applet in applets)
-                {
-                    SetStatus(null, $"Preparing Initial Configuration", (float)appletsPrepared++ / (float)applets.Count);
-                    using (var appletstream = await FileSystem.OpenAppPackageFileAsync(applet))
-                    {
-                        using (var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite))
-                        {
-                            appletstream.CopyTo(fs);
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            this.ErrorLabel.IsVisible = true;
-            this.ErrorLabel.Text = ex.ToHumanReadableString();
-        }
-
         var task = Task.Run(async () =>
         {
             await Task.Yield(); //Yield back to move off the main thread.
@@ -167,6 +110,53 @@ public partial class StartupPage : ContentPage
             // JF - Allow startup to set status on the startup page
             try
             {
+                var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
+
+                if (!directoryprovider.IsConfigFilePresent())
+                {
+                    this.StatusLabel.Text = "Preparing Initial Configuration";
+                    //ShowStatusText("Preparing Default Applets");
+                    List<string> applets = new();
+                    using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
+                    using (var sr = new StreamReader(appletslist))
+                    {
+                        while (!sr.EndOfStream)
+                        {
+                            // JF - Receiving an AssetStreamIsClosed exception when using async read line
+                            var line = sr.ReadLine();
+
+                            var commentmarker = line.IndexOf('#');
+
+                            if (commentmarker != -1)
+                            {
+                                line = line.Substring(0, commentmarker)?.Trim();
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(line))
+                            {
+                                applets.Add(line);
+                            }
+                        }
+                    }
+
+                    var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
+
+                    Directory.CreateDirectory(pakdirectory);
+
+                    var appletsPrepared = 0;
+                    foreach (var applet in applets)
+                    {
+                        SetStatus(null, $"Preparing Initial Configuration", (float)appletsPrepared++ / (float)applets.Count);
+                        using (var appletstream = await FileSystem.OpenAppPackageFileAsync(applet))
+                        {
+                            using (var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite))
+                            {
+                                appletstream.CopyTo(fs);
+                            }
+                        }
+                    }
+                }
+
                 this.IsStarting = true;
                 // Allow set status
                 Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
