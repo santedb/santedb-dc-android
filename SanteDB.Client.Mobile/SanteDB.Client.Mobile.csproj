@@ -53,6 +53,10 @@
 		<TrimmerRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" RootMode="library" />
 		<TrimmerRootAssembly Include="SanteDB.OrmLite" RootMode="library" />
 		<TrimmerRootAssembly Include="SanteDB.Core.i18n" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Persistence.Data" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Persistence.Auditing.ADO" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Persistence.Synchronization.ADO" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Rest.Common" RootMode="library" />
 		<TrimmerRootAssembly Include="System.Xml.Linq" RootMode="all" />
 		<TrimmerRootAssembly Include="System" RootMode="all" />
 		<TrimmerRootAssembly Include="mscorlib" RootMode="all" />
