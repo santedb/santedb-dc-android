@@ -5,7 +5,9 @@
              x:Class="SanteDB.Client.Mobile.MainPage">
     <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" RowDefinitions="1*, auto">
         <Border Grid.Row="0" StrokeThickness="0">
-            <WebView x:Name="WebView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  />
+            <RefreshView x:Name="UIRefreshView" Refreshing="UIRefreshView_Refreshing">
+                <WebView x:Name="WebView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  />
+            </RefreshView>
         </Border>
         <sdb:NotificationBar x:Name="NotificationBar" Grid.Row="1" />
     </Grid>

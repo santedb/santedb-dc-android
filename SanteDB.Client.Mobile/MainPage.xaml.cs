@@ -137,5 +137,17 @@ namespace SanteDB.Client.Mobile
                 return string.Empty;
             }
         }
+
+        private void UIRefreshView_Refreshing(object sender, EventArgs e)
+        {
+            try
+            {
+                WebView.Reload();
+            }
+            finally
+            {
+                UIRefreshView.IsRefreshing = false;
+            }
+        }
     }
 }
