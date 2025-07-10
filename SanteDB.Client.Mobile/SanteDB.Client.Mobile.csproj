@@ -21,8 +21,8 @@
 		<ApplicationIdGuid>43d0ddbb-d6ef-4887-b48e-001fe8b290c4</ApplicationIdGuid>
 		<UseInterpreter Condition="'$(Configuration)'=='Debug'">false</UseInterpreter>
 		<!-- Versions -->
-		<ApplicationDisplayVersion>3.0.2005</ApplicationDisplayVersion>
-		<ApplicationVersion>2005</ApplicationVersion>
+		<ApplicationDisplayVersion>3.0.2006</ApplicationDisplayVersion>
+		<ApplicationVersion>2006</ApplicationVersion>
 
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>-->
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>-->
@@ -53,6 +53,10 @@
 		<TrimmerRootAssembly Include="SanteDB.Core.Model.ViewModelSerializers" RootMode="library" />
 		<TrimmerRootAssembly Include="SanteDB.OrmLite" RootMode="library" />
 		<TrimmerRootAssembly Include="SanteDB.Core.i18n" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Persistence.Data" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Persistence.Auditing.ADO" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Persistence.Synchronization.ADO" RootMode="library" />
+		<TrimmerRootAssembly Include="SanteDB.Rest.Common" RootMode="library" />
 		<TrimmerRootAssembly Include="System.Xml.Linq" RootMode="all" />
 		<TrimmerRootAssembly Include="System" RootMode="all" />
 		<TrimmerRootAssembly Include="mscorlib" RootMode="all" />
