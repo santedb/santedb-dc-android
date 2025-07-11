@@ -31,6 +31,7 @@ using System.Xml.Linq;
 using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Data.Sqlite;
+using System.Net;
 namespace SanteDB.Client.Mobile
 {
 
@@ -41,6 +42,7 @@ namespace SanteDB.Client.Mobile
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SqliteConnection))]
         public static MauiApp CreateMauiApp()
         {
+
             //try
             //{
             //    SQLitePCL.Batteries_V2.Init();

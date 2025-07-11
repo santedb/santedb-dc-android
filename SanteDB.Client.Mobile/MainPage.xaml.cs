@@ -142,7 +142,11 @@ namespace SanteDB.Client.Mobile
         {
             try
             {
-                WebView.Reload();
+                if (WebView.Handler.PlatformView is Android.Webkit.WebView awebview &&
+                    awebview.ScrollY == 0)
+                {
+                    WebView.Reload();
+                }
             }
             finally
             {
