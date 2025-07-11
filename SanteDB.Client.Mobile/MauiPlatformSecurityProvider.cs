@@ -296,7 +296,8 @@ namespace SanteDB.Client.Mobile
             {
                 if ((await Permissions.CheckStatusAsync<TPlatformPermission>()) != PermissionStatus.Granted)
                 {
-                    if ((await Permissions.RequestAsync<TPlatformPermission>() != PermissionStatus.Granted))
+                    var permissionResult = await Permissions.RequestAsync<TPlatformPermission>();
+                    if (permissionResult != PermissionStatus.Granted)
                     {
                         return false;
                     }
@@ -316,9 +317,10 @@ namespace SanteDB.Client.Mobile
         {
             try
             {
+                
                 _AsyncCallback.Reset();
                 bool result = false;
-                Task.Run(async () =>
+                Microsoft.Maui.Controls.Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
                 {
                     switch (platformServicePermission)
                     {
@@ -329,7 +331,8 @@ namespace SanteDB.Client.Mobile
                             result = await this.DemandPlatformServicePermissionInternal<Permissions.LocationWhenInUse>();
                             break;
                         case PlatformServicePermission.ExternalMedia:
-                            result = await this.DemandPlatformServicePermissionInternal<Permissions.Media>();
+                            result = await this.DemandPlatformServicePermissionInternal<Permissions.StorageWrite>();
+                            result = await this.DemandPlatformServicePermissionInternal<Permissions.StorageRead>();
                             break;
                         case PlatformServicePermission.Bluetooth:
                             result = await this.DemandPlatformServicePermissionInternal<Permissions.Bluetooth>();
