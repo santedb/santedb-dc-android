@@ -1,3 +1,4 @@
+org.santedb.bicore.pak
 org.santedb.config.init.pak
 org.santedb.config.pak
 org.santedb.core.pak
@@ -5,6 +6,7 @@ org.santedb.emr.common.pak
 org.santedb.emr.pak
 org.santedb.i18n.en.pak
 org.santedb.ims.pak
+org.santedb.sg.pak
 org.santedb.uicore.pak
 unicef.ims.common.pak
 unicef.ims.pak
