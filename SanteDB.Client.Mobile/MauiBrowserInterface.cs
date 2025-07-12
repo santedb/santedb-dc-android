@@ -25,6 +25,7 @@ using SanteDB.Core;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using System;
+using System.Globalization;
 using System.Linq;
 
 #nullable enable
@@ -33,9 +34,12 @@ namespace SanteDB.Client.Mobile
 {
     public class MauiBrowserInterface : Java.Lang.Object
     {
-        readonly IApplicationServiceContext _Context;
         readonly MainPage _MainPage;
+        private readonly Guid _Magic;
         readonly IConfigurationManager? _ConfigManager;
+        private readonly ILocalizationService _LocalizationService;
+        private readonly IUpstreamAvailabilityProvider _UpstreamAvailabilityProvider;
+        private readonly INetworkInformationService _NetworkInformationService;
         readonly string? _DeviceId;
         readonly string? _ClientId;
         readonly string? _RealmId;
@@ -55,10 +59,13 @@ namespace SanteDB.Client.Mobile
 
         public MauiBrowserInterface(IApplicationServiceContext context, MainPage mainPage)
         {
-            _Context = context;
-            _ConfigManager = SanteDB.Core.ApplicationServiceContext.GetService<IConfigurationManager>(context);
-            _MainPage = mainPage;
+            _ConfigManager = context.GetService<IConfigurationManager>();
+            _LocalizationService = context.GetService<ILocalizationService>();
+            _UpstreamAvailabilityProvider = context.GetService<IUpstreamAvailabilityProvider>();
+            _NetworkInformationService = context.GetService<INetworkInformationService>();
 
+            _MainPage = mainPage;
+            _Magic = context.ActivityUuid;
             var upstreamconfig = _ConfigManager?.GetSection<UpstreamConfigurationSection>();
 
             var devicecredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Device);
@@ -99,72 +106,45 @@ namespace SanteDB.Client.Mobile
 
         [Export]
         [JavascriptInterface]
-        public bool GetOnlineState()
-        {
-            return true;
-        }
+        public bool GetOnlineState() => _NetworkInformationService.IsNetworkAvailable && _NetworkInformationService.IsNetworkConnected;
 
         [Export]
         [JavascriptInterface]
-        public bool IsAdminAvailable()
-        {
-            return true;
-        }
+        public bool IsAdminAvailable() => _UpstreamAvailabilityProvider.IsAvailable(Core.Interop.ServiceEndpointType.AdministrationIntegrationService);
 
         [Export]
         [JavascriptInterface]
-        public bool IsClinicalAvailable()
-        {
-            return true;
-        }
+        public bool IsClinicalAvailable() => _UpstreamAvailabilityProvider.IsAvailable(Core.Interop.ServiceEndpointType.HealthDataService);
 
         [Export]
         [JavascriptInterface]
-        public string? GetClientId()
-        {
-            return _ClientId;
-        }
+        public string? GetClientId() => _ClientId;
 
         [Export]
         [JavascriptInterface]
-        public string? GetAssignedFacilityId()
-        {
-            return _FacilityId;
-        }
+        public string? GetAssignedFacilityId() => _FacilityId;
 
         [Export]
         [JavascriptInterface]
-        public string? GetAssignedOwnerId()
-        {
-            return _OwnerId;
-        }
+        public string? GetAssignedOwnerId() => _OwnerId;
 
         [Export]
         [JavascriptInterface]
-        public string? GetDeviceId()
-        {
-            return _DeviceId;
-        }
+        public string? GetDeviceId() => _DeviceId;
 
         [Export]
         [JavascriptInterface]
-        public string? GetRealm()
-        {
-            return _RealmId;
-        }
+        public string? GetRealm() => _RealmId;
 
         [Export]
         [JavascriptInterface]
-        public string GetLocale()
-        {
-            return "en"; //TODO
-        }
+        public string GetLocale() => System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
 
         [Export]
         [JavascriptInterface]
         public void SetLocale(string locale)
         {
-            //TODO: Fix this.
+            CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo(locale);
         }
 
         [Export]
@@ -173,17 +153,7 @@ namespace SanteDB.Client.Mobile
         {
             try
             {
-                var appletResource = SanteDB.Core.ApplicationServiceContext.GetService<ILocalizationService>(_Context).GetStrings(this.GetLocale()).FirstOrDefault(o => o.Key == stringId).Value;
-                if (appletResource != null)
-                    return appletResource;
-                else
-                {
-                    //var androidStringId = this.m_context.Resources.GetIdentifier(stringId, "string", this.m_context.PackageName);
-                    //if (androidStringId > 0)
-                    //    return this.m_context.Resources.GetString(androidStringId);
-                    //else
-                        return stringId;
-                }
+                return _LocalizationService.GetString(stringId);
             }
             catch (Exception e)
             {
@@ -194,10 +164,7 @@ namespace SanteDB.Client.Mobile
 
         [Export]
         [JavascriptInterface]
-        public string GetMagic()
-        {
-            return _Context.ActivityUuid.ToString();
-        }
+        public string GetMagic() => _Magic.ToString();
 
         [Export]
         [JavascriptInterface]

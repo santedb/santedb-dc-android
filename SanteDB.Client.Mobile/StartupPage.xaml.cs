@@ -42,6 +42,7 @@ using System.Linq;
 using System;
 using Microsoft.Maui.ApplicationModel;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Rest.Common.Configuration;
 
 namespace SanteDB.Client.Mobile;
 
@@ -88,64 +89,41 @@ public partial class StartupPage : ContentPage
     {
         base.OnAppearing();
         this.VersionLabel.Text = $"v.{this.GetType().Assembly.GetName().Version}";
+        // JF - Allow startup to set status on the startup page
+        this.IsStarting = true;
+        
+        // Startup occurs on a background thread/task
         var task = Task.Run(async () =>
         {
             await Task.Yield(); //Yield back to move off the main thread.
 
-            //var splashwriter = new SplashScreenTraceWriter(m_window);
-            //SanteDB.Core.Diagnostics.Tracer.AddWriter(splashwriter, System.Diagnostics.Tracing.EventLevel.Verbose);
-            //m_window.ShowSplashStatusText("Starting SanteDB");
-
-            //Directory.GetFiles(Path.GetDirectoryName(typeof(Program).Assembly.Location)!, "Sante*.dll").ToList().ForEach(itm =>
-            //{
-            //    try
-            //    {
-            //        m_window.ShowSplashStatusText(string.Format("Loading reference assembly {0}...", itm));
-            //        AssemblyLoadContext.Default.LoadFromAssemblyPath(itm);
-
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        m_window.ShowSplashStatusText(string.Format("Error loading assembly {0}: {1}", itm, e));
-            //    }
-            //});
-
-            // JF - Allow startup to set status on the startup page
             try
             {
                 var directoryprovider = new Shared.LocalAppDirectoryProvider("dc-maui");
-
                 if (!directoryprovider.IsConfigFilePresent())
                 {
                     this.StatusLabel.Text = "Preparing Initial Configuration";
+
                     //ShowStatusText("Preparing Default Applets");
                     List<string> applets = new();
+                    
                     using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
                     using (var sr = new StreamReader(appletslist))
                     {
                         while (!sr.EndOfStream)
                         {
-                            // JF - Receiving an AssetStreamIsClosed exception when using async read line
+                            // JF - Receiving an AssetStreamIsClosed exception when using async read line - nonsync seems to work better
                             var line = sr.ReadLine();
-
-                            var commentmarker = line.IndexOf('#');
-
-                            if (commentmarker != -1)
-                            {
-                                line = line.Substring(0, commentmarker)?.Trim();
-                            }
-
-                            if (!string.IsNullOrWhiteSpace(line))
+                            if(!line.StartsWith("#") && !String.IsNullOrWhiteSpace(line))
                             {
                                 applets.Add(line);
                             }
                         }
                     }
 
+                    // Extract the assets to 
                     var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
-
                     Directory.CreateDirectory(pakdirectory);
-
                     var appletsPrepared = 0;
                     foreach (var applet in applets)
                     {
@@ -160,25 +138,19 @@ public partial class StartupPage : ContentPage
                     }
                 }
 
-                this.IsStarting = true;
-                // Allow set status
                 Stack<AssemblyName> assemblies = new(typeof(StartupPage).Assembly.GetReferencedAssemblies());
                 List<(AssemblyName, Assembly)> loadedassemblies = new();
                 assemblies.Push(typeof(Persistence.Synchronization.ADO.Configuration.AdoSynchronizationFeature).Assembly.GetName());
 
                 // JF - Keep track for showing progress to the user 
                 int totalAssemblies = assemblies.Count(), processedAssemblies = 0;
-
                 while (assemblies.TryPop(out var assemblyname))
                 {
                     SetStatus(null, "Loading Core Modules", (float)processedAssemblies++ / (float)totalAssemblies);
-
                     if (loadedassemblies.Any(tuple => assemblyname.FullName.Equals(tuple.Item1.FullName, StringComparison.Ordinal)))
                     {
                         continue;
                     }
-
-
                     try
                     {
                         var assembly = Assembly.Load(assemblyname);
@@ -194,14 +166,12 @@ public partial class StartupPage : ContentPage
                     }
                     catch (Exception)
                     {
-
                     }
                 }
 
-
                 try
                 {
-                    SetStatus(null, "Initializing SQLite Provider", 0f);
+                    SetStatus(null, "Initializing SQLite/SQLCipher", 0f);
                     SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3mc());
                     SQLitePCL.raw.FreezeProvider(true);
                     SqliteConnection.ClearAllPools(); //Force-load sqlite.
@@ -223,8 +193,7 @@ public partial class StartupPage : ContentPage
                         Name = "org.santedb.disconnected_client.android"
                     };
 
-
-
+                    // Initialize the default client environment
                     SanteDB.Client.Batteries.ClientBatteries.Initialize(directoryprovider.GetDataDirectory(), directoryprovider.GetConfigDirectory(), new Client.Configuration.Upstream.UpstreamCredentialConfiguration()
                     {
                         CredentialType = SanteDB.Client.Configuration.Upstream.UpstreamCredentialType.Application,
@@ -232,13 +201,26 @@ public partial class StartupPage : ContentPage
                         CredentialSecret = applicationidentity.ApplicationSecret
                     });
 
-                    AppDomain.CurrentDomain.SetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA, "http://127.0.0.1:9200");
-
                     IConfigurationManager configmanager = null;
+                    // Pick a random port
+                    ushort portNumber = (ushort)new Random(DateTime.Now.Millisecond).Next(32768, 60999);
+                    var baseBindingUrl = $"http://127.0.0.1:{portNumber}";
+                    AppDomain.CurrentDomain.SetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA, baseBindingUrl);
 
                     if (directoryprovider.IsConfigFilePresent())
                     {
                         configmanager = new FileConfigurationService(directoryprovider.GetConfigFilePath(), isReadonly: true);
+                        // Update the rest services to use our new binding base
+                        foreach(var svc in configmanager.GetSection<RestConfigurationSection>().Services)
+                        {
+                            foreach(var ep in svc.Endpoints)
+                            {
+                                var uriBuilder = new UriBuilder(ep.Address);
+                                uriBuilder.Host = "127.0.0.1"; // only listen on local host
+                                uriBuilder.Port = portNumber; // assign the random port
+                                ep.Address = uriBuilder.ToString();
+                            }
+                        }
                     }
                     else
                     {
@@ -247,9 +229,7 @@ public partial class StartupPage : ContentPage
 
 
                     //var configmanager = new SanteDB.Client.Batteries.Configuration.DefaultDcdrConfigurationProvider();
-
                     string bridgescript = null;
-
                     using (var bridgestream = await FileSystem.OpenAppPackageFileAsync("santedb_shim.js"))
                     {
                         using (var sr = new StreamReader(bridgestream))
@@ -259,26 +239,14 @@ public partial class StartupPage : ContentPage
                     }
 
                     var context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
-
                     SetStatus(null, "Starting SanteDB Service Context", 0f);
-
                     ServiceUtil.Start(Guid.NewGuid(), context);
-
-
                     var magic = context.ActivityUuid.ToByteArray().HexEncode();
-
-                    //splashwriter.TraceInfo(string.Empty, string.Empty);
-
-                    //SanteDB.Core.Diagnostics.Tracer.RemoveWriter(splashwriter);
-
-                    // Install the packages to the local applet manager
-
                     var starturl = configmanager switch
                     {
-                        InitialConfigurationManager => "http://127.0.0.1:9200/#!/config/initialSettings",
-                        _ => "http://127.0.0.1:9200/#!/"
+                        InitialConfigurationManager => $"{baseBindingUrl}/#!/config/initialSettings",
+                        _ => $"{baseBindingUrl}/#!/"
                     };
-
 
                     this.Dispatcher.Dispatch(() =>
                     {

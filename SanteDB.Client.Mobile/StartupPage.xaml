@@ -7,7 +7,7 @@
         <Image Source="Resources/Images/santedb_render.png" MaximumWidthRequest="256" Margin="10,0,10,5" />
         <Label 
             x:Name="StatusLabel"
-            Text="Starting SanteDB"
+            Text="Welcome to SanteDB"
             HorizontalTextAlignment="Center"
             HorizontalOptions="Center" />
         <ProgressBar 

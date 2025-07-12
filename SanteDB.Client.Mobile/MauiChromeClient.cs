@@ -36,10 +36,9 @@ namespace SanteDB.Client.Mobile
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(MauiChromeClient));
         private readonly IUserInterfaceInteractionProvider m_userInteractivityService;
 
-        public MauiChromeClient()
+        public MauiChromeClient(IUserInterfaceInteractionProvider interactionProvider)
         {
-            // TODO: Make sure that this can be comptible with DI
-            this.m_userInteractivityService = ApplicationServiceContext.Current.GetService<IUserInterfaceInteractionProvider>();
+            this.m_userInteractivityService = interactionProvider;
         }
 
         /// <summary>
@@ -66,5 +65,40 @@ namespace SanteDB.Client.Mobile
             this.m_tracer.TraceEvent(eventLevel, "[{0}:{1}] {2}", consoleMessage.SourceId(), consoleMessage.LineNumber(), consoleMessage.Message());
             return retVal;
         }
+
+        /// <summary>
+        /// We override this and take over the rendering of CONFIRM since we don't want the tablet to read : "127.0.0.1:port Says"
+        /// </summary>
+        public override bool OnJsConfirm(WebView view, string url, string message, JsResult result)
+        {
+            if(this.m_userInteractivityService.Confirm(message))
+            {
+                result.Confirm();
+            }
+            else
+            {
+                result.Cancel();
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// We override this to take over rendering of ALERT since we don't want the tablet to read: "127.0.0.1:port Says"
+        /// </summary>
+        public override bool OnJsAlert(WebView view, string url, string message, JsResult result)
+        {
+            this.m_userInteractivityService.Alert(message);
+            return true;
+        }
+
+        /// <summary>
+        /// Javascript prompt
+        /// </summary>
+        public override bool OnJsPrompt(WebView view, string url, string message, string defaultValue, JsPromptResult result)
+        {
+            result.Confirm(this.m_userInteractivityService.Prompt(message));
+            return true;
+        }
+
     }
 }

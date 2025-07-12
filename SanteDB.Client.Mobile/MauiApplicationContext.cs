@@ -33,6 +33,10 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
+ 
+    /// <summary>
+    /// Custom implementation of the client application context
+    /// </summary>
     public class MauiApplicationContext : ClientApplicationContextBase
     {
         readonly StartupPage _StartupPage;

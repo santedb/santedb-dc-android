@@ -290,6 +290,7 @@ namespace SanteDB.Client.Mobile
 
         /// <inheritdoc/>
         /// <remarks>This is not required on Windows or Linux</remarks>
+#pragma warning disable CA1416 // We manually check the android version
         public bool DemandPlatformServicePermission(PlatformServicePermission platformServicePermission)
         {
             try
@@ -299,7 +300,7 @@ namespace SanteDB.Client.Mobile
                 {
                     return true; // Android Marshmallow Already applies
                 }
-                else // using this method as it works better than the Maui versions which don't seem to work beyond SDK 31
+                else // using this method as it works better than the Maui versions which don't seem to work reliably beyond Android 31
                 {
                     var context = Platform.AppContext;
                     var activity = Platform.CurrentActivity;
@@ -333,6 +334,6 @@ namespace SanteDB.Client.Mobile
                 throw new SecurityException(ErrorMessages.PLATFORM_SECURITY_ERROR, ex);
             }
         }
-
+#pragma warning restore CA1416
     }
 }

@@ -30,6 +30,9 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
+    /// <summary>
+    /// Implementation of the MAUI 
+    /// </summary>
     [PreferredService(typeof(IGeographicLocationProvider))]
     public class MauiLocationProvider : IGeographicLocationProvider
     {

@@ -148,6 +148,7 @@ namespace SanteDB.Client.Mobile.Configuration
             backupConfiguration.PrivateBackupLocation = Path.Combine(localDataPath, "backup");
             backupConfiguration.PublicBackupLocation = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "Backups");
 
+            // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
 #if !PUBLISH
             var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
             diagnosticsConfigSection.TraceWriter.Add(

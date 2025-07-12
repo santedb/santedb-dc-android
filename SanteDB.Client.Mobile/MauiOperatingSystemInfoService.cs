@@ -63,6 +63,6 @@ namespace SanteDB.Client.Mobile
 
         public string MachineName => DeviceInfo.Current.Name;
 
-        public string ManufacturerName => DeviceInfo.Current.Manufacturer;
+        public string ManufacturerName => Android.OS.Build.Manufacturer;
     }
 }

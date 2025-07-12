@@ -26,7 +26,7 @@ using System.Diagnostics.Tracing;
 namespace SanteDB.Client.Mobile.Diagnostics
 {
     /// <summary>
-    /// Rollover trace listener
+    /// Rollover trace listener which interacts with the operating system provider to demand permission to access a public location
     /// </summary>
     public class MauiPublicRolloverTraceWriter : RolloverTextWriterTraceWriter
     {
