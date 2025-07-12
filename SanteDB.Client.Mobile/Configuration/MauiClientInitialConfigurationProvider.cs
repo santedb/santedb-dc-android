@@ -103,7 +103,6 @@ namespace SanteDB.Client.Mobile.Configuration
                 {
                     macAddress = wlan.GetPhysicalAddress().ToString();
                 }
-
             }
 
             // Upstream default configuration
@@ -114,7 +113,11 @@ namespace SanteDB.Client.Mobile.Configuration
                 {
                     new UpstreamCredentialConfiguration()
                     {
+#if DEBUG
                         CredentialName = $"Debugee-{macAddress.Replace(" ", "")}",
+#else
+                        CredentialName = $"Tablet-{macAddress.Replace(" ", "")}",
+#endif
                         Conveyance = UpstreamCredentialConveyance.Secret,
                         CredentialType = UpstreamCredentialType.Device
                     },
