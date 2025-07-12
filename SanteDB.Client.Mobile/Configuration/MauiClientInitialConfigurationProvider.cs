@@ -157,7 +157,9 @@ namespace SanteDB.Client.Mobile.Configuration
                     TraceWriter = typeof(MauiPublicRolloverTraceWriter)
                 }
             );
+            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
+
 #endif
             return configuration;
         }

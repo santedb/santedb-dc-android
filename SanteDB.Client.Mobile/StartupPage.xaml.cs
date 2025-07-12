@@ -41,12 +41,15 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using Microsoft.Maui.ApplicationModel;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Client.Mobile;
 
 public partial class StartupPage : ContentPage
 {
 
+    // Tracer 
+    private Tracer m_tracer = Tracer.GetTracer(typeof(StartupPage));
     // JF - Reduce the number of dispatching to the UI thread
     private string m_lastStatusText = string.Empty;
     private float m_lastStatusProgress = 0.0f;
@@ -279,6 +282,8 @@ public partial class StartupPage : ContentPage
 
                     this.Dispatcher.Dispatch(() =>
                     {
+                        this.m_tracer.TraceInfo("Launching applet browser host");
+                        this.StatusLabel.Text = "Welcome to SanteDB";
                         var shell = Shell.Current;
                         App.Current.MainPage = new MainPage(starturl, magic, context);
                     });
@@ -292,6 +297,8 @@ public partial class StartupPage : ContentPage
                     {
                         Debugger.Break();
                     }
+
+                    this.m_tracer.TraceError(ex.ToString());
 
                     Dispatcher.Dispatch(() =>
                     {

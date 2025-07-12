@@ -83,11 +83,11 @@ namespace SanteDB.Client.Mobile
                     awebview.Settings.BuiltInZoomControls = false;
                     awebview.Settings.DisplayZoomControls = false;
 
-                    //awebview.Settings.PluginsEnabled = false;
+                    awebview.Settings.PluginsEnabled = false;
                     awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false;
-                    //awebview.Settings.SetRenderPriority(RenderPriority.High);
+                    awebview.Settings.SetRenderPriority(RenderPriority.High);
                     awebview.Settings.SetSupportMultipleWindows(false);
-                    //awebview.Settings.SetAppCacheEnabled(true);
+                    awebview.Settings.SetAppCacheEnabled(true);
                     awebview.SetScrollContainer(true);
                     awebview.ScrollBarStyle = Android.Views.ScrollbarStyles.InsideOverlay;
 
