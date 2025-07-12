@@ -17,6 +17,7 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Antlr4.Runtime.Misc;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics.Tracing;
 using SanteDB.Core.Security;
@@ -34,13 +35,30 @@ namespace SanteDB.Client.Mobile.Diagnostics
         {
         }
 
-        /// <inheritdoc/>
-        protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
+        /// <summary>
+        /// Validate write permission 
+        /// </summary>
+        private bool ValidateWritePermission()
         {
             var osService = ApplicationServiceContext.Current.GetService<IPlatformSecurityProvider>();
-            if (osService.DemandPlatformServicePermission(PlatformServicePermission.ExternalMedia))
+            return osService.DemandPlatformServicePermission(PlatformServicePermission.ExternalMedia);
+        }
+
+        /// <inheritdoc/>
+        public override void TraceEvent(EventLevel level, string source, string format, params object[] args)
+        {
+            if (this.ValidateWritePermission())
             {
-                base.WriteTrace(level, source, format, args);
+                base.TraceEvent(level, source, format, args);
+            }
+        }
+
+        /// <inheritdoc/>
+        public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
+        {
+            if (this.ValidateWritePermission())
+            {
+                base.TraceEventWithData(level, source, message, data);
             }
         }
     }

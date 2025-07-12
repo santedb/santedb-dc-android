@@ -17,11 +17,15 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Android.Content;
 using Android.Webkit;
+using Firely.Fhir.Packages;
+using Javax.Security.Auth;
 using Microsoft.Maui.Handlers;
 using SanteDB.Client.UserInterface;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Services;
 using System.Diagnostics.Tracing;
 using static Android.Provider.ContactsContract.CommonDataKinds;
 
@@ -34,11 +38,13 @@ namespace SanteDB.Client.Mobile
         /// Tracer 
         /// </summary>
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(MauiChromeClient));
-        private readonly IUserInterfaceInteractionProvider m_userInteractivityService;
+        private readonly ILocalizationService m_localizationService;
+        private readonly Context m_context;
 
-        public MauiChromeClient(IUserInterfaceInteractionProvider interactionProvider)
+        public MauiChromeClient(Context context)
         {
-            this.m_userInteractivityService = interactionProvider;
+            this.m_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
+            this.m_context = context;
         }
 
         /// <summary>
@@ -71,14 +77,13 @@ namespace SanteDB.Client.Mobile
         /// </summary>
         public override bool OnJsConfirm(WebView view, string url, string message, JsResult result)
         {
-            if(this.m_userInteractivityService.Confirm(message))
-            {
-                result.Confirm();
-            }
-            else
-            {
-                result.Cancel();
-            }
+            // JF - Use the native Android handlers as the Maui dialog builders have a cross-thread access issue setting result
+            var alert = new Android.App.AlertDialog.Builder(this.m_context)
+                .SetMessage(message)
+                .SetTitle(this.m_localizationService.GetString("ui.alert.confirm"))
+                .SetPositiveButton(this.m_localizationService.GetString("ui.action.ok"), (o, e) => result.Confirm())
+                .SetNegativeButton(this.m_localizationService.GetString("ui.action.cancel"), (o, e) => result.Cancel());
+            alert.Create().Show();
             return true;
         }
 
@@ -87,18 +92,15 @@ namespace SanteDB.Client.Mobile
         /// </summary>
         public override bool OnJsAlert(WebView view, string url, string message, JsResult result)
         {
-            this.m_userInteractivityService.Alert(message);
+            // JF - Use the native Android handlers as the Maui dialog builders have a cross-thread access issue setting result
+            var alert = new Android.App.AlertDialog.Builder(this.m_context)
+                .SetMessage(message)
+                .SetTitle(this.m_localizationService.GetString("ui.alert.alert"))
+                .SetPositiveButton(this.m_localizationService.GetString("ui.action.ok"), (o, e) => result.Confirm());
+            alert.Create().Show();
             return true;
         }
 
-        /// <summary>
-        /// Javascript prompt
-        /// </summary>
-        public override bool OnJsPrompt(WebView view, string url, string message, string defaultValue, JsPromptResult result)
-        {
-            result.Confirm(this.m_userInteractivityService.Prompt(message));
-            return true;
-        }
 
     }
 }

@@ -96,7 +96,7 @@ namespace SanteDB.Client.Mobile
 
                     var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this); 
                     awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge"); // Adds the Javascript bridge service (allows JS to interact with the C#)
-                    awebview.SetWebChromeClient(typeof(MauiChromeClient).CreateInjected() as WebChromeClient);// Redirects the CONSOLE logs from the browser to our tracer system
+                    awebview.SetWebChromeClient(new MauiChromeClient(awebview.Context));// Redirects the CONSOLE logs from the browser to our tracer system
 #if !DISABLE_WEBVIEW_DEBUGGING
                     //TODO: Additional platform initialization
                     Android.Webkit.WebView.SetWebContentsDebuggingEnabled(true);
