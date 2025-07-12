@@ -296,7 +296,7 @@ public partial class StartupPage : ContentPage
                     Dispatcher.Dispatch(() =>
                     {
                         this.ErrorLabel.IsVisible = true;
-                        this.ErrorLabel.Text = ex.ToHumanReadableString();
+                        this.ErrorLabel.Text = ex.ToString();
                     });
                 }
             }

@@ -18,6 +18,7 @@
  * Date: 2023-5-16
  */
 using Android.App;
+using Jint.Runtime.Debugger;
 using Kotlin.Contracts;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Dispatching;
@@ -287,61 +288,45 @@ namespace SanteDB.Client.Mobile
                 .WithSystemObjects(Core.Model.Audit.AuditableObjectRole.SecurityResource, Core.Model.Audit.AuditableObjectLifecycle.PermanentErasure, certificate);
 
 
-        /// <summary>
-        /// Perform the task of reqesting permission
-        /// </summary>
-        private async Task<bool> DemandPlatformServicePermissionInternal<TPlatformPermission>() where TPlatformPermission : Permissions.BasePlatformPermission, new()
-        {
-            try
-            {
-                if ((await Permissions.CheckStatusAsync<TPlatformPermission>()) != PermissionStatus.Granted)
-                {
-                    var permissionResult = await Permissions.RequestAsync<TPlatformPermission>();
-                    if (permissionResult != PermissionStatus.Granted)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            catch(Exception ex)
-            {
-                this._Tracer.TraceError("Error obtaining security permission - {0}", ex.ToHumanReadableString());
-                return false;
-            }
-        }
-
         /// <inheritdoc/>
         /// <remarks>This is not required on Windows or Linux</remarks>
         public bool DemandPlatformServicePermission(PlatformServicePermission platformServicePermission)
         {
             try
             {
-                
-                _AsyncCallback.Reset();
-                bool result = false;
-                Microsoft.Maui.Controls.Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+
+                if (Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.M)
                 {
+                    return true; // Android Marshmallow Already applies
+                }
+                else // using this method as it works better than the Maui versions which don't seem to work beyond SDK 31
+                {
+                    var context = Platform.AppContext;
+                    var activity = Platform.CurrentActivity;
+                    string permissionString = string.Empty;
                     switch (platformServicePermission)
                     {
                         case PlatformServicePermission.Camera:
-                            result = await this.DemandPlatformServicePermissionInternal<Permissions.Camera>();
+                            permissionString = Android.Manifest.Permission.Camera;
                             break;
                         case PlatformServicePermission.Geolocation:
-                            result = await this.DemandPlatformServicePermissionInternal<Permissions.LocationWhenInUse>();
+                            permissionString = Android.Manifest.Permission.AccessCoarseLocation;
                             break;
                         case PlatformServicePermission.ExternalMedia:
-                            result = await this.DemandPlatformServicePermissionInternal<Permissions.StorageWrite>();
-                            result = await this.DemandPlatformServicePermissionInternal<Permissions.StorageRead>();
+                            permissionString = Android.Manifest.Permission.WriteExternalStorage;
                             break;
                         case PlatformServicePermission.Bluetooth:
-                            result = await this.DemandPlatformServicePermissionInternal<Permissions.Bluetooth>();
+                            permissionString = Android.Manifest.Permission.Bluetooth;
                             break;
                     }
-                    _AsyncCallback.Set();
-                });
-                _AsyncCallback.Wait(10_000);
-                return result;
+                    if(activity.CheckSelfPermission(permissionString) != Android.Content.PM.Permission.Granted)
+                    {
+                        activity.RequestPermissions(new String[] { permissionString }, 0);
+                        return activity.CheckSelfPermission(permissionString) == Android.Content.PM.Permission.Granted;
+                    }
+                    return true;
+                }
+                
             }
             catch(Exception ex)
             {
