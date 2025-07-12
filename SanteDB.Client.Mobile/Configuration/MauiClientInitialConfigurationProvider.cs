@@ -18,6 +18,7 @@
  * Date: 2023-4-19
  */
 using AndroidX.AppCompat.Widget;
+using AndroidX.RecyclerView.Widget;
 using SanteDB.BI.Services.Impl;
 using SanteDB.BusinessRules.JavaScript;
 using SanteDB.Caching.Memory;
@@ -25,6 +26,7 @@ using SanteDB.Caching.Memory.Session;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Client.Disconnected.Services;
+using SanteDB.Client.Mobile.Diagnostics;
 using SanteDB.Client.OAuth;
 using SanteDB.Client.Services;
 using SanteDB.Client.Tickles;
@@ -39,6 +41,7 @@ using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
 using SanteDB.Core.Data.Backup;
+using SanteDB.Core.Diagnostics.Tracing;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Security.Privacy;
@@ -142,8 +145,20 @@ namespace SanteDB.Client.Mobile.Configuration
 
             // Fetch the backup locations
             backupConfiguration.PrivateBackupLocation = Path.Combine(localDataPath, "backup");
-            backupConfiguration.PublicBackupLocation = Android.App.Application.Context.GetExternalFilesDir("").AbsolutePath;
+            backupConfiguration.PublicBackupLocation = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "Backups");
 
+#if !PUBLISH
+            var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
+            diagnosticsConfigSection.TraceWriter.Add(
+                new TraceWriterConfiguration()
+                {
+                    Filter = System.Diagnostics.Tracing.EventLevel.Informational,
+                    InitializationData = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "santedb.txt"),
+                    TraceWriter = typeof(MauiPublicRolloverTraceWriter)
+                }
+            );
+            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
+#endif
             return configuration;
         }
     }

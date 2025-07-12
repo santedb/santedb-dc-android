@@ -1,0 +1,47 @@
+﻿/*
+ * Portions Copyright 2015-2019 Mohawk College of Applied Arts and Technology
+ * Portions Copyright 2019-2024 SanteSuite Contributors (See NOTICE)
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you 
+ * may not use this file except in compliance with the License. You may 
+ * obtain a copy of the License at 
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0 
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the 
+ * License for the specific language governing permissions and limitations under 
+ * the License.
+ * 
+ * User: trevor
+ * Date: 2023-4-19
+ */
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics.Tracing;
+using SanteDB.Core.Security;
+using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+
+namespace SanteDB.Client.Mobile.Diagnostics
+{
+    /// <summary>
+    /// Rollover trace listener
+    /// </summary>
+    public class MauiPublicRolloverTraceWriter : RolloverTextWriterTraceWriter
+    {
+        public MauiPublicRolloverTraceWriter(EventLevel filter, string fileName, IDictionary<string, EventLevel> sources) : base(filter, fileName, sources)
+        {
+        }
+
+        /// <inheritdoc/>
+        protected override void WriteTrace(EventLevel level, string source, string format, params object[] args)
+        {
+            var osService = ApplicationServiceContext.Current.GetService<IPlatformSecurityProvider>();
+            if (osService.DemandPlatformServicePermission(PlatformServicePermission.ExternalMedia))
+            {
+                base.WriteTrace(level, source, format, args);
+            }
+        }
+    }
+}

@@ -24,6 +24,7 @@ using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Handlers;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using System;
 using System.Configuration;
 using System.Diagnostics;
@@ -34,63 +35,84 @@ namespace SanteDB.Client.Mobile
 {
     public partial class MainPage : ContentPage
     {
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(MainPage));
+
+        private long m_logicalScroll;
         int count = 0;
         private string _HttpMagic;
         readonly MauiApplicationContext _ApplicationContext;
 
         public MainPage(string sourceUrl, string httpMagicValue, MauiApplicationContext applicationContext)
         {
-            _ApplicationContext = applicationContext;
-
-            _ApplicationContext.GetInteractionProvider().SetStatusCallback = (task, message, progress) =>
+            try
             {
-                Nito.AsyncEx.AsyncContext.Run(() => NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress));
-            };
+                _ApplicationContext = applicationContext;
 
-            InitializeComponent();
+                this.m_tracer.TraceInfo("Setting Status Callbacks");
+                _ApplicationContext.GetInteractionProvider().SetStatusCallback = (task, message, progress) =>
+                {
+                    Nito.AsyncEx.AsyncContext.Run(() => NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress));
+                };
 
-            _HttpMagic = httpMagicValue;
+                this.m_tracer.TraceInfo("Initializing Main View...");
 
-            WebView.HandlerChanged += WebView_HandlerChanged;
+                InitializeComponent();
 
-            WebView.Source = sourceUrl;
+                _HttpMagic = httpMagicValue;
+                WebView.HandlerChanged += WebView_HandlerChanged;
+                WebView.Source = sourceUrl;
+            }
+            catch(Exception ex)
+            {
+                this.m_tracer.TraceError("Error initializing main view {0}", ex);
+            }
         }
 
         private void WebView_HandlerChanged(object sender, EventArgs e)
         {
-            var handler = WebView.Handler;
-
-            if ((handler?.PlatformView) is Android.Webkit.WebView awebview)
+            try
             {
-                awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}";
-                awebview.Settings.JavaScriptEnabled = true;
-                awebview.Settings.SetGeolocationEnabled(true);
-                awebview.Settings.BuiltInZoomControls = false;
-                awebview.Settings.DisplayZoomControls = false;
-                //awebview.Settings.PluginsEnabled = false;
-                awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false;
-                //awebview.Settings.SetRenderPriority(RenderPriority.High);
-                awebview.Settings.SetSupportMultipleWindows(false);
-                //awebview.Settings.SetAppCacheEnabled(true);
-                awebview.SetScrollContainer(true);
-                awebview.ScrollBarStyle = Android.Views.ScrollbarStyles.InsideOverlay;
-                var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this);
-                awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
+                var handler = WebView.Handler;
 
-                if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.Kitkat)
+                if ((handler?.PlatformView) is Android.Webkit.WebView awebview)
                 {
-                    awebview.SetLayerType(Android.Views.LayerType.Hardware, null);
-                }
+                    this.m_tracer.TraceInfo("Initializing the trace handler web view");
+                    awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}";
+                    awebview.Settings.JavaScriptEnabled = true;
+                    awebview.Settings.SetGeolocationEnabled(true);
+                    awebview.Settings.BuiltInZoomControls = false;
+                    awebview.Settings.DisplayZoomControls = false;
 
-                awebview.SetWebChromeClient(new MauiChromeClient());
+                    //awebview.Settings.PluginsEnabled = false;
+                    awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false;
+                    //awebview.Settings.SetRenderPriority(RenderPriority.High);
+                    awebview.Settings.SetSupportMultipleWindows(false);
+                    //awebview.Settings.SetAppCacheEnabled(true);
+                    awebview.SetScrollContainer(true);
+                    awebview.ScrollBarStyle = Android.Views.ScrollbarStyles.InsideOverlay;
+
+                    var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this);
+                    awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge");
+
+                    if (Android.OS.Build.VERSION.SdkInt > Android.OS.BuildVersionCodes.Kitkat)
+                    {
+                        awebview.SetLayerType(Android.Views.LayerType.Hardware, null);
+                    }
+
+                    awebview.SetWebChromeClient(new MauiChromeClient());
 #if !DISABLE_WEBVIEW_DEBUGGING
-                //TODO: Additional platform initialization
-                Android.Webkit.WebView.SetWebContentsDebuggingEnabled(true);
-#endif 
+                    //TODO: Additional platform initialization
+                    Android.Webkit.WebView.SetWebContentsDebuggingEnabled(true);
+#endif
+                }
+                else
+                {
+                    throw new InvalidOperationException("Platform not supported");
+                }
             }
-            else
+            catch(Exception ex)
             {
-                throw new InvalidOperationException("Platform not supported");
+                this.m_tracer.TraceError("Error initializing the web view - {0}", ex);
             }
         }
 
@@ -137,5 +159,6 @@ namespace SanteDB.Client.Mobile
                 return string.Empty;
             }
         }
+
     }
 }
