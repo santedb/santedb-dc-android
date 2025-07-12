@@ -19,6 +19,7 @@
  */
 using AndroidX.AppCompat.Widget;
 using AndroidX.RecyclerView.Widget;
+using Microsoft.Maui.Controls.PlatformConfiguration;
 using SanteDB.BI.Services.Impl;
 using SanteDB.BusinessRules.JavaScript;
 using SanteDB.Caching.Memory;
@@ -116,7 +117,7 @@ namespace SanteDB.Client.Mobile.Configuration
 #if DEBUG
                         CredentialName = $"Debugee-{macAddress.Replace(" ", "")}",
 #else
-                        CredentialName = $"Tablet-{macAddress.Replace(" ", "")}",
+                        CredentialName = $"{Android.OS.Build.Model}-{macAddress.Replace(" ", "")}",
 #endif
                         Conveyance = UpstreamCredentialConveyance.Secret,
                         CredentialType = UpstreamCredentialType.Device
@@ -152,13 +153,13 @@ namespace SanteDB.Client.Mobile.Configuration
             diagnosticsConfigSection.TraceWriter.Add(
                 new TraceWriterConfiguration()
                 {
-                    Filter = System.Diagnostics.Tracing.EventLevel.Informational,
+                    Filter = System.Diagnostics.Tracing.EventLevel.Verbose,
                     InitializationData = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "santedb.txt"),
                     TraceWriter = typeof(MauiPublicRolloverTraceWriter)
                 }
             );
-            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
-            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
+            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Verbose);
+            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Verbose });
 
 #endif
             return configuration;
