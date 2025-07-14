@@ -33,7 +33,7 @@
 		<AndroidEnableProfiler>true</AndroidEnableProfiler>
 		<AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
 		<AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
-		<Configurations>Debug;Release;Pusblish</Configurations>
+		<Configurations>Debug;Release;Publish</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
@@ -42,7 +42,7 @@
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Pusblish|net8.0-android|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Publish|net8.0-android|AnyCPU'">
 	  <RunAOTCompilation>False</RunAOTCompilation>
 	  <DebugSymbols>False</DebugSymbols>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
@@ -53,7 +53,7 @@
 		<AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Pusblish'">
+	<PropertyGroup Condition="'$(Configuration)'=='Publish'">
 	  <AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
