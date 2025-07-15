@@ -77,10 +77,10 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Condition="'@(MauiIcon->Count())' &lt; 1" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" />
+		<MauiIcon Condition="'@(MauiIcon-&gt;Count())' &lt; 1" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Condition="'@(MauiSplashScreen->Count())' &lt; 1" Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
+		<MauiSplashScreen Condition="'@(MauiSplashScreen-&gt;Count())' &lt; 1" Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
 		<!--<MauiSplashScreen Include="Resources\Images\santedb_render.png" Color="#FFFFFF" BaseSize="128,128" Resize="True" />-->
 
 		<!-- Images -->
