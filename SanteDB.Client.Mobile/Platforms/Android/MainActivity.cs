@@ -21,11 +21,17 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Microsoft.Maui;
+using SanteDB.OrmLite.Providers;
 
 namespace SanteDB.Client.Mobile
 {
     [Activity(Theme = "@style/Maui.SplashTheme", MainLauncher = true, ConfigurationChanges = ConfigChanges.ScreenSize | ConfigChanges.Orientation | ConfigChanges.UiMode | ConfigChanges.ScreenLayout | ConfigChanges.SmallestScreenSize | ConfigChanges.Density)]
     public class MainActivity : MauiAppCompatActivity
     {
+        protected override void OnStop()
+        {
+            base.OnStop();
+            OrmProviderManager.Current.Flush(); // Flush all writebacks to disk
+        }
     }
 }

@@ -36,6 +36,9 @@
 		<Configurations>Debug;Release;Pusblish</Configurations>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="Exists('..\..\santeims\plugins\SanteDB.Ims\SanteDB.Ims\SanteIMS.csproj')">
+		<DefineConstants>INCLUDE_IMS</DefineConstants>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
 		<RunAOTCompilation>False</RunAOTCompilation>
 		<DebugSymbols>False</DebugSymbols>
@@ -47,6 +50,7 @@
 	  <DebugSymbols>False</DebugSymbols>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	  <DefineConstants>$(DefineConstants);PUBLISH</DefineConstants>
+		
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -132,6 +136,7 @@
 		<PackageReference Include="SanteDB.Client.Batteries" Version="$(VersionNumber)" />
 		<PackageReference Include="SanteDB.Client.Disconnected" Version="$(VersionNumber)" />-->
 		<ProjectReference Include="..\..\santedb-dc-core\SanteDB.Client.Shared\SanteDB.Client.Shared.csproj" />
+		<ProjectReference Condition="Exists('..\..\santeims\plugins\SanteDB.Ims\SanteDB.Ims\SanteIMS.csproj')" Include="..\..\santeims\plugins\SanteDB.Ims\SanteDB.Ims\SanteIMS.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -154,13 +154,13 @@ namespace SanteDB.Client.Mobile.Configuration
             diagnosticsConfigSection.TraceWriter.Add(
                 new TraceWriterConfiguration()
                 {
-                    Filter = System.Diagnostics.Tracing.EventLevel.Verbose,
+                    Filter = System.Diagnostics.Tracing.EventLevel.Informational,
                     InitializationData = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "santedb.txt"),
                     TraceWriter = typeof(MauiPublicRolloverTraceWriter)
                 }
             );
-            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Verbose);
-            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Verbose });
+            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
+            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
 
 #endif
             return configuration;
