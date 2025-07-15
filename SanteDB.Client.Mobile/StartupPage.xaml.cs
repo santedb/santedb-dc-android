@@ -156,7 +156,7 @@ public partial class StartupPage : ContentPage
                         var assembly = Assembly.Load(assemblyname);
                         loadedassemblies.Add((assemblyname, assembly));
 
-                        if (assemblyname.Name.StartsWith("SanteDB"))
+                        if (assemblyname.Name.StartsWith("Sante"))
                         {
                             foreach (var refassembly in assembly.GetReferencedAssemblies())
                             {

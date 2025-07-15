@@ -33,7 +33,7 @@
 		<AndroidEnableProfiler>true</AndroidEnableProfiler>
 		<AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
 		<AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
-		<Configurations>Debug;Release;Pusblish</Configurations>
+		<Configurations>Debug;Release;Publish</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="Exists('..\..\santeims\plugins\SanteDB.Ims\SanteDB.Ims\SanteIMS.csproj')">
@@ -45,7 +45,7 @@
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Pusblish|net8.0-android|AnyCPU'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Publish|net8.0-android|AnyCPU'">
 	  <RunAOTCompilation>False</RunAOTCompilation>
 	  <DebugSymbols>False</DebugSymbols>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
@@ -57,7 +57,7 @@
 		<AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Pusblish'">
+	<PropertyGroup Condition="'$(Configuration)'=='Publish'">
 	  <AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
@@ -114,6 +114,7 @@
 		<PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="8.0.82" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.82" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
 		<PackageReference Include="Xamarin.AndroidX.Lifecycle.LiveData" Version="2.8.4.1" />
 
 
