@@ -267,10 +267,9 @@
 
   <Target Name="_IncludeAppletAssets" BeforeTargets="BeforeBuild" DependsOnTargets="_CopyAppletsToIntermediateDirectory;_WriteAppletsTextFileToIntermediateDirectory" Condition="@(SanteDBApplet-&gt;Count()) &gt; 0">
     <ItemGroup>
-      <MauiAsset Include="@(SanteDBApplet->'$(IntermediateOutputPath)SanteDBApplets\%(Identity)-%(Version).pak')" LogicalName="%(Filename)%(Extension)" />
+      <MauiAsset Include="@(SanteDBApplet->'$(IntermediateOutputPath)SanteDBApplets\%(Identity)-%(Version).pak')" LogicalName="%(SanteDBApplet.Identity)-%(SanteDBApplet.Version).pak" />
       <MauiAsset Include="$(IntermediateOutputPath)applets.txt" LogicalName="applets.txt" />
     </ItemGroup>
-    <Message Importance="high" Text="@(MauiAsset)" />
   </Target>
 
 </Project>
