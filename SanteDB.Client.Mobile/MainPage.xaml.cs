@@ -158,5 +158,18 @@ namespace SanteDB.Client.Mobile
             }
         }
 
+        protected override bool OnBackButtonPressed()
+        {
+            if (WebView.CanGoBack)
+            {
+                WebView.GoBack();
+                return true; //Signal that it was handled by us.
+            }
+            else
+            {
+                return base.OnBackButtonPressed();
+            }
+        }
+
     }
 }

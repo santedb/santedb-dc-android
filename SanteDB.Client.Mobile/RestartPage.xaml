@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SanteDB.Client.Mobile.RestartPage"
              xmlns:my="SanteDB.Client.Mobile"
-             Title="App Restart Required">
+             Title="App Restart Required" Padding="10,0">
     <VerticalStackLayout VerticalOptions="Center">
         <VerticalStackLayout>
             <Label 
@@ -11,13 +11,13 @@
                 FontSize="Title"
                 Text="App Restart Required"
                 VerticalOptions="Center" 
-                HorizontalOptions="Center" Margin="0,0,0,20" /> 
+                HorizontalOptions="Center" Margin="0,0,0,20" HorizontalTextAlignment="Center" /> 
             <Label
                 x:Name="ContentLabel"
                 FontSize="Body"
                 Text="The App needs to be restarted. Click the Quit button below, and then re-launch the app."
                 VerticalOptions="Center"
-                HorizontalOptions="Center" />
+                HorizontalOptions="Center" HorizontalTextAlignment="Center" />
             <Button
                 x:Name="QuitButton"
                 Text="Quit"
