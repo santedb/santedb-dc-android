@@ -21,6 +21,7 @@ using Android.App;
 using Android.Content.PM;
 using Android.OS;
 using Microsoft.Maui;
+using SanteDB.OrmLite.Providers;
 
 namespace SanteDB.Client.Mobile
 {
@@ -31,6 +32,11 @@ namespace SanteDB.Client.Mobile
         {
             base.OnCreate(savedInstanceState);
             Window.SetSoftInputMode(Android.Views.SoftInput.AdjustResize);
+        }
+        protected override void OnStop()
+        {
+            base.OnStop();
+            OrmProviderManager.Current.Flush(); // Flush all writebacks to disk
         }
     }
 }
