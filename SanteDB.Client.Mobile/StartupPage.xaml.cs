@@ -91,7 +91,7 @@ public partial class StartupPage : ContentPage
         this.VersionLabel.Text = $"v.{this.GetType().Assembly.GetName().Version}";
         // JF - Allow startup to set status on the startup page
         this.IsStarting = true;
-        
+
         // Startup occurs on a background thread/task
         var task = Task.Run(async () =>
         {
@@ -106,7 +106,7 @@ public partial class StartupPage : ContentPage
 
                     //ShowStatusText("Preparing Default Applets");
                     List<string> applets = new();
-                    
+
                     using var appletslist = await FileSystem.OpenAppPackageFileAsync("applets.txt");
                     using (var sr = new StreamReader(appletslist))
                     {
@@ -114,27 +114,51 @@ public partial class StartupPage : ContentPage
                         {
                             // JF - Receiving an AssetStreamIsClosed exception when using async read line - nonsync seems to work better
                             var line = sr.ReadLine();
-                            if(!line.StartsWith("#") && !String.IsNullOrWhiteSpace(line))
+                            if (!line.StartsWith("#") && !String.IsNullOrWhiteSpace(line))
                             {
                                 applets.Add(line);
                             }
                         }
                     }
 
+
+
                     // Extract the assets to 
                     var pakdirectory = Path.Combine(directoryprovider.GetDataDirectory(), "pakfiles");
                     Directory.CreateDirectory(pakdirectory);
                     var appletsPrepared = 0;
+
+                    var missingapplets = new List<string>();
+
                     foreach (var applet in applets)
                     {
                         SetStatus(null, $"Preparing Initial Configuration", (float)appletsPrepared++ / (float)applets.Count);
-                        using (var appletstream = await FileSystem.OpenAppPackageFileAsync(applet))
+
+                        try
                         {
-                            using (var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite))
+                            using (var appletstream = await FileSystem.OpenAppPackageFileAsync(applet))
                             {
-                                appletstream.CopyTo(fs);
+                                using (var fs = new FileStream(Path.Combine(pakdirectory, applet), FileMode.Create, FileAccess.ReadWrite))
+                                {
+                                    appletstream.CopyTo(fs);
+                                }
                             }
                         }
+                        catch (FileNotFoundException)
+                        {
+                            missingapplets.Add(applet);
+                        }
+                    }
+
+                    if (missingapplets.Any())
+                    {
+                        _ = MainThread.InvokeOnMainThreadAsync(async () =>
+                        {
+                            await DisplayAlert("Configuration Issue", $"A configuration issue exists with this build of SanteDB. Contact the software vendor.\n\nMissing Applets:\n{string.Join('\n', missingapplets)}", "Quit");
+                            Application.Current?.Quit();
+                        });
+
+                        return;
                     }
                 }
 
@@ -156,7 +180,7 @@ public partial class StartupPage : ContentPage
                         var assembly = Assembly.Load(assemblyname);
                         loadedassemblies.Add((assemblyname, assembly));
 
-                        if (assemblyname.Name.StartsWith("SanteDB"))
+                        if (assemblyname.Name.StartsWith("Sante"))
                         {
                             foreach (var refassembly in assembly.GetReferencedAssemblies())
                             {
@@ -211,9 +235,9 @@ public partial class StartupPage : ContentPage
                     {
                         configmanager = new FileConfigurationService(directoryprovider.GetConfigFilePath(), isReadonly: true);
                         // Update the rest services to use our new binding base
-                        foreach(var svc in configmanager.GetSection<RestConfigurationSection>().Services)
+                        foreach (var svc in configmanager.GetSection<RestConfigurationSection>().Services)
                         {
-                            foreach(var ep in svc.Endpoints)
+                            foreach (var ep in svc.Endpoints)
                             {
                                 var uriBuilder = new UriBuilder(ep.Address);
                                 uriBuilder.Host = "127.0.0.1"; // only listen on local host
@@ -274,6 +298,7 @@ public partial class StartupPage : ContentPage
                         this.ErrorLabel.Text = ex.ToString();
                     });
                 }
+
             }
             finally
             {
