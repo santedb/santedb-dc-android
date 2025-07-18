@@ -272,4 +272,9 @@
     </ItemGroup>
   </Target>
 
+  <Target Name="_SanteDBCleanTarget" BeforeTargets="BeforeClean" Condition="@(SanteDBApplet->Count()) > 0">
+    <Delete Files="$(IntermediateOutputPath)applets.txt" />
+    <RemoveDir Directories="$(IntermediateOutputPath)SanteDBApplets" />
+  </Target>
+
 </Project>
