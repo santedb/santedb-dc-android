@@ -1,7 +1,89 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+	<!-- Provide Backward Compatability when using an older version of MSBuild -->
+  <Choose>
+    <When Condition="'$(MSBuildVersion.Substring(0,2))' &gt;= 16 Or&#xD;&#xA;    ('$(MSBuildVersion.Substring(0,2))' == 15 And '$(MSBuildVersion.Substring(3,1))' &gt;= 8)">
+      <PropertyGroup>
+        <TaskFactory>RoslynCodeTaskFactory</TaskFactory>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <TaskFactory>CodeTaskFactory</TaskFactory>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+
+	<!-- Define Default Locations for Pakman Cache and Repository -->
+  <PropertyGroup>
+    <_SanteDBPakmanCache Condition="'$(_SanteDBPakmanCache)' == '' And $([System.OperatingSystem]::IsWindows())">$([System.Environment]::ExpandEnvironmentVariables('%USERPROFILE%\.pakman\'))</_SanteDBPakmanCache>
+    <_SanteDBPakmanCache Condition="'$(_SanteDBPakmanCache)' == '' And $([System.OperatingSystem]::IsWindows())==False">~/.pakman/</_SanteDBPakmanCache>
+    <_SanteDBAppletRepository Condition="'$(_SanteDBAppletRepository)' == ''">https://packages.santesuite.net/pak/</_SanteDBAppletRepository>
+  </PropertyGroup>
+
+	<!-- Custom task to inspect applets in the cache folder. Used by _ResolveAppletsTarget -->
+  <UsingTask TaskName="SanteDB_DetermineAppletsToDownload" TaskFactory="$(TaskFactory)" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <CacheFolder ParameterType="System.String" Required="true" />
+      <InputApplets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <CachedApplets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+      <DownloadApplets ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="Microsoft.Build.Framework" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+
+        if (!Directory.Exists(CacheFolder))
+        {
+          try
+          {
+          Directory.CreateDirectory(CacheFolder);
+          Log.LogMessage("CacheFolder {0} did not exist and was created.", CacheFolder);
+          }
+          catch(IOException ioex)
+          {
+            Log.LogErrorFromException(ioex);
+          }
+        }
+
+        List<ITaskItem> cached = new List<ITaskItem>();
+        List<ITaskItem> download = new List<ITaskItem>();
+
+        foreach (ITaskItem inputapplet in InputApplets)
+        {
+          string appletname = inputapplet.GetMetadata("Identity");
+          string version = inputapplet.GetMetadata("Version");
+
+          string pakfilename = $"{appletname}-{version}.pak";
+
+          string pakpath = Path.Combine(CacheFolder, pakfilename);
+
+          Log.LogMessage("Checking existence of {0}", pakpath);
+
+          if (File.Exists(pakpath))
+          {
+            cached.Add(new TaskItem(inputapplet));
+          }
+          else
+          {
+            download.Add(new TaskItem(inputapplet));
+          }
+        }
+
+        CachedApplets = cached.ToArray();
+        DownloadApplets = download.ToArray();
+        
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
 	<PropertyGroup>
 		<VersionNumber Condition="'$(VersionNumber)'==''">3.0-debug</VersionNumber>
+    <AppletVersion Condition="'$(AppletVersion)'==''">3.0.2009</AppletVersion>
 		<!--<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
 		<TargetFrameworks>net8.0-android</TargetFrameworks>
 		<!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>-->
@@ -14,15 +96,15 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 
 		<!-- Display name -->
-		<ApplicationTitle>SanteDB</ApplicationTitle>
+		<ApplicationTitle Condition="'$(ApplicationTitle)' == ''">SanteDB</ApplicationTitle>
 
 		<!-- App Identifier -->
-		<ApplicationId>org.santedb.mobile</ApplicationId>
-		<ApplicationIdGuid>43d0ddbb-d6ef-4887-b48e-001fe8b290c4</ApplicationIdGuid>
-		<UseInterpreter Condition="'$(Configuration)'=='Debug'">false</UseInterpreter>
+		<ApplicationId Condition="'$(ApplicationId)' == ''">org.santedb.mobile</ApplicationId>
+		<ApplicationIdGuid Condition="'$(ApplicationIdGuid)' == ''">43d0ddbb-d6ef-4887-b48e-001fe8b290c4</ApplicationIdGuid>
+		<UseInterpreter Condition="'$(Configuration)' == 'Debug'">false</UseInterpreter>
 		<!-- Versions -->
-		<ApplicationDisplayVersion>3.0.2008</ApplicationDisplayVersion>
-		<ApplicationVersion>2008</ApplicationVersion>
+		<ApplicationDisplayVersion Condition="'$(ApplicationDisplayVersion)' == ''">3.0.2008</ApplicationDisplayVersion>
+		<ApplicationVersion Condition="'$(ApplicationVersion)' == ''">1</ApplicationVersion>
 
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>-->
 		<!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">13.1</SupportedOSPlatformVersion>-->
@@ -61,6 +143,15 @@
 	  <AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
+	<!-- Applets to include in the build -->
+  <ItemGroup Condition="'$(SanteDBApplet)' == ''">
+    <SanteDBApplet Include="org.santedb.core" Version="$(AppletVersion)" />
+    <SanteDBApplet Include="org.santedb.config.init" Version="$(AppletVersion)" />
+    <SanteDBApplet Include="org.santedb.config" Version="$(AppletVersion)" />
+    <SanteDBApplet Include="org.santedb.uicore" Version="$(AppletVersion)" />
+    <SanteDBApplet Include="org.santedb.i18n.en" Version="$(AppletVersion)" />
+	</ItemGroup>
+
 	<ItemGroup>
 		<!-- https://learn.microsoft.com/en-us/dotnet/core/deploying/trimming/trimming-options?pivots=dotnet-7-0#root-assemblies -->
 		<TrimmerRootAssembly Include="SanteDB.Core.Api" RootMode="library" />
@@ -81,10 +172,10 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" />
+		<MauiIcon Condition="'@(MauiIcon->Count())' &lt; 1" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
+		<MauiSplashScreen Condition="'@(MauiSplashScreen->Count())' &lt; 1" Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
 		<!--<MauiSplashScreen Include="Resources\Images\santedb_render.png" Color="#FFFFFF" BaseSize="128,128" Resize="True" />-->
 
 		<!-- Images -->
@@ -157,5 +248,38 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>
+
+  <Target Name="_ResolveAppletsTarget" BeforeTargets="BeforeBuild" Condition="@(SanteDBApplet-&gt;Count()) &gt; 0">
+    <SanteDB_DetermineAppletsToDownload InputApplets="@(SanteDBApplet)" CacheFolder="$(_SanteDBPakmanCache)">
+      <Output TaskParameter="CachedApplets" ItemName="_SanteDB_CachedApplets" />
+      <Output TaskParameter="DownloadApplets" ItemName="_SanteDB_DownloadApplets" />
+    </SanteDB_DetermineAppletsToDownload>
+  </Target>
+
+  <Target Name="_DownloadAppletsTarget" BeforeTargets="BeforeBuild" DependsOnTargets="_ResolveAppletsTarget" Condition="'@(_SanteDB_DownloadApplets-&gt;Count())' &gt; 0">
+    <DownloadFile SourceUrl="$(_SanteDBAppletRepository)%(_SanteDB_DownloadApplets.Identity)/%(_SanteDB_DownloadApplets.Version)" DestinationFolder="$(_SanteDBPakmanCache)" DestinationFileName="%(_SanteDB_DownloadApplets.Identity)-%(_SanteDB_DownloadApplets.Version).pak" Retries="5" RetryDelayMilliseconds="5000">
+      <Output TaskParameter="DownloadedFile" ItemName="_SanteDB_DownloadedApplets" />
+    </DownloadFile>
+  </Target>
+
+  <Target Name="_CopyAppletsToIntermediateDirectory" BeforeTargets="BeforeBuild" DependsOnTargets="_ResolveAppletsTarget;_DownloadAppletsTarget" Condition="@(SanteDBApplet-&gt;Count()) &gt; 0" Inputs="@(SanteDBApplet->'$(_SanteDBPakmanCache)%(Identity)-%(Version).pak')" Outputs="@(SanteDBApplet->'$(IntermediateOutputPath)SanteDBApplets\%(Identity)-%(Version).pak')">
+    <Copy SourceFiles="@(SanteDBApplet->'$(_SanteDBPakmanCache)%(Identity)-%(Version).pak')" DestinationFolder="$(IntermediateOutputPath)SanteDBApplets" />
+  </Target>
+
+  <Target Name="_WriteAppletsTextFileToIntermediateDirectory" BeforeTargets="BeforeBuild" DependsOnTargets="_CopyAppletsToIntermediateDirectory" Condition="@(SanteDBApplet-&gt;Count()) &gt; 0" Inputs="@(SanteDBApplet)" Outputs="$(IntermediateOutputPath)applets.txt">
+    <WriteLinesToFile File="$(IntermediateOutputPath)applets.txt" Lines="@(SanteDBApplet->'%(Identity)-%(Version).pak')" Overwrite="true" WriteOnlyWhenDifferent="true" />
+  </Target>
+
+  <Target Name="_IncludeAppletAssets" BeforeTargets="BeforeBuild" DependsOnTargets="_CopyAppletsToIntermediateDirectory;_WriteAppletsTextFileToIntermediateDirectory" Condition="@(SanteDBApplet-&gt;Count()) &gt; 0">
+    <ItemGroup>
+      <MauiAsset Include="@(SanteDBApplet->'$(IntermediateOutputPath)SanteDBApplets\%(Identity)-%(Version).pak')" LogicalName="%(SanteDBApplet.Identity)-%(SanteDBApplet.Version).pak" />
+      <MauiAsset Include="$(IntermediateOutputPath)applets.txt" LogicalName="applets.txt" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_SanteDBCleanTarget" BeforeTargets="BeforeClean" Condition="@(SanteDBApplet->Count()) > 0">
+    <Delete Files="$(IntermediateOutputPath)applets.txt" />
+    <RemoveDir Directories="$(IntermediateOutputPath)SanteDBApplets" />
+  </Target>
 
 </Project>
