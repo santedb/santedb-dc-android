@@ -85,7 +85,7 @@ namespace SanteDB.Client.Mobile
                     awebview.Settings.SetGeolocationEnabled(true);
                     awebview.Settings.BuiltInZoomControls = false; // We don't allow pinch and zoom
                     awebview.Settings.DisplayZoomControls = false;
-
+                    awebview.Settings.BlockNetworkLoads = true;  // Don't allow network loads from the browser
                     awebview.Settings.PluginsEnabled = false; // When this is commented out - sometimes the web view takes upwards of 30 seconds to initialize on Android versions < 30 - 
                     awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false; 
                     awebview.Settings.SetRenderPriority(RenderPriority.High); // When commented out - sometimes on web views on Android Versions < 28 the scrolling experience is jittery
