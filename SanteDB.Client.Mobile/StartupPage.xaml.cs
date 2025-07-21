@@ -193,17 +193,20 @@ public partial class StartupPage : ContentPage
                     }
                 }
 
-                try
+                if (directoryprovider.IsConfigFilePresent())
                 {
-                    SetStatus(null, "Initializing SQLite/SQLCipher", 0f);
-                    SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3mc());
-                    SQLitePCL.raw.FreezeProvider(true);
-                    SqliteConnection.ClearAllPools(); //Force-load sqlite.
-                    SanteDB.OrmLite.Providers.Sqlite.SqliteSpellfixExtensionLoader.SetLibraryInformation("libe_sqlite3mc", "sqlite3_spellfix_init");
-                }
-                catch
-                {
+                    try
+                    {
+                        SetStatus(null, "Initializing SQLite/SQLCipher", 0f);
+                        SQLitePCL.raw.SetProvider(new SQLitePCL.SQLite3Provider_e_sqlite3mc());
+                        SQLitePCL.raw.FreezeProvider(true);
+                        SqliteConnection.ClearAllPools(); //Force-load sqlite.
+                        SanteDB.OrmLite.Providers.Sqlite.SqliteSpellfixExtensionLoader.SetLibraryInformation("libe_sqlite3mc", "sqlite3_spellfix_init");
+                    }
+                    catch
+                    {
 
+                    }
                 }
 
                 try
