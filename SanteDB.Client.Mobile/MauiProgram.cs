@@ -32,7 +32,6 @@ using Microsoft.Maui.Hosting;
 using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Data.Sqlite;
 using System.Net;
-using SanteIMS.Services;
 namespace SanteDB.Client.Mobile
 {
 
@@ -42,7 +41,7 @@ namespace SanteDB.Client.Mobile
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(XElement))]
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SqliteConnection))]
 #if INCLUDE_IMS
-        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(ImsInitializationDaemon))]
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SanteIMS.Services.ImsInitializationDaemon))]
 #endif
         public static MauiApp CreateMauiApp()
         {
