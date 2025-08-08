@@ -18,11 +18,18 @@
  * Date: 2023-4-19
  */
 using Acornima.Ast;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
+using SanteDB.Client.Configuration;
+using SanteDB.Client.UserInterface;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Data.Backup;
+using SanteDB.Core.i18n;
+using SanteDB.Core.Security;
 using SanteDB.Core.Security.Configuration;
+using SanteDB.Core.Security.Services;
 using SanteDB.Core.Services;
 using System;
 using System.Collections.Generic;
@@ -42,8 +49,6 @@ namespace SanteDB.Client.Mobile
         readonly StartupPage _StartupPage;
         readonly Application _Application;
         readonly MauiInteractionProvider _InteractionProvider;
-
-
         
         public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
@@ -120,5 +125,38 @@ namespace SanteDB.Client.Mobile
         /// </summary>
         /// <returns></returns>
         internal MauiInteractionProvider GetInteractionProvider() => _InteractionProvider;
+
+        /// <summary>
+        /// Auto restore environment
+        /// </summary>
+        protected override void AutoRestoreEnvironment()
+        {
+            using (AuthenticationContext.EnterSystemContext())
+            {
+                var backupServiceManager = this.GetService<IBackupService>();
+                var configurationManager = this.GetService<IConfigurationManager>();
+                var uiInteraction = this.GetService<IUserInterfaceInteractionProvider>();
+                if (configurationManager is InitialConfigurationManager && uiInteraction.Confirm(UserMessages.ISOLATED_STORAGE_BACKUP_RESTORE))
+                {
+                    var backupFile = uiInteraction.SelectFile(UserMessages.ISOLATED_STORAGE_SELECT_BACKUP_FILE, "application/octet-stream", null);
+                    if (!String.IsNullOrEmpty(backupFile))
+                    {
+                        try
+                        {
+                            var backupDescriptor = backupServiceManager.GetBackupDescriptorFromFile(backupFile);
+                            string backupSecret = backupDescriptor.IsEnrypted ? uiInteraction.Prompt(UserMessages.AUTO_RESTORE_BACKUP_SECRET, true) : String.Empty;
+                            backupServiceManager.RestoreFromFile(backupFile, backupSecret);
+                            this.OnRestartRequested(this);
+                        }
+                        catch (Exception e)
+                        {
+                            uiInteraction.Alert(e.ToHumanReadableString());
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 }

@@ -17,9 +17,13 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Java.Util;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Devices;
+using Microsoft.Maui.Storage;
 using SanteDB.Client.UserInterface;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SanteDB.Client.Mobile
@@ -100,6 +104,41 @@ namespace SanteDB.Client.Mobile
                 SetStatusCallback(taskIdentifier, statusText, progressIndicator);
             }
 
+        }
+
+        /// <inheritdoc/>
+        public string SelectFile(string title, string pattern, string path)
+        {
+            this.m_interactionResetEvent.Reset();
+            string result = null;
+            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            {
+                try
+                {
+                    var pickerResult = await FilePicker.Default.PickAsync(new PickOptions()
+                    {
+                        PickerTitle = title,
+                        FileTypes = !String.IsNullOrEmpty(pattern) ? new FilePickerFileType(
+                            new Dictionary<DevicePlatform, IEnumerable<String>>()
+                            {
+                                { DevicePlatform.Android, pattern.Split(';') },
+                                { DevicePlatform.iOS, pattern.Split(';') },
+                            }
+                        ) : null
+                    });
+                    result = pickerResult.FileName;
+                }
+                catch
+                {
+                    result = null;
+                }
+                finally
+                {
+                    this.m_interactionResetEvent.Set();
+                }
+            });
+            this.m_interactionResetEvent.Wait();
+            return result;
         }
 
         public Action<string, string, float> SetStatusCallback { get; set; }

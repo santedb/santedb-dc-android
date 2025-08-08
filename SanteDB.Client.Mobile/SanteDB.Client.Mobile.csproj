@@ -84,6 +84,8 @@
 	<PropertyGroup>
 		<VersionNumber Condition="'$(VersionNumber)'==''">3.0-debug</VersionNumber>
     <AppletVersion Condition="'$(AppletVersion)'==''">3.0.2009</AppletVersion>
+		<!-- Allow reflection to to show version number -->
+		<Version>$(VersionNumber)</Version>
 		<!--<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>-->
 		<TargetFrameworks>net8.0-android</TargetFrameworks>
 		<!--<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>-->
@@ -172,10 +174,10 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Condition="'@(MauiIcon->Count())' &lt; 1" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" />
+		<MauiIcon Condition="'@(MauiIcon-&gt;Count())' &lt; 1" Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.png" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Condition="'@(MauiSplashScreen->Count())' &lt; 1" Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
+		<MauiSplashScreen Condition="'@(MauiSplashScreen-&gt;Count())' &lt; 1" Include="Resources\Splash\splash.svg" Color="#FFFFFF" BaseSize="128,128" />
 		<!--<MauiSplashScreen Include="Resources\Images\santedb_render.png" Color="#FFFFFF" BaseSize="128,128" Resize="True" />-->
 
 		<!-- Images -->
@@ -277,7 +279,7 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="_SanteDBCleanTarget" BeforeTargets="BeforeClean" Condition="@(SanteDBApplet->Count()) > 0">
+  <Target Name="_SanteDBCleanTarget" BeforeTargets="BeforeClean" Condition="@(SanteDBApplet-&gt;Count()) &gt; 0">
     <Delete Files="$(IntermediateOutputPath)applets.txt" />
     <RemoveDir Directories="$(IntermediateOutputPath)SanteDBApplets" />
   </Target>

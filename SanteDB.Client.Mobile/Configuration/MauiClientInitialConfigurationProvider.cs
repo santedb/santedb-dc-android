@@ -144,9 +144,15 @@ namespace SanteDB.Client.Mobile.Configuration
                 configuration.AddSection(backupConfiguration);
             }
 
+            var externalDirectory = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments);
+            if(!externalDirectory.Exists())
+            {
+                externalDirectory = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads);
+            }
+
             // Fetch the backup locations
             backupConfiguration.PrivateBackupLocation = Path.Combine(localDataPath, "backup");
-            backupConfiguration.PublicBackupLocation = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "Backups");
+            backupConfiguration.PublicBackupLocation = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
 #if !PUBLISH
@@ -155,7 +161,7 @@ namespace SanteDB.Client.Mobile.Configuration
                 new TraceWriterConfiguration()
                 {
                     Filter = System.Diagnostics.Tracing.EventLevel.Informational,
-                    InitializationData = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "SanteDB", "santedb.txt"),
+                    InitializationData = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "santedb.txt"),
                     TraceWriter = typeof(MauiPublicRolloverTraceWriter)
                 }
             );
