@@ -43,6 +43,9 @@ namespace SanteDB.Client.Mobile
 #if INCLUDE_IMS
         [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SanteIMS.Services.ImsInitializationDaemon))]
 #endif
+#if INCLUDE_EMR
+        [DynamicDependency(DynamicallyAccessedMemberTypes.All, typeof(SanteEMR.Services.EmrInitializationDaemon))]
+#endif 
         public static MauiApp CreateMauiApp()
         {
 
