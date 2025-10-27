@@ -155,7 +155,7 @@ namespace SanteDB.Client.Mobile.Configuration
             backupConfiguration.PublicBackupLocation = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
-#if !PUBLISH
+#if DEBUG || SDB_TRACE
             var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
             diagnosticsConfigSection.TraceWriter.Add(
                 new TraceWriterConfiguration()

@@ -117,7 +117,7 @@
 		<AndroidEnableProfiler>true</AndroidEnableProfiler>
 		<AndroidXCollectionVersion>1.4.2</AndroidXCollectionVersion>
 		<AndroidXLifecycleVersion>2.8.4</AndroidXLifecycleVersion>
-		<Configurations>Debug;Release;Publish</Configurations>
+		<Configurations>Debug;Release</Configurations>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="Exists('..\..\santeims\plugins\SanteDB.Ims\SanteDB.Ims\SanteIMS.csproj')">
@@ -129,24 +129,24 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
 		<RunAOTCompilation>False</RunAOTCompilation>
 		<DebugSymbols>False</DebugSymbols>
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
+		<AndroidPackageFormat Condition="'$(AndroidPackageFormat)'==''">aab</AndroidPackageFormat>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Publish|net9.0-android|AnyCPU'">
+	<!--<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Publish|net9.0-android|AnyCPU'">
 	  <RunAOTCompilation>False</RunAOTCompilation>
 	  <DebugSymbols>False</DebugSymbols>
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <AndroidPackageFormat Condition="'$(AndroidPackageFormat)'==''">apk</AndroidPackageFormat>
 	  <DefineConstants>$(DefineConstants);PUBLISH</DefineConstants>
 		
-	</PropertyGroup>
+	</PropertyGroup>-->
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<AotAssemblies>false</AotAssemblies>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Publish'">
+	<!--<PropertyGroup Condition="'$(Configuration)'=='Publish'">
 	  <AotAssemblies>false</AotAssemblies>
-	</PropertyGroup>
+	</PropertyGroup>-->
 
 	<!-- Applets to include in the build -->
   <ItemGroup Condition="'$(SanteDBApplet)' == ''">
