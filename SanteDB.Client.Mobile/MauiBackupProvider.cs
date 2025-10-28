@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using SanteDB.Client.UserInterface;
 using SanteDB.Core.Configuration;
+using SanteDB.Core.Data;
 using SanteDB.Core.Data.Backup;
 using SanteDB.Core.i18n;
 using SanteDB.Core.Security;
@@ -70,9 +71,10 @@ namespace SanteDB.Client.Mobile
                         throw new InvalidOperationException(String.Format(ErrorMessages.POLICY_PREVENTS_ACTION, SecurityPolicyIdentification.AllowPublicBackups));
                     }
 
-                    using (var ms = new MemoryStream())
+                    using (var ms = new TemporaryFileStream())
                     {
                         base.BackupToStream(ms, password);
+                        ms.Flush();
                         ms.Seek(0, SeekOrigin.Begin);
                         var backupDescriptor = this.m_userInterfaceInteraction.SaveFile(
                             Path.GetDirectoryName(this.Configuration.PublicBackupLocation),
