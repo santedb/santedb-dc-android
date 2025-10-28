@@ -17,6 +17,7 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using CommunityToolkit.Maui.Storage;
 using Java.Util;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Devices;
@@ -24,6 +25,7 @@ using Microsoft.Maui.Storage;
 using SanteDB.Client.UserInterface;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 
 namespace SanteDB.Client.Mobile
@@ -61,7 +63,7 @@ namespace SanteDB.Client.Mobile
 
         public bool Confirm(string message)
         {
-            
+
             // JF - TODO: Fix this to look up from the i18n
             bool result = false;
             this.m_interactionResetEvent.Reset();
@@ -94,7 +96,7 @@ namespace SanteDB.Client.Mobile
 
         public void SetStatus(string taskIdentifier, string statusText, float progressIndicator)
         {
-            
+
             if (this.CurrentPage is StartupPage sp && sp.IsStarting)
             {
                 sp.SetStatus(taskIdentifier, statusText, progressIndicator);
@@ -106,12 +108,37 @@ namespace SanteDB.Client.Mobile
 
         }
 
-        /// <inheritdoc/>
-        public string SelectFile(string title, string pattern, string path)
+        /// <summary>
+        /// Save a file 
+        /// </summary>
+        /// <returns></returns>
+        public string SaveFile(String initialPath, string defaultName, Stream fileContents)
         {
-            this.m_interactionResetEvent.Reset();
-            string result = null;
-            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            return Nito.AsyncEx.AsyncContext.Run(async () =>
+            {
+                try
+                {
+                    var saverResult = await FileSaver.Default.SaveAsync(initialPath, defaultName, fileContents);
+                    if (saverResult.IsSuccessful)
+                    {
+                        return saverResult.FilePath;
+                    }
+                    else
+                    {
+                        return String.Empty;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return String.Empty;
+                }
+            });
+        }
+
+        /// <inheritdoc/>
+        public Stream SelectFile(string title, string pattern, string path)
+        {
+            return Nito.AsyncEx.AsyncContext.Run(async () =>
             {
                 try
                 {
@@ -125,20 +152,22 @@ namespace SanteDB.Client.Mobile
                                 { DevicePlatform.iOS, pattern.Split(';') },
                             }
                         ) : null
+
                     });
-                    result = pickerResult.FileName;
+                    if(!String.IsNullOrEmpty(pickerResult.FileName))
+                    {
+                        return await pickerResult.OpenReadAsync();
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
-                catch
+                catch (Exception ex)
                 {
-                    result = null;
-                }
-                finally
-                {
-                    this.m_interactionResetEvent.Set();
+                    return null;
                 }
             });
-            this.m_interactionResetEvent.Wait();
-            return result;
         }
 
         public Action<string, string, float> SetStatusCallback { get; set; }

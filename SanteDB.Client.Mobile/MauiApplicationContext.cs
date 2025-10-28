@@ -40,7 +40,7 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
- 
+
     /// <summary>
     /// Custom implementation of the client application context
     /// </summary>
@@ -49,7 +49,7 @@ namespace SanteDB.Client.Mobile
         readonly StartupPage _StartupPage;
         readonly Application _Application;
         readonly MauiInteractionProvider _InteractionProvider;
-        
+
         public MauiApplicationContext(string instanceName, IConfigurationManager configurationManager, StartupPage startupPage, string bridgeScript)
             : base(Core.SanteDBHostType.Client, instanceName, configurationManager)
         {
@@ -102,22 +102,22 @@ namespace SanteDB.Client.Mobile
                 _ => Constants.REASONKEY_DEFAULT
             };
 
-                _ = MainThread.InvokeOnMainThreadAsync(() =>
+            _ = MainThread.InvokeOnMainThreadAsync(() =>
+            {
+                //We do not use the shell so we need to replace the main page in the app.
+                var restartpage = new RestartPage(this);
+
+                _Application.MainPage = restartpage;
+
+                //Support the routing query parameter contract by calling the reason in.
+                restartpage.ApplyQueryAttributes(new Dictionary<string, object>
                 {
-                    //We do not use the shell so we need to replace the main page in the app.
-                    var restartpage = new RestartPage(this);
-
-                    _Application.MainPage = restartpage;
-
-                    //Support the routing query parameter contract by calling the reason in.
-                    restartpage.ApplyQueryAttributes(new Dictionary<string, object>
-                    {
                         { "reason", reason }
-                    });
-
-                    return Task.CompletedTask;
                 });
-            
+
+                return Task.CompletedTask;
+            });
+
         }
 
         /// <summary>
@@ -138,20 +138,20 @@ namespace SanteDB.Client.Mobile
                 var uiInteraction = this.GetService<IUserInterfaceInteractionProvider>();
                 if (configurationManager is InitialConfigurationManager && uiInteraction.Confirm(UserMessages.ISOLATED_STORAGE_BACKUP_RESTORE))
                 {
-                    var backupFile = uiInteraction.SelectFile(UserMessages.ISOLATED_STORAGE_SELECT_BACKUP_FILE, "application/octet-stream", null);
-                    if (!String.IsNullOrEmpty(backupFile))
+                    try
                     {
-                        try
+                        var backupStream = uiInteraction.SelectFile(UserMessages.ISOLATED_STORAGE_SELECT_BACKUP_FILE, "application/octet-stream", null);
+                        if (backupStream != null)
                         {
-                            var backupDescriptor = backupServiceManager.GetBackupDescriptorFromFile(backupFile);
+                            var backupDescriptor = backupServiceManager.GetBackupDescriptorFromStream(backupStream);
                             string backupSecret = backupDescriptor.IsEnrypted ? uiInteraction.Prompt(UserMessages.AUTO_RESTORE_BACKUP_SECRET, true) : String.Empty;
-                            backupServiceManager.RestoreFromFile(backupFile, backupSecret);
+                            backupServiceManager.RestoreFromStream(backupStream, backupSecret);
                             this.OnRestartRequested(this);
                         }
-                        catch (Exception e)
-                        {
-                            uiInteraction.Alert(e.ToHumanReadableString());
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        uiInteraction.Alert(e.ToHumanReadableString());
                     }
                 }
 

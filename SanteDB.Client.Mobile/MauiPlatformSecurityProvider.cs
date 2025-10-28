@@ -17,6 +17,7 @@
  * User: trevor
  * Date: 2023-5-16
  */
+using Android;
 using Android.App;
 using Jint.Runtime.Debugger;
 using Kotlin.Contracts;
@@ -42,6 +43,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ZstdSharp.Unsafe;
+using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace SanteDB.Client.Mobile
 {
@@ -57,7 +59,6 @@ namespace SanteDB.Client.Mobile
             _Tracer = new Tracer(nameof(MauiPlatformSecurityProvider));
             _InternalChain = new SanteDBChain();
         }
-
 
         /// <inheritdoc/>
         public IEnumerable<X509Certificate2> FindAllCertificates(X509FindType findType, object findValue, StoreName storeName = StoreName.My, StoreLocation storeLocation = StoreLocation.CurrentUser, bool validOnly = true)
@@ -295,43 +296,56 @@ namespace SanteDB.Client.Mobile
         {
             try
             {
-
-                if (Android.OS.Build.VERSION.SdkInt < Android.OS.BuildVersionCodes.M)
-                {
-                    return true; // Android Marshmallow Already applies
-                }
-                else // using this method as it works better than the Maui versions which don't seem to work reliably beyond Android 31
-                {
-                    var context = Platform.AppContext;
-                    var activity = Platform.CurrentActivity;
-                    string permissionString = string.Empty;
-                    switch (platformServicePermission)
-                    {
-                        case PlatformServicePermission.Camera:
-                            permissionString = Android.Manifest.Permission.Camera;
-                            break;
-                        case PlatformServicePermission.Geolocation:
-                            permissionString = Android.Manifest.Permission.AccessCoarseLocation;
-                            break;
-                        case PlatformServicePermission.ExternalMedia:
-                            permissionString = Android.Manifest.Permission.WriteExternalStorage;
-                            break;
-                        case PlatformServicePermission.Bluetooth:
-                            permissionString = Android.Manifest.Permission.Bluetooth;
-                            break;
-                    }
-                    if(activity.CheckSelfPermission(permissionString) != Android.Content.PM.Permission.Granted)
-                    {
-                        activity.RequestPermissions(new String[] { permissionString }, 0);
-                        return activity.CheckSelfPermission(permissionString) == Android.Content.PM.Permission.Granted;
-                    }
-                    return true;
-                }
-                
+                return Nito.AsyncEx.AsyncContext.Run(async () => await this.DemandPlatformServicePermissionInternalAsync(platformServicePermission));
             }
             catch(Exception ex)
             {
                 throw new SecurityException(ErrorMessages.PLATFORM_SECURITY_ERROR, ex);
+            }
+        }
+
+        private async Task<bool> DemandPlatformServicePermissionInternalAsync(PlatformServicePermission platformServicePermission)
+        {
+            if (!MainThread.IsMainThread)
+            {
+                return await MainThread.InvokeOnMainThreadAsync(async () => await this.DemandPlatformServicePermissionInternalAsync(platformServicePermission));
+            }
+            else
+            {
+                var permission = PermissionStatus.Unknown;
+                switch (platformServicePermission)
+                {
+                    case PlatformServicePermission.ExternalMedia:
+                        permission = await Permissions.CheckStatusAsync<Permissions.StorageWrite>();
+                        if (permission != PermissionStatus.Granted)
+                        {
+                            permission = await Permissions.RequestAsync<Permissions.StorageWrite>();
+                        }
+                        break;
+                    case PlatformServicePermission.Camera:
+                        permission = await Permissions.CheckStatusAsync<Permissions.Camera>();
+                        if (permission != PermissionStatus.Granted)
+                        {
+                            permission = await Permissions.RequestAsync<Permissions.Camera>();
+                        }
+                        break;
+                    case PlatformServicePermission.Bluetooth:
+                        permission = await Permissions.CheckStatusAsync<Permissions.Bluetooth>();
+                        if (permission != PermissionStatus.Granted)
+                        {
+                            permission = await Permissions.RequestAsync<Permissions.Bluetooth>();
+                        }
+                        break;
+                    case PlatformServicePermission.Geolocation:
+                        permission = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+                        if (permission != PermissionStatus.Granted)
+                        {
+                            permission = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                        }
+                        break;
+                }
+
+                return permission == PermissionStatus.Granted;
             }
         }
 #pragma warning restore CA1416

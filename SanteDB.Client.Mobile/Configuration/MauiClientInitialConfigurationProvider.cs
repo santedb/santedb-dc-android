@@ -75,12 +75,13 @@ namespace SanteDB.Client.Mobile.Configuration
             }
 
             appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)));
-            appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
+            //appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
             appServiceSection.RemoveAllServiceImplementations(typeof(IAppletHostBridgeProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IUserInterfaceInteractionProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IGeographicLocationProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IOperatingSystemInfoService));
             appServiceSection.RemoveAllServiceImplementations(typeof(IPlatformSecurityProvider));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IBackupService));
 
             appServiceSection.AddServices(new List<TypeReferenceConfiguration>() {
                     new TypeReferenceConfiguration(typeof(NullSymmetricCryptographicProvider)),
@@ -88,6 +89,7 @@ namespace SanteDB.Client.Mobile.Configuration
                     new TypeReferenceConfiguration(typeof(MauiOperatingSystemInfoService)),
                     new TypeReferenceConfiguration(typeof(MauiPlatformSecurityProvider)),
                     new TypeReferenceConfiguration(typeof(MauiLocationProvider)),
+                    new TypeReferenceConfiguration(typeof(MauiBackupProvider))
             });
 
             // On android the user cannot dynamically load asms
@@ -153,6 +155,10 @@ namespace SanteDB.Client.Mobile.Configuration
             // Fetch the backup locations
             backupConfiguration.PrivateBackupLocation = Path.Combine(localDataPath, "backup");
             backupConfiguration.PublicBackupLocation = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
+
+            // Externals go into the downloads folders
+            externalDirectory = Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDownloads);
+            backupConfiguration.ExternalBackupLocation= Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
 #if DEBUG || SDB_TRACE
