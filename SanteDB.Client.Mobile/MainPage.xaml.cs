@@ -80,6 +80,13 @@ namespace SanteDB.Client.Mobile
                 if ((handler?.PlatformView) is Android.Webkit.WebView awebview)
                 {
                     this.m_tracer.TraceInfo("Initializing the trace handler web view");
+
+                    awebview.ClearFormData();
+                    awebview.ClearHistory();
+                    awebview.ClearCache(true);
+                    CookieManager.Instance.RemoveAllCookies(null); // remove browser cookies
+                    WebStorage.Instance.DeleteAllData(); // remove browser data
+
                     awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}"; // MAGIC is required so the API will not work when another app attempts to access 127.0.0.1
                     awebview.Settings.JavaScriptEnabled = true; 
                     awebview.Settings.SetGeolocationEnabled(true);
