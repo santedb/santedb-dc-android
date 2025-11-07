@@ -74,7 +74,7 @@ namespace SanteDB.Client.Mobile
         }
 
         /// <inheritdoc/>
-        [SuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file", Justification = "<Pending>")]
+        [SuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file", Justification = "We are not using AOT and the Assembly will resolve.")]
         public bool IsAssemblyTrusted(Assembly assembly)
         {
             if (null == assembly)

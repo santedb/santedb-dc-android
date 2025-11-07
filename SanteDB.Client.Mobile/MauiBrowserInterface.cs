@@ -32,7 +32,7 @@ using System.Linq;
 
 namespace SanteDB.Client.Mobile
 {
-    public class MauiBrowserInterface : Java.Lang.Object
+    public class MauiBrowserInterface : Java.Lang.Object 
     {
         readonly MainPage _MainPage;
         private readonly Guid _Magic;
