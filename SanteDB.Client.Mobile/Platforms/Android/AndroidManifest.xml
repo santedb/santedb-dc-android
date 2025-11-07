@@ -40,9 +40,5 @@
   <!--<uses-feature android:name="android.hardware.camera" android:required="false" />
   <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />-->
 	<!-- Required for the permissions dialog to show up -->
-<<<<<<< HEAD
-	<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="35" />
-=======
 	<uses-sdk android:minSdkVersion="29" android:targetSdkVersion="35" />
->>>>>>> c1f248c9018e1cbcfe91ef0dd29a74d5bfcc0789
 </manifest> 
