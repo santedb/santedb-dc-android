@@ -36,7 +36,7 @@ namespace SanteDB.Client.Mobile
         protected override void OnStop()
         {
             base.OnStop();
-            OrmProviderManager.Current.Flush(); // Flush all writebacks to disk
+            OrmProviderManager.Current?.Flush(); // Flush all writebacks to disk
         }
     }
 }
