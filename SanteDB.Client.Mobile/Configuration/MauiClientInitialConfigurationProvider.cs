@@ -75,7 +75,7 @@ namespace SanteDB.Client.Mobile.Configuration
             }
 
             appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)));
-            //appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
+            appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
             appServiceSection.RemoveAllServiceImplementations(typeof(IAppletHostBridgeProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IUserInterfaceInteractionProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IGeographicLocationProvider));
