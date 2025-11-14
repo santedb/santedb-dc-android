@@ -97,7 +97,7 @@ namespace SanteDB.Client.Mobile
                         awebview.Settings.PluginsEnabled = false; // When this is commented out - sometimes the web view takes upwards of 30 seconds to initialize on Android versions < 30 - 
                     awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false; 
                     if (!OperatingSystem.IsAndroidVersionAtLeast(29))
-                        awebview.Settings.SetRenderPriority(RenderPriority.High); // When commented out - sometimes on web views on Android Versions < 28 the scrolling experience is jittery
+                        awebview.Settings.SetRenderPriority(RenderPriority.Normal); // When commented out - sometimes on web views on Android Versions < 28 the scrolling experience is jittery
                     awebview.Settings.SetSupportMultipleWindows(false); 
                     //awebview.Settings.SetAppCacheEnabled(true); //TODO: Do we need this? We do not appear to use window.applicationCache anywhere in the UI as of 2025-10-29. TD
                     awebview.SetScrollContainer(true);
