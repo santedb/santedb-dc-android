@@ -74,8 +74,8 @@ namespace SanteDB.Client.Mobile.Configuration
                 throw new ApplicationException("Application bug exists. DataDirectory was not set before configuration provider was called. Ensure the DataDirectory data variable in the app domain is set before the config provider is initialized.");
             }
 
-            appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)));
-            appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
+            //appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(BouncyCastleCertificateGenerator)));
+            //appServiceSection.RemoveService(new TypeReferenceConfiguration(typeof(AesSymmetricCrypographicProvider)));
             appServiceSection.RemoveAllServiceImplementations(typeof(IAppletHostBridgeProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IUserInterfaceInteractionProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IGeographicLocationProvider));
@@ -97,7 +97,7 @@ namespace SanteDB.Client.Mobile.Configuration
 
             // Security configuration
             var wlan = NetworkInterface.GetAllNetworkInterfaces().FirstOrDefault(o => o.NetworkInterfaceType == NetworkInterfaceType.Ethernet || o.Description.StartsWith("wlan"));
-            String macAddress = Guid.NewGuid().ToString();
+            String macAddress = BitConverter.ToString(Guid.NewGuid().ToByteArray(), 0, 8).Replace("-","");
             if (wlan != null)
             {
                 var mac = wlan.GetPhysicalAddress().ToString();
@@ -161,7 +161,7 @@ namespace SanteDB.Client.Mobile.Configuration
             backupConfiguration.ExternalBackupLocation= Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
-#if DEBUG || SDB_TRACE
+#if SDB_TRACE
             var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
             diagnosticsConfigSection.TraceWriter.Add(
                 new TraceWriterConfiguration()
@@ -173,7 +173,6 @@ namespace SanteDB.Client.Mobile.Configuration
             );
             diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
-
 #endif
             return configuration;
         }
