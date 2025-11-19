@@ -134,8 +134,16 @@ namespace SanteDB.Client.Mobile
             using (AuthenticationContext.EnterSystemContext())
             {
                 var backupServiceManager = this.GetService<IBackupService>();
+
+                // Pass the progress of restore
+                if(backupServiceManager is IReportProgressChanged irpc)
+                {
+                    irpc.ProgressChanged += Irpc_ProgressChanged;
+                }
+
                 var configurationManager = this.GetService<IConfigurationManager>();
                 var uiInteraction = this.GetService<IUserInterfaceInteractionProvider>();
+                var locale = this.GetService<ILocalizationService>();
                 if (configurationManager is InitialConfigurationManager && uiInteraction.Confirm(UserMessages.ISOLATED_STORAGE_BACKUP_RESTORE))
                 {
                     try
@@ -144,9 +152,14 @@ namespace SanteDB.Client.Mobile
                         if (backupStream != null)
                         {
                             var backupDescriptor = backupServiceManager.GetBackupDescriptorFromStream(backupStream);
-                            string backupSecret = backupDescriptor.IsEnrypted ? uiInteraction.Prompt(UserMessages.AUTO_RESTORE_BACKUP_SECRET, true) : String.Empty;
+                            string backupSecret = String.Empty;
+                            while(backupDescriptor.IsEnrypted && String.IsNullOrEmpty(backupSecret))
+                            {
+                                backupSecret = uiInteraction.Prompt(UserMessages.AUTO_RESTORE_BACKUP_SECRET, true);
+                            }
                             backupServiceManager.RestoreFromStream(backupStream, backupSecret);
-                            this.OnRestartRequested(this);
+                            uiInteraction.Alert(locale.GetString(UserMessageStrings.CONFIRM_RESTART_REQUEST, new { source = "Restore from backup" }));
+                            Application.Current?.Quit();
                         }
                     }
                     catch (Exception e)
@@ -155,8 +168,19 @@ namespace SanteDB.Client.Mobile
                     }
                 }
 
+
+                // Pass the progress of restore
+                if (backupServiceManager is IReportProgressChanged irpc2)
+                {
+                    irpc2.ProgressChanged -= Irpc_ProgressChanged;
+                }
+
             }
         }
 
+        private void Irpc_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            _StartupPage?.SetStatus(String.Empty, e.State, e.Progress);
+        }
     }
 }

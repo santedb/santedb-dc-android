@@ -118,7 +118,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
                 case 0:
                     return 0;
                 default:
-                    return Notifications.Sum(n => Math.Min(n.ProgressIndicator, 1)) / c;
+                    return Math.Min(Notifications.Sum(n => Math.Min(n.ProgressIndicator, 1) / c), 1);
             }
         }
     }
