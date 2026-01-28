@@ -61,11 +61,15 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
 
     private void NotificationsUpdated()
     {
+        // Remove all notifications that have not reported status in the last 1 minute
+        Notifications.Where(o => DateTimeOffset.UtcNow.Subtract(o.LastUpdated).TotalMinutes > 1).ToArray().ForEach(o => Notifications.Remove(o));
+
         OnPropertyChanged(nameof(NotificationCount));
         OnPropertyChanged(nameof(NotificationText));
         OnPropertyChanged(nameof(NotificationProgress));
         OnPropertyChanged(nameof(ShowNotificationsDetailEnabled));
         OnPropertyChanged(nameof(ShowNotificationBar));
+
     }
 
     public ObservableCollection<ViewModels.NotificationViewModel> Notifications { get; } = new();
@@ -163,7 +167,6 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
             {
                 Notifications.RemoveAt(i);
             }
-
         });
     }
 
@@ -173,9 +176,8 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
         {
             _IsDismissed = true;
             IsVisible = false;
-
+            Notifications.Clear();
         });
-
     }
 
     private async void ShowNotificationsPopup_Clicked(object sender, EventArgs args)

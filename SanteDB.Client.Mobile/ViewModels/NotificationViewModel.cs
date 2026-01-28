@@ -27,6 +27,10 @@ namespace SanteDB.Client.Mobile.ViewModels
 {
     public class NotificationViewModel
     {
+        public NotificationViewModel()
+        {
+            this.LastUpdated = DateTimeOffset.UtcNow;
+        }
         public string Identifier { get; set; }
         public string Message { get; set; }
         public float ProgressIndicator { get; set; }
