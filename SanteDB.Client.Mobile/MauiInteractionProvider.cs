@@ -36,6 +36,7 @@ namespace SanteDB.Client.Mobile
 
         // Interaction event callback
         private readonly ManualResetEventSlim m_interactionResetEvent = new ManualResetEventSlim(false);
+        private readonly object m_uiLock = new object(); // Only show one UI element per thread 
 
         /// <summary>
         /// JF- Allows the Maui application to push the currently visible content page
@@ -52,42 +53,51 @@ namespace SanteDB.Client.Mobile
         public void Alert(string message)
         {
             // JF- TODO: Fix this to look up from the i18n 
-            this.m_interactionResetEvent.Reset();
-            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            lock (this.m_uiLock)
             {
-                await Application.Current!.MainPage!.DisplayAlert("Alert", message, "OK");
-                this.m_interactionResetEvent.Set();
-            });
-            this.m_interactionResetEvent.Wait();
+                this.m_interactionResetEvent.Reset();
+                Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+                {
+                    await Application.Current!.MainPage!.DisplayAlert("Alert", message, "OK");
+                    this.m_interactionResetEvent.Set();
+                });
+                this.m_interactionResetEvent.Wait();
+            }
         }
 
         public bool Confirm(string message)
         {
 
-            // JF - TODO: Fix this to look up from the i18n
-            bool result = false;
-            this.m_interactionResetEvent.Reset();
-            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            lock (this.m_uiLock)
             {
-                result = await Application.Current!.MainPage!.DisplayAlert("Confirm", message, "OK", "Cancel");
-                this.m_interactionResetEvent.Set();
-            });
-            this.m_interactionResetEvent.Wait();
-            return result;
+                // JF - TODO: Fix this to look up from the i18n
+                bool result = false;
+                this.m_interactionResetEvent.Reset();
+                Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+                {
+                    result = await Application.Current!.MainPage!.DisplayAlert("Confirm", message, "OK", "Cancel");
+                    this.m_interactionResetEvent.Set();
+                });
+                this.m_interactionResetEvent.Wait();
+                return result;
+            }
         }
 
         public string Prompt(string message, bool maskEntry = false)
         {
-            string result = String.Empty;
-            this.m_interactionResetEvent.Reset();
-            Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+            lock (this.m_uiLock)
             {
-                result = await Application.Current!.MainPage!.DisplayPromptAsync("Prompt", message);
-                // JF - TODO: Fix this to look up from the i18n
-                this.m_interactionResetEvent.Set();
-            });
-            this.m_interactionResetEvent.Wait();
-            return result;
+                string result = String.Empty;
+                this.m_interactionResetEvent.Reset();
+                Application.Current!.MainPage!.Dispatcher.Dispatch(async () =>
+                {
+                    result = await Application.Current!.MainPage!.DisplayPromptAsync("Prompt", message);
+                    // JF - TODO: Fix this to look up from the i18n
+                    this.m_interactionResetEvent.Set();
+                });
+                this.m_interactionResetEvent.Wait();
+                return result;
+            }
 
         }
 

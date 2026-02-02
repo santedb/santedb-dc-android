@@ -32,8 +32,10 @@ using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
 using SanteDB.Core.Services;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Security;
@@ -47,35 +49,27 @@ using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace SanteDB.Client.Mobile
 {
+    /// <summary>
+    /// MAUI Certificate Provider
+    /// </summary>
+    /// <remarks>
+    /// This implementation is based on the <see cref="MonoPlatformSecurityProvider"/>. Since PersistKeySet is not supported on Mono based
+    /// environments, this implementation stores the private keys in a hidden directory password protected as PFX files.
+    /// </remarks>
     [PreferredService(typeof(IPlatformSecurityProvider))]
-    public class MauiPlatformSecurityProvider : IPlatformSecurityProvider
+    public class MauiPlatformSecurityProvider : MonoPlatformSecurityProvider
     {
         readonly SanteDBChain _InternalChain;
-        readonly Tracer _Tracer;
-        private readonly ManualResetEventSlim _AsyncCallback = new ManualResetEventSlim(false);
-
+        readonly Tracer _Tracer = Tracer.GetTracer(typeof(MauiPlatformSecurityProvider));
+        
         public MauiPlatformSecurityProvider()
         {
-            _Tracer = new Tracer(nameof(MauiPlatformSecurityProvider));
             _InternalChain = new SanteDBChain();
         }
 
         /// <inheritdoc/>
-        public IEnumerable<X509Certificate2> FindAllCertificates(X509FindType findType, object findValue, StoreName storeName = StoreName.My, StoreLocation storeLocation = StoreLocation.CurrentUser, bool validOnly = true)
-        {
-            using (var store = new X509Store(storeName, storeLocation))
-            {
-                store.Open(OpenFlags.ReadOnly);
-                foreach (var cert in store.Certificates.Find(findType, findValue, validOnly))
-                {
-                    yield return cert;
-                }
-            }
-        }
-
-        /// <inheritdoc/>
         [SuppressMessage("SingleFile", "IL3000:Avoid accessing Assembly file path when publishing as a single file", Justification = "We are not using AOT and the Assembly will resolve.")]
-        public bool IsAssemblyTrusted(Assembly assembly)
+        public override bool IsAssemblyTrusted(Assembly assembly)
         {
             if (null == assembly)
             {
@@ -111,194 +105,21 @@ namespace SanteDB.Client.Mobile
             }
         }
 
-        public bool IsCertificateTrusted(X509Certificate2 certificate, DateTimeOffset? asOfDate = null)
+        public override bool IsCertificateTrusted(X509Certificate2 certificate, DateTimeOffset? asOfDate = null)
         {
             return _InternalChain.ValidateCertificate(certificate);
         }
 
-        ///<inheritdoc />
-        public bool TryGetCertificate(X509FindType findType, object findValue, out X509Certificate2 certificate, bool validOnly = true)
-        {
-            return TryGetCertificate(findType, findValue, StoreName.My, StoreLocation.CurrentUser, out certificate, validOnly);
-        }
-
-        ///<inheritdoc />
-        public bool TryGetCertificate(X509FindType findType, object findValue, StoreName storeName, out X509Certificate2 certificate, bool validOnly = true)
-        {
-            return TryGetCertificate(findType, findValue, storeName, StoreLocation.CurrentUser, out certificate, validOnly);
-        }
-
-        ///<inheritdoc />
-        public bool TryGetCertificate(X509FindType findType, object findValue, StoreName storeName, StoreLocation storeLocation, out X509Certificate2 certificate, bool validOnly = true)
-        {
-            if (findValue == null)
-            {
-                throw new ArgumentNullException(nameof(findValue));
-            }
-
-            try
-            {
-                using (var store = new X509Store(storeName, storeLocation))
-                {
-                    store.Open(OpenFlags.ReadOnly);
-
-                    var certs = store.Certificates.Find(findType, findValue, validOnly: validOnly); // since the user is asking for a specific certificate allow for searching of invalid certificates
-
-                    if (certs.Count == 0)
-                    {
-                        certificate = null;
-                        return false;
-                    }
-
-                    certificate = certs[0];
-
-                    store.Close();
-
-                    return true;
-                }
-            }
-            catch (CryptographicException)
-            {
-                certificate = null;
-                return false;
-            }
-        }
-
-        ///<inheritdoc />
-        public bool TryInstallCertificate(X509Certificate2 certificate, StoreName storeName = StoreName.My, StoreLocation storeLocation = StoreLocation.CurrentUser)
-        {
-            var audit = this.AuditCertificateInstallation(certificate);
-
-            try
-            {
-                using (var store = new X509Store(storeName, storeLocation))
-                {
-                    store.Open(OpenFlags.ReadWrite);
-
-                    var password = Guid.NewGuid().ToString();
-
-                    var certtext = certificate.Export(X509ContentType.Pfx, password);
-
-                    var importcert = new X509Certificate2(certtext, password);
-
-                    store.Add(importcert);
-
-                    this._Tracer.TraceWarning("Certificate {0} has been installed to {1}/{2}", certificate.Subject, storeLocation, storeName);
-                    audit?.WithOutcome(OutcomeIndicator.Success);
-
-                    store.Close();
-
-                    return true;
-                }
-            }
-            catch (CryptographicException cex)
-            {
-                audit?.WithOutcome(OutcomeIndicator.SeriousFail);
-                return false;
-            }
-            catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
-            {
-                audit?.WithOutcome(Core.Model.Audit.OutcomeIndicator.SeriousFail);
-                throw;
-            }
-            finally
-            {
-                audit?.Send();
-            }
-        }
-
-        ///<inheritdoc />
-        public bool TryUninstallCertificate(X509Certificate2 certificate, StoreName storeName = StoreName.My, StoreLocation storeLocation = StoreLocation.CurrentUser)
-        {
-            var audit = this.AuditCertificateRemoval(certificate);
-
-            try
-            {
-                using (var store = new X509Store(storeName, storeLocation))
-                {
-                    store.Open(OpenFlags.ReadWrite);
-
-                    var thumbprint = certificate?.Thumbprint;
-
-                    var certs = store.Certificates.Find(X509FindType.FindByThumbprint, thumbprint, true);
-
-                    if (certs.Count == 0)
-                    {
-                        audit?.WithOutcome(OutcomeIndicator.MinorFail);
-                        return false;
-                    }
-
-                    foreach (var cert in certs)
-                    {
-                        store.Certificates.Remove(cert);
-                    }
-                    this._Tracer.TraceWarning("Certificate {0} has been removed from {1}/{2}", certificate.Subject, storeLocation, storeName);
-
-                    audit?.WithOutcome(OutcomeIndicator.Success);
-
-                    store.Close();
-
-                    return true;
-                }
-            }
-            catch (CryptographicException cex)
-            {
-                audit?.WithOutcome(OutcomeIndicator.SeriousFail);
-                return false;
-            }
-            catch (Exception ex) when (!(ex is StackOverflowException || ex is OutOfMemoryException))
-            {
-                audit?.WithOutcome(Core.Model.Audit.OutcomeIndicator.SeriousFail);
-                throw;
-            }
-            finally
-            {
-                audit?.Send();
-            }
-        }
-
-
-        /// <summary>
-        /// Create an audit builder for certificate installation.
-        /// </summary>
-        /// <param name="certificate">The certificate being installed.</param>
-        /// <returns></returns>
-        private IAuditBuilder AuditCertificateInstallation(X509Certificate2 certificate)
-            => ApplicationServiceContext.Current?.GetAuditService()?.Audit() // Prevents circular dependency in dCDR
-                .WithTimestamp()
-                .WithEventType(EventTypeCodes.SecurityAlert)
-                .WithEventIdentifier(Core.Model.Audit.EventIdentifierType.Import)
-                .WithAction(Core.Model.Audit.ActionType.Execute)
-                .WithLocalDestination()
-                .WithPrincipal()
-                .WithSystemObjects(Core.Model.Audit.AuditableObjectRole.SecurityResource, Core.Model.Audit.AuditableObjectLifecycle.Import, certificate);
-
-        /// <summary>
-        /// Create an audit builder for certificate removal.
-        /// </summary>
-        /// <param name="certificate">The certificate being removed.</param>
-        /// <returns></returns>
-        private IAuditBuilder AuditCertificateRemoval(X509Certificate2 certificate)
-            => ApplicationServiceContext.Current?.GetAuditService()?.Audit()
-                .WithTimestamp()
-                .WithEventType(EventTypeCodes.SecurityAlert)
-                .WithEventIdentifier(Core.Model.Audit.EventIdentifierType.SecurityAlert)
-                .WithAction(Core.Model.Audit.ActionType.Delete)
-                .WithLocalDestination()
-                .WithPrincipal()
-                .WithSystemObjects(Core.Model.Audit.AuditableObjectRole.SecurityResource, Core.Model.Audit.AuditableObjectLifecycle.PermanentErasure, certificate);
-
-
         /// <inheritdoc/>
         /// <remarks>This is not required on Windows or Linux</remarks>
 #pragma warning disable CA1416 // We manually check the android version
-        public bool DemandPlatformServicePermission(PlatformServicePermission platformServicePermission)
+        public override bool DemandPlatformServicePermission(PlatformServicePermission platformServicePermission)
         {
             try
             {
                 return Nito.AsyncEx.AsyncContext.Run(async () => await this.DemandPlatformServicePermissionInternalAsync(platformServicePermission));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new SecurityException(ErrorMessages.PLATFORM_SECURITY_ERROR, ex);
             }

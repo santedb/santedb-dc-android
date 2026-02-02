@@ -18,20 +18,25 @@
  * Date: 2023-4-19
  */
 using BarcodeScanner.Mobile;
-using Microsoft.Extensions.Logging;
-using SanteDB.Core.Applets.Services.Impl;
-using SanteDB.Rest.HDSI;
-using System.Diagnostics;
-using System.Runtime.Loader;
-using System.Security.Cryptography.X509Certificates;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
-using System.Diagnostics.CodeAnalysis;
-using System.Xml.Linq;
-using Microsoft.Maui.Hosting;
-using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Data.Sqlite;
+using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Maui.Hosting;
+using SanteDB.Client.Mobile;
+using SanteDB.Core.Applets.Services.Impl;
+using SanteDB.Core.Attributes;
+using SanteDB.Rest.HDSI;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
+using System.Runtime.Loader;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml.Linq;
+
+[assembly: DefaultPlatformSecurityType(typeof(MauiPlatformSecurityProvider))]
+
 namespace SanteDB.Client.Mobile
 {
 
@@ -59,7 +64,6 @@ namespace SanteDB.Client.Mobile
 
             //    Debugger.Break();
             //}
-
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
