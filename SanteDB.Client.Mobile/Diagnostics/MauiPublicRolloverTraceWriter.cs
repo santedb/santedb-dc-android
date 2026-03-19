@@ -18,6 +18,8 @@
  * Date: 2023-4-19
  */
 using Antlr4.Runtime.Misc;
+using Microsoft.Extensions.Configuration;
+using SanteDB.Client.Configuration;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics.Tracing;
 using SanteDB.Core.Security;
@@ -47,7 +49,7 @@ namespace SanteDB.Client.Mobile.Diagnostics
         /// <inheritdoc/>
         public override void TraceEvent(EventLevel level, string source, string format, params object[] args)
         {
-            if (this.ValidateWritePermission())
+            if (ApplicationServiceContext.Current?.GetService<IConfigurationManager>() is InitialConfigurationManager && this.ValidateWritePermission())
             {
                 base.TraceEvent(level, source, format, args);
             }
@@ -56,7 +58,7 @@ namespace SanteDB.Client.Mobile.Diagnostics
         /// <inheritdoc/>
         public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
         {
-            if (this.ValidateWritePermission())
+            if (ApplicationServiceContext.Current?.GetService<IConfigurationManager>() is InitialConfigurationManager && this.ValidateWritePermission())
             {
                 base.TraceEventWithData(level, source, message, data);
             }

@@ -161,19 +161,19 @@ namespace SanteDB.Client.Mobile.Configuration
             backupConfiguration.ExternalBackupLocation= Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
-//#if SDB_TRACE
-//            var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
-//            diagnosticsConfigSection.TraceWriter.Add(
-//                new TraceWriterConfiguration()
-//                {
-//                    Filter = System.Diagnostics.Tracing.EventLevel.Informational,
-//                    InitializationData = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "santedb.txt"),
-//                    TraceWriter = typeof(MauiPublicRolloverTraceWriter)
-//                }
-//            );
-//            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
-//            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
-//#endif
+#if SDB_TRACE
+            var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
+            diagnosticsConfigSection.TraceWriter.Add(
+                new TraceWriterConfiguration()
+                {
+                    Filter = System.Diagnostics.Tracing.EventLevel.Informational,
+                    InitializationData = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "santedb.txt"),
+                    TraceWriter = typeof(MauiPublicRolloverTraceWriter)
+                }
+            );
+            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
+            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
+#endif
             return configuration;
         }
     }
