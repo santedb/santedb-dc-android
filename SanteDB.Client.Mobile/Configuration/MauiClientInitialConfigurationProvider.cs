@@ -166,13 +166,22 @@ namespace SanteDB.Client.Mobile.Configuration
             diagnosticsConfigSection.TraceWriter.Add(
                 new TraceWriterConfiguration()
                 {
+#if DEBUG
                     Filter = System.Diagnostics.Tracing.EventLevel.Informational,
+#else
+                    Filter = System.Diagnostics.Tracing.EventLevel.Warning,
+#endif 
                     InitializationData = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "santedb.txt"),
                     TraceWriter = typeof(MauiPublicRolloverTraceWriter)
                 }
             );
+#if DEBUG
             diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
+#else 
+            diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Warning);
+            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Warning });
+#endif
 #endif
             return configuration;
         }
