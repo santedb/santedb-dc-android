@@ -17,18 +17,14 @@
  * User: trevor
  * Date: 2023-11-3
  */
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Markup;
 using CommunityToolkit.Maui.Views;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Dispatching;
-using Microsoft.Maui.Platform;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Threading.Tasks;
 using static CommunityToolkit.Maui.Markup.GridRowsColumns;
@@ -37,6 +33,7 @@ namespace SanteDB.Client.Mobile.Controls;
 
 public partial class NotificationBar : ContentView, INotifyPropertyChanged
 {
+    //True if the bar has been manually dismissed. False otherwise.
     bool _IsDismissed;
 
     public NotificationBar()
@@ -147,12 +144,18 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
             else
             {
                 update = true;
-                
             }
+
 
             notification.Message = message;
             notification.ProgressIndicator = progressIndicator;
             notification.LastUpdated = DateTimeOffset.UtcNow;
+
+            if (progressIndicator >= 1.0f)
+                Notifications.Remove(notification);
+
+            if (Notifications.Count == 0)
+                IsVisible = false;
 
             if (update)
                 NotificationsUpdated();
@@ -237,7 +240,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
                 new ScrollView
                 {
                     Content = new VerticalStackLayout()
-                    
+
                     .FillVertical()
                     .Margin(10, 0)
                     .Invoke(vsl => vsl.Spacing = 15)
