@@ -43,6 +43,7 @@ using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
 using SanteDB.Core.Data.Backup;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Diagnostics.Tracing;
 using SanteDB.Core.Security;
 using SanteDB.Core.Security.Audit;
@@ -52,6 +53,7 @@ using SanteDB.Core.Services.Impl;
 using SanteDB.Security.Certs.BouncyCastle;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -123,7 +125,7 @@ namespace SanteDB.Client.Mobile.Configuration
 #if DEBUG
                         CredentialName = $"Debugee-{macAddress.Replace(" ", "")}",
 #else
-                        CredentialName = $"{Android.OS.Build.Model}-{macAddress.Replace(" ", "")}",
+                        CredentialName = $"{Android.OS.Build.Model.Replace(" ", "")}-{macAddress.Replace(" ", "")}",
 #endif
                         Conveyance = UpstreamCredentialConveyance.Secret,
                         CredentialType = UpstreamCredentialType.Device
@@ -166,19 +168,9 @@ namespace SanteDB.Client.Mobile.Configuration
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
 #if SDB_TRACE
+            Tracer.AddWriter(new MauiPublicRolloverTraceWriter(System.Diagnostics.Tracing.EventLevel.Informational, externalDirectory.AbsolutePath, new Dictionary<String, System.Diagnostics.Tracing.EventLevel>()), System.Diagnostics.Tracing.EventLevel.Informational);
+#endif
             var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
-            diagnosticsConfigSection.TraceWriter.Add(
-                new TraceWriterConfiguration()
-                {
-#if DEBUG
-                    Filter = System.Diagnostics.Tracing.EventLevel.Informational,
-#else
-                    Filter = System.Diagnostics.Tracing.EventLevel.Warning,
-#endif 
-                    InitializationData = Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "santedb.txt"),
-                    TraceWriter = typeof(MauiPublicRolloverTraceWriter)
-                }
-            );
 #if DEBUG
             diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
@@ -186,7 +178,6 @@ namespace SanteDB.Client.Mobile.Configuration
             diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Warning);
 //            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB", Filter = System.Diagnostics.Tracing.EventLevel.Warning });
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Warning });
-#endif
 #endif
             return configuration;
         }

@@ -42,8 +42,8 @@ namespace SanteDB.Client.Mobile.Diagnostics
         /// </summary>
         private bool ValidateWritePermission()
         {
-            var osService = ApplicationServiceContext.Current.GetService<IPlatformSecurityProvider>();
-            return osService.DemandPlatformServicePermission(PlatformServicePermission.ExternalMedia);
+            var osService = ApplicationServiceContext.Current?.GetService<IPlatformSecurityProvider>();
+            return osService?.DemandPlatformServicePermission(PlatformServicePermission.ExternalMedia) == true;
         }
 
         /// <inheritdoc/>
