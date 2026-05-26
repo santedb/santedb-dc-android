@@ -38,6 +38,7 @@ using SanteDB.Client.Upstream.Security;
 using SanteDB.Client.UserInterface;
 using SanteDB.Client.UserInterface.Impl;
 using SanteDB.Core;
+using SanteDB.Core.Applets.Services;
 using SanteDB.Core.Applets.Services.Impl;
 using SanteDB.Core.Configuration;
 using SanteDB.Core.Data;
@@ -82,6 +83,8 @@ namespace SanteDB.Client.Mobile.Configuration
             appServiceSection.RemoveAllServiceImplementations(typeof(IOperatingSystemInfoService));
             appServiceSection.RemoveAllServiceImplementations(typeof(IPlatformSecurityProvider));
             appServiceSection.RemoveAllServiceImplementations(typeof(IBackupService));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IAppletManagerService));
+            appServiceSection.RemoveAllServiceImplementations(typeof(IAppletSolutionManagerService));
 
             appServiceSection.AddServices(new List<TypeReferenceConfiguration>() {
                     //new TypeReferenceConfiguration(typeof(NullSymmetricCryptographicProvider)),
@@ -89,7 +92,8 @@ namespace SanteDB.Client.Mobile.Configuration
                     new TypeReferenceConfiguration(typeof(MauiOperatingSystemInfoService)),
                     new TypeReferenceConfiguration(typeof(MauiPlatformSecurityProvider)),
                     new TypeReferenceConfiguration(typeof(MauiLocationProvider)),
-                    new TypeReferenceConfiguration(typeof(MauiBackupProvider))
+                    new TypeReferenceConfiguration(typeof(MauiBackupProvider)),
+                    new TypeReferenceConfiguration(typeof(MauiAppletManagerService))
             });
 
             // On android the user cannot dynamically load asms
@@ -180,6 +184,7 @@ namespace SanteDB.Client.Mobile.Configuration
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });
 #else 
             diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Warning);
+//            diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB", Filter = System.Diagnostics.Tracing.EventLevel.Warning });
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Warning });
 #endif
 #endif

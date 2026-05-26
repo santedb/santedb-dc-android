@@ -22,6 +22,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
+using SanteDB.Client.Batteries.Services;
 using SanteDB.Client.Configuration;
 using SanteDB.Client.UserInterface;
 using SanteDB.Core.Configuration;
@@ -35,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -56,18 +58,21 @@ namespace SanteDB.Client.Mobile
             _Application = Application.Current ?? throw new NullReferenceException("Application.Current is null.");
             _StartupPage = startupPage;
 
-            configurationManager.Configuration.AddSection<SecurityConfigurationSection>(new SecurityConfigurationSection
+            // Only add security signature if one does not exist
+            if (configurationManager.Configuration.GetSection<SecurityConfigurationSection>() == null)
             {
-                Signatures = new List<SecuritySignatureConfiguration>
+                configurationManager.Configuration.AddSection<SecurityConfigurationSection>(new SecurityConfigurationSection
+                {
+                    Signatures = new List<SecuritySignatureConfiguration>
                 {
                     new SecuritySignatureConfiguration
                     {
                         Algorithm = SignatureAlgorithm.HS256,
-                        HmacSecret = "@@SanteDB2021!&",
+                        HmacSecret = RandomNumberGenerator.GetBytes(32).HexEncode(),
                     }
                 }
-            });
-
+                });
+            }
 
             _InteractionProvider = new MauiInteractionProvider(_Application, startupPage);
             DependencyServiceManager.AddServiceProvider(_InteractionProvider);
@@ -75,7 +80,11 @@ namespace SanteDB.Client.Mobile
             DependencyServiceManager.AddServiceProvider(new MauiOperatingSystemInfoService());
             DependencyServiceManager.AddServiceProvider(new MauiPlatformSecurityProvider());
 
-            SanteDB.Core.Model.Map.ModelMapper.UseReflectionOnly = true; //This is a hack for now until we can rewrite the model mapper to use source generators.
+            // Remove any old service providers which are obsolete and replace them
+            this.DependencyServiceManager.RemoveServiceProvider(typeof(ClientAppletManagerService));
+            this.DependencyServiceManager.AddServiceProvider(typeof(MauiAppletManagerService));
+
+            SanteDB.Core.Model.Map.ModelMapper.UseReflectionOnly = true; // HACK: This is a hack for now until we can rewrite the model mapper to use source generators.
         }
 
         public override void Start()
