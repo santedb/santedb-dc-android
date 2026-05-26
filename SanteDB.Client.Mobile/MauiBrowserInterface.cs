@@ -27,6 +27,7 @@ using SanteDB.Core.Services;
 using System;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 
 #nullable enable
 
@@ -36,6 +37,10 @@ namespace SanteDB.Client.Mobile
     {
         readonly MainPage _MainPage;
         private readonly Guid _Magic;
+        private Shared.AppServiceStateResponse m_stateObject;
+        private object m_stateLock = new object();
+        private bool m_isCheckingStatus = false;
+
         readonly IConfigurationManager? _ConfigManager;
         private readonly ILocalizationService _LocalizationService;
         private readonly IUpstreamAvailabilityProvider _UpstreamAvailabilityProvider;
@@ -45,7 +50,7 @@ namespace SanteDB.Client.Mobile
         readonly string? _RealmId;
         readonly string? _FacilityId;
         readonly string? _OwnerId;
-
+        private readonly Timer _StateMonitorTimer;
         static string? _Version;
         private static string? GetAssemblyVersion()
         {
@@ -73,7 +78,6 @@ namespace SanteDB.Client.Mobile
 
             var securityconfig = _ConfigManager?.GetSection<SecurityConfigurationSection>();
 
-
             _DeviceId = devicecredential?.CredentialName;
             _ClientId = upstreamconfig?.Realm == null ? null : appcredential?.CredentialName;
             _RealmId = upstreamconfig?.Realm?.DomainName;
@@ -81,40 +85,66 @@ namespace SanteDB.Client.Mobile
             _FacilityId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedFacilityUuid).ToString();
             _OwnerId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedOwnerUuid).ToString();
 
+            // We want to background the availability call because of the timeout
+            this.BackgroundStateMonitor(null);
+            _StateMonitorTimer = new Timer(this.BackgroundStateMonitor, null, 0, 5000);
+            
+        }
+
+        private void BackgroundStateMonitor(object e)
+        {
+            if (!Interlocked.CompareExchange(ref m_isCheckingStatus, true, false))
+            {
+                var state = new Shared.AppServiceStateResponse
+                {
+                    Ami = _UpstreamAvailabilityProvider.IsAvailable(Core.Interop.ServiceEndpointType.AdministrationIntegrationService),
+                    ClientId = _ClientId,
+                    DeviceId = _DeviceId,
+                    Hdsi = _UpstreamAvailabilityProvider.IsAvailable(Core.Interop.ServiceEndpointType.HealthDataService),
+                    Magic = GetMagic(),
+                    Online = _NetworkInformationService.IsNetworkAvailable && _NetworkInformationService.IsNetworkConnected,
+                    Realm = GetRealm(),
+                    Version = GetAssemblyVersion(),
+                    FacilityId = _FacilityId,
+                    OwnerId = _OwnerId,
+                };
+
+
+                lock (this.m_stateLock)
+                {
+                    this.m_stateObject = state;
+                }
+                Interlocked.Exchange(ref m_isCheckingStatus, false);
+            }
+
         }
 
         [Export]
         [JavascriptInterface]
         public string GetServiceState()
         {
-            var state = new Shared.AppServiceStateResponse
-            {
-                Ami = IsAdminAvailable(),
-                ClientId = _ClientId,
-                DeviceId = _DeviceId,
-                Hdsi = IsClinicalAvailable(),
-                Magic = GetMagic(),
-                Online = GetOnlineState(),
-                Realm = GetRealm(),
-                Version = GetAssemblyVersion(),
-                FacilityId = _FacilityId,
-                OwnerId = _OwnerId,
-            };
+            return JsonConvert.SerializeObject(this.GetStateObject());
+        }
 
-            return JsonConvert.SerializeObject(state);
+        private Shared.AppServiceStateResponse GetStateObject()
+        {
+            lock(this.m_stateLock)
+            {
+                return this.m_stateObject;
+            }
         }
 
         [Export]
         [JavascriptInterface]
-        public bool GetOnlineState() => _NetworkInformationService.IsNetworkAvailable && _NetworkInformationService.IsNetworkConnected;
+        public bool GetOnlineState() => this.GetStateObject().Online;
 
         [Export]
         [JavascriptInterface]
-        public bool IsAdminAvailable() => _UpstreamAvailabilityProvider.IsAvailable(Core.Interop.ServiceEndpointType.AdministrationIntegrationService);
+        public bool IsAdminAvailable() => this.GetStateObject().Ami;
 
         [Export]
         [JavascriptInterface]
-        public bool IsClinicalAvailable() => _UpstreamAvailabilityProvider.IsAvailable(Core.Interop.ServiceEndpointType.HealthDataService);
+        public bool IsClinicalAvailable() => this.GetStateObject().Hdsi;
 
         [Export]
         [JavascriptInterface]
@@ -175,6 +205,13 @@ namespace SanteDB.Client.Mobile
         public string ScanBarcode()
         {
             return Nito.AsyncEx.AsyncContext.Run(async () => await _MainPage.ScanBarcodeAsync());
+        }
+
+
+        protected override void Dispose(bool disposing)
+        {
+            _StateMonitorTimer.Dispose();
+            base.Dispose(disposing);
         }
     }
 }
