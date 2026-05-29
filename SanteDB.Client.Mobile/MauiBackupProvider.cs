@@ -94,7 +94,7 @@ namespace SanteDB.Client.Mobile
             {
                 case BackupMedia.Private:
                 case BackupMedia.Public:
-                    return base.GetBackup(media, backupDescriptorLabel);
+                    return base.GetBackupInternal(media, backupDescriptorLabel);
                 case BackupMedia.ExternalPublic:
                     this.m_pepService.Demand(PermissionPolicyIdentifiers.ManageBackups);
 
