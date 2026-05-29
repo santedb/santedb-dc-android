@@ -3,10 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sdb="clr-namespace:SanteDB.Client.Mobile.Controls"
              x:Class="SanteDB.Client.Mobile.MainPage">
-    <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand" RowDefinitions="1*, auto">
+    <Grid RowDefinitions="1*">
         <Border Grid.Row="0" StrokeThickness="0">
-            <WebView x:Name="WebView" HorizontalOptions="FillAndExpand" VerticalOptions="FillAndExpand"  />
+            <WebView x:Name="WebView"  />
         </Border>
-        <sdb:NotificationBar x:Name="NotificationBar" Grid.Row="1" />
+        <sdb:NotificationBar x:Name="NotificationBar" Grid.Row="0" VerticalOptions="End" />
     </Grid>
 </ContentPage>
