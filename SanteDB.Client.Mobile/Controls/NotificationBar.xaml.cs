@@ -19,6 +19,7 @@
  */
 using CommunityToolkit.Maui.Markup;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Devices;
 using Microsoft.Maui.Dispatching;
@@ -43,6 +44,41 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
         this.Notifications.CollectionChanged += Notifications_CollectionChanged;
 
         this.IsVisible = false;
+    }
+
+    private static Task<bool> IsVisibleTo(VisualElement view, bool toIsVisible, uint length = 250)
+    {
+        //Adapted from the ViewExtensions.AnimateTo()
+
+        ArgumentNullException.ThrowIfNull(view, nameof(view));
+
+        var tcs = new TaskCompletionSource<bool>();
+
+        var weak = new WeakReference<VisualElement>(view);
+
+        void Update(double f)
+        {
+            if (weak.TryGetTarget(out var tgt) && f >= 0.99)
+            {
+                tgt.IsVisible = toIsVisible;
+            }
+        }
+
+        new Animation(Update, 0, 1, Easing.Linear).Commit(view, nameof(IsVisibleTo), 16, length, finished: (final, aborted) => tcs.SetResult(aborted));
+
+        return tcs.Task;
+    }
+
+    private void ShowMe()
+    {
+        this.AbortAnimation(nameof(IsVisibleTo));
+        IsVisible = true;
+    }
+
+    private void HideMe()
+    {
+        this.AbortAnimation(nameof(IsVisibleTo));
+        _ = IsVisibleTo(this, false);
     }
 
     protected override void OnApplyTemplate()
@@ -85,7 +121,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
             switch (c)
             {
                 case 0:
-                    return "There are no notifications";
+                    return string.Empty;
                 case 1:
                     return Notifications.Single().Message;
                 default:
@@ -139,7 +175,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
                 Notifications.Add(notification);
 
                 _IsDismissed = false; //Reset dismissal because we're adding a new notification.
-                IsVisible = true;
+                ShowMe();
             }
             else
             {
@@ -155,7 +191,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
                 Notifications.Remove(notification);
 
             if (Notifications.Count == 0)
-                IsVisible = false;
+                HideMe();
 
             if (update)
                 NotificationsUpdated();
@@ -170,6 +206,9 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
             {
                 Notifications.RemoveAt(i);
             }
+
+            if (Notifications.Count == 0)
+                HideMe();
         });
     }
 
@@ -178,7 +217,7 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
         await Dispatcher.DispatchAsync(() =>
         {
             _IsDismissed = true;
-            IsVisible = false;
+            HideMe();
             Notifications.Clear();
         });
     }
