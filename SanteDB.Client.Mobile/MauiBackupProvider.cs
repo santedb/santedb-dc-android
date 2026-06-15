@@ -111,12 +111,6 @@ namespace SanteDB.Client.Mobile
             }
         }
 
-        public override IBackupDescriptor GetBackup(string backupDescriptorLabel, out BackupMedia locatedOnMedia)
-        {
-            throw new NotSupportedException();
-        }
-
-
         public override bool HasBackup(BackupMedia media)
         {
             switch (media)
