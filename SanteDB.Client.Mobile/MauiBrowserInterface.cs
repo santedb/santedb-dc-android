@@ -19,15 +19,19 @@
  */
 using Android.Webkit;
 using Java.Interop;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
 using Newtonsoft.Json;
 using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Core;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 #nullable enable
 
@@ -40,6 +44,8 @@ namespace SanteDB.Client.Mobile
         private Shared.AppServiceStateResponse m_stateObject;
         private object m_stateLock = new object();
         private bool m_isCheckingStatus = false;
+
+        
 
         readonly IConfigurationManager? _ConfigManager;
         private readonly ILocalizationService _LocalizationService;
@@ -205,6 +211,29 @@ namespace SanteDB.Client.Mobile
         public string ScanBarcode()
         {
             return Nito.AsyncEx.AsyncContext.Run(async () => await _MainPage.ScanBarcodeAsync());
+        }
+
+        [Export]
+        [JavascriptInterface]
+        public void CloseApp()
+        {
+            if (null != Application.Current)
+                _ = MainThread.InvokeOnMainThreadAsync(() =>
+                {
+                    //We do not use the shell so we need to replace the main page in the app.
+                    var restartpage = new RestartPage();
+
+                    Application.Current!.Windows[0].Page = restartpage;
+
+                    //Support the routing query parameter contract by calling the reason in.
+                    restartpage.ApplyQueryAttributes(new Dictionary<string, object>
+                    {
+                            { "reason", Constants.REASONKEY_DEFAULT }
+                    });
+
+                    return Task.CompletedTask;
+                });
+
         }
 
 

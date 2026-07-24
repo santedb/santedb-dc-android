@@ -18,7 +18,6 @@
  * Date: 2023-4-19
  */
 if (typeof __SanteDBAppService === 'undefined') {
-    console.log("reinstantiating __SanteDBAppService");
     window.__SanteDBAppService = {};
 }
 
@@ -27,10 +26,7 @@ let __firstrun = true;
 
 __SanteDBAppService.GetStatus = async function () {
     let statestr = __sdb_bridge.GetServiceState();
-    console.log("Received state string");
-    console.log(statestr);
     let state = JSON.parse(statestr);
-    console.log(state);
     return state;
 };
 
@@ -52,7 +48,7 @@ __SanteDBAppService.Print = function () {
 };
 
 __SanteDBAppService.Close = function () {
-    window.console.log("Close function called.");
+    __sdb_bridge.CloseApp();
 };
 
 __SanteDBAppService.GetDataAsset = function (dataId) {
