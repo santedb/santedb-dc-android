@@ -22,6 +22,7 @@ using Android.Webkit;
 using Firely.Fhir.Packages;
 using Javax.Security.Auth;
 using Microsoft.Maui.Handlers;
+using Microsoft.Maui.Layouts;
 using SanteDB.Client.UserInterface;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
@@ -82,7 +83,8 @@ namespace SanteDB.Client.Mobile
                 .SetMessage(message)
                 .SetTitle(this.m_localizationService.GetString("ui.alert.confirm"))
                 .SetPositiveButton(this.m_localizationService.GetString("ui.action.ok"), (o, e) => result.Confirm())
-                .SetNegativeButton(this.m_localizationService.GetString("ui.action.cancel"), (o, e) => result.Cancel());
+                .SetNegativeButton(this.m_localizationService.GetString("ui.action.cancel"), (o, e) => result.Cancel())
+                .SetCancelable(false);
             alert.Create().Show();
             return true;
         }
@@ -96,7 +98,8 @@ namespace SanteDB.Client.Mobile
             var alert = new Android.App.AlertDialog.Builder(this.m_context)
                 .SetMessage(message)
                 .SetTitle(this.m_localizationService.GetString("ui.alert.alert"))
-                .SetPositiveButton(this.m_localizationService.GetString("ui.action.ok"), (o, e) => result.Confirm());
+                .SetPositiveButton(this.m_localizationService.GetString("ui.action.ok"), (o, e) => result.Confirm())
+                .SetCancelable(false);
             alert.Create().Show();
             return true;
         }
