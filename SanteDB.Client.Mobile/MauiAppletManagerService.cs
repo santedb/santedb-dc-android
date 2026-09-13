@@ -59,7 +59,7 @@ namespace SanteDB.Client.Mobile
         /// DI constructor
         /// </summary>
         public MauiAppletManagerService(IConfigurationManager configurationManager, IAppletHostBridgeProvider bridgeProvider, IUserInterfaceInteractionProvider userInterfaceInteractionProvider, IPlatformSecurityProvider platformSecurityProvider)
-            : base(configurationManager, bridgeProvider, userInterfaceInteractionProvider, platformSecurityProvider)
+            : base(configurationManager, userInterfaceInteractionProvider, platformSecurityProvider, bridgeProvider)
         {
         }
 
