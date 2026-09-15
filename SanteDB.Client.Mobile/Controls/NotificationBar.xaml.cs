@@ -164,37 +164,44 @@ public partial class NotificationBar : ContentView, INotifyPropertyChanged
     {
         await Dispatcher.DispatchAsync(() =>
         {
-            var notification = Notifications.FirstOrDefault(n => n.Identifier == identifier);
-            bool update = false;
-
-            if (null == notification)
+            try
             {
-                notification = new();
-                notification.Identifier = identifier;
+                var notification = Notifications.FirstOrDefault(n => n.Identifier == identifier);
+                bool update = false;
 
-                Notifications.Add(notification);
+                if (null == notification)
+                {
+                    notification = new();
+                    notification.Identifier = identifier;
 
-                _IsDismissed = false; //Reset dismissal because we're adding a new notification.
-                ShowMe();
+                    Notifications.Add(notification);
+
+                    _IsDismissed = false; //Reset dismissal because we're adding a new notification.
+                    ShowMe();
+                }
+                else
+                {
+                    update = true;
+                }
+
+
+                notification.Message = message;
+                notification.ProgressIndicator = progressIndicator;
+                notification.LastUpdated = DateTimeOffset.UtcNow;
+
+                if (progressIndicator >= 1.0f)
+                    Notifications.Remove(notification);
+
+                if (Notifications.Count == 0)
+                    HideMe();
+
+                if (update)
+                    NotificationsUpdated();
             }
-            else
+            catch
             {
-                update = true;
+                
             }
-
-
-            notification.Message = message;
-            notification.ProgressIndicator = progressIndicator;
-            notification.LastUpdated = DateTimeOffset.UtcNow;
-
-            if (progressIndicator >= 1.0f)
-                Notifications.Remove(notification);
-
-            if (Notifications.Count == 0)
-                HideMe();
-
-            if (update)
-                NotificationsUpdated();
         });
     }
 
