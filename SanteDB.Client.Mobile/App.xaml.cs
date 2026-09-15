@@ -68,34 +68,13 @@ namespace SanteDB.Client.Mobile
         protected override void OnResume()
         {
             base.OnResume();
-            // Audit application start
-            if (ApplicationServiceContext.Current != null)
-            {
-                ApplicationServiceContext.Current.GetService<IAuditService>().Audit()
-                    .WithAction(ActionType.Execute)
-                    .WithSensitivity(Core.Model.Attributes.ResourceSensitivityClassification.Administrative)
-                    .WithOutcome(OutcomeIndicator.Success)
-                    .WithEventIdentifier(EventIdentifierType.ApplicationActivity)
-                    .WithEventType(EventTypeCodes.AuditLoggingStarted)
-                    .WithLocalSource();
-            }
+                this.m_tracer.TraceInfo("Application resumed");
         }
 
         protected override void OnSleep()
         {
             base.OnSleep();
-            // Audit application start
-            if (ApplicationServiceContext.Current != null)
-            {
-                ApplicationServiceContext.Current.GetService<IAuditService>().Audit()
-                    .WithAction(ActionType.Execute)
-                    .WithSensitivity(Core.Model.Attributes.ResourceSensitivityClassification.Administrative)
-                    .WithOutcome(OutcomeIndicator.Success)
-                    .WithEventIdentifier(EventIdentifierType.ApplicationActivity)
-                    .WithEventType(EventTypeCodes.AuditLoggingStopped)
-                    .WithLocalSource();
-
-            }
+            this.m_tracer.TraceInfo("Application slept/paused");
 
         }
 
