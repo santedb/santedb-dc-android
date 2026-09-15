@@ -19,15 +19,44 @@
  */
 using Microsoft.Maui;
 using Microsoft.Maui.Controls;
+using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Audit;
+using SanteDB.Core.Security;
+using SanteDB.Core.Security.Audit;
+using SanteDB.Core.Security.Services;
+using System;
+using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
     public partial class App : Application
     {
+
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(App));
+
         public App()
         {
             InitializeComponent();
+            RegisterGlobalExceptionHandlers();
+        }
 
+        private void RegisterGlobalExceptionHandlers()
+        {
+            // Handle unhandled exceptions on the main thread
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => HandleException((Exception)e.ExceptionObject);
+            // Handle unobserved task exceptions (async code)
+            TaskScheduler.UnobservedTaskException += (sender, e) =>
+            {
+                HandleException(e.Exception);
+                e.SetObserved();
+            };
+        }
+
+        private async void HandleException(Exception ex)
+        {
+            // Log the exception
+            this.m_tracer.TraceError("---------- FATAL ERROR -----------\r\n{0}", ex);
         }
 
         protected override void OnStart()
@@ -39,6 +68,35 @@ namespace SanteDB.Client.Mobile
         protected override void OnResume()
         {
             base.OnResume();
+            // Audit application start
+            if (ApplicationServiceContext.Current != null)
+            {
+                ApplicationServiceContext.Current.GetService<IAuditService>().Audit()
+                    .WithAction(ActionType.Execute)
+                    .WithSensitivity(Core.Model.Attributes.ResourceSensitivityClassification.Administrative)
+                    .WithOutcome(OutcomeIndicator.Success)
+                    .WithEventIdentifier(EventIdentifierType.ApplicationActivity)
+                    .WithEventType(EventTypeCodes.AuditLoggingStarted)
+                    .WithLocalSource();
+            }
+        }
+
+        protected override void OnSleep()
+        {
+            base.OnSleep();
+            // Audit application start
+            if (ApplicationServiceContext.Current != null)
+            {
+                ApplicationServiceContext.Current.GetService<IAuditService>().Audit()
+                    .WithAction(ActionType.Execute)
+                    .WithSensitivity(Core.Model.Attributes.ResourceSensitivityClassification.Administrative)
+                    .WithOutcome(OutcomeIndicator.Success)
+                    .WithEventIdentifier(EventIdentifierType.ApplicationActivity)
+                    .WithEventType(EventTypeCodes.AuditLoggingStopped)
+                    .WithLocalSource();
+
+            }
+
         }
 
         /// <summary>
