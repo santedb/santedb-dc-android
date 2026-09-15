@@ -158,9 +158,10 @@ namespace SanteDB.Client.Mobile
         /// <inheritdoc/>
         protected override AppletManifest SaveAppletPackageData(AppletPackage package)
         {
-            using(var mfstStream = File.Create(this.GetInstallationTargetFile(package.Meta.Id)))
+            using (var mfstStream = File.Create(this.GetInstallationTargetFile(package.Meta.Id)))
             {
                 var manifest = package.Unpack();
+                base.ExtractManifestStaticFiles(manifest);
                 manifest.Save(mfstStream);
                 return manifest;
             }

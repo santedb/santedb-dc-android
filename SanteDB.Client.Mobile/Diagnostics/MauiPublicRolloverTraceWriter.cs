@@ -49,7 +49,7 @@ namespace SanteDB.Client.Mobile.Diagnostics
         /// <inheritdoc/>
         public override void TraceEvent(EventLevel level, string source, string format, params object[] args)
         {
-            if (ApplicationServiceContext.Current?.GetService<IConfigurationManager>() is InitialConfigurationManager && this.ValidateWritePermission())
+            if (this.ValidateWritePermission())
             {
                 base.TraceEvent(level, source, format, args);
             }
@@ -58,7 +58,7 @@ namespace SanteDB.Client.Mobile.Diagnostics
         /// <inheritdoc/>
         public override void TraceEventWithData(EventLevel level, string source, string message, object[] data)
         {
-            if (ApplicationServiceContext.Current?.GetService<IConfigurationManager>() is InitialConfigurationManager && this.ValidateWritePermission())
+            if (this.ValidateWritePermission())
             {
                 base.TraceEventWithData(level, source, message, data);
             }

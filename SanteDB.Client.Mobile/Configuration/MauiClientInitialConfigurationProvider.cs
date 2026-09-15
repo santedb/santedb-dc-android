@@ -167,10 +167,9 @@ namespace SanteDB.Client.Mobile.Configuration
             backupConfiguration.ExternalBackupLocation= Path.Combine(externalDirectory.AbsolutePath, "SanteDB", "Backups");
 
             // IN RELEASE MODE OR DEBUG MODE PLACE A LOG WHERE THE USER CAN EASILY ACCESS IT
-#if SDB_TRACE
-            Tracer.AddWriter(new MauiPublicRolloverTraceWriter(System.Diagnostics.Tracing.EventLevel.Informational, externalDirectory.AbsolutePath, new Dictionary<String, System.Diagnostics.Tracing.EventLevel>()), System.Diagnostics.Tracing.EventLevel.Informational);
-#endif
             var diagnosticsConfigSection = configuration.GetSection<DiagnosticsConfigurationSection>();
+
+
 #if DEBUG
             diagnosticsConfigSection.Sources.ForEach(o => o.Filter = System.Diagnostics.Tracing.EventLevel.Informational);
             diagnosticsConfigSection.Sources.Add(new TraceSourceConfiguration() { SourceName = "SanteDB.Client", Filter = System.Diagnostics.Tracing.EventLevel.Informational });

@@ -24,6 +24,7 @@ using Microsoft.Maui.Controls;
 using Newtonsoft.Json;
 using SanteDB.Client.Configuration.Upstream;
 using SanteDB.Core;
+using SanteDB.Core.Diagnostics;
 using SanteDB.Core.Security.Configuration;
 using SanteDB.Core.Services;
 using System;
@@ -37,7 +38,7 @@ using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile
 {
-    public class MauiBrowserInterface : Java.Lang.Object 
+    public class MauiBrowserInterface : Java.Lang.Object
     {
         readonly MainPage _MainPage;
         private readonly Guid _Magic;
@@ -45,7 +46,7 @@ namespace SanteDB.Client.Mobile
         private object m_stateLock = new object();
         private bool m_isCheckingStatus = false;
 
-        
+        private readonly Tracer m_tracer = Tracer.GetTracer(typeof(MauiBrowserInterface));
 
         readonly IConfigurationManager? _ConfigManager;
         private readonly ILocalizationService _LocalizationService;
@@ -70,15 +71,17 @@ namespace SanteDB.Client.Mobile
 
         public MauiBrowserInterface(IApplicationServiceContext context, MainPage mainPage)
         {
+
+            m_tracer.TraceVerbose("Initializing Maui Browser Interface");
             _ConfigManager = context.GetService<IConfigurationManager>();
             _LocalizationService = context.GetService<ILocalizationService>();
             _UpstreamAvailabilityProvider = context.GetService<IUpstreamAvailabilityProvider>();
             _NetworkInformationService = context.GetService<INetworkInformationService>();
 
+
             _MainPage = mainPage;
             _Magic = context.ActivityUuid;
             var upstreamconfig = _ConfigManager?.GetSection<UpstreamConfigurationSection>();
-
             var devicecredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Device);
             var appcredential = upstreamconfig?.Credentials?.FirstOrDefault(c => c.CredentialType == UpstreamCredentialType.Application);
 
@@ -92,9 +95,9 @@ namespace SanteDB.Client.Mobile
             _OwnerId = securityconfig?.GetSecurityPolicy<Guid>(Core.Configuration.SecurityPolicyIdentification.AssignedOwnerUuid).ToString();
 
             // We want to background the availability call because of the timeout
-            this.BackgroundStateMonitor(null);
-            _StateMonitorTimer = new Timer(this.BackgroundStateMonitor, null, 0, 5000);
-            
+            m_tracer.TraceVerbose("Initializing Background Monitor Timer");
+            _StateMonitorTimer = new Timer(this.BackgroundStateMonitor, null, 0, 10000);
+
         }
 
         private void BackgroundStateMonitor(object e)
@@ -115,7 +118,7 @@ namespace SanteDB.Client.Mobile
                     OwnerId = _OwnerId,
                 };
 
-
+                this.m_tracer.TraceVerbose("Fetched upstream information for maui integration");
                 lock (this.m_stateLock)
                 {
                     this.m_stateObject = state;
@@ -134,7 +137,7 @@ namespace SanteDB.Client.Mobile
 
         private Shared.AppServiceStateResponse GetStateObject()
         {
-            lock(this.m_stateLock)
+            lock (this.m_stateLock)
             {
                 return this.m_stateObject;
             }
@@ -218,21 +221,15 @@ namespace SanteDB.Client.Mobile
         public void CloseApp()
         {
             if (null != Application.Current)
-                _ = MainThread.InvokeOnMainThreadAsync(() =>
+                //We do not use the shell so we need to replace the main page in the app.
+                Nito.AsyncEx.AsyncContext.Run(() => MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    //We do not use the shell so we need to replace the main page in the app.
-                    var restartpage = new RestartPage();
-
-                    Application.Current!.Windows[0].Page = restartpage;
-
-                    //Support the routing query parameter contract by calling the reason in.
-                    restartpage.ApplyQueryAttributes(new Dictionary<string, object>
-                    {
-                            { "reason", Constants.REASONKEY_DEFAULT }
-                    });
-
-                    return Task.CompletedTask;
-                });
+                        await Shell.Current.GoToAsync("//RestartPage");
+                        (Shell.Current.CurrentPage as RestartPage)?.ApplyQueryAttributes(new Dictionary<string, object>
+                        {
+                                { "reason", Constants.REASONKEY_DEFAULT }
+                        });
+                }));
 
         }
 

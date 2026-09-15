@@ -113,21 +113,16 @@ namespace SanteDB.Client.Mobile
                 _ => Constants.REASONKEY_DEFAULT
             };
 
-            _ = MainThread.InvokeOnMainThreadAsync(() =>
+            //We do not use the shell so we need to replace the main page in the app.
+            Nito.AsyncEx.AsyncContext.Run(() => MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                //We do not use the shell so we need to replace the main page in the app.
-                var restartpage = new RestartPage(this);
+                await Shell.Current.GoToAsync("//RestartPage");
+                (Shell.Current.CurrentPage as RestartPage)?.ApplyQueryAttributes(new Dictionary<string, object>
+                    {
+                            { "reason", reason }
+                    });
+            }));
 
-                _Application.MainPage = restartpage;
-
-                //Support the routing query parameter contract by calling the reason in.
-                restartpage.ApplyQueryAttributes(new Dictionary<string, object>
-                {
-                        { "reason", reason }
-                });
-
-                return Task.CompletedTask;
-            });
 
         }
 

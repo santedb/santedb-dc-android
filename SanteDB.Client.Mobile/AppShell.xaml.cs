@@ -18,14 +18,31 @@
  * Date: 2023-4-19
  */
 using Microsoft.Maui.Controls;
+using SanteDB.Core.Diagnostics;
 
 namespace SanteDB.Client.Mobile
 {
     public partial class AppShell : Shell
     {
+        private Tracer m_tracer = Tracer.GetTracer(typeof(AppShell));
+
         public AppShell()
         {
             InitializeComponent();
         }
+
+        protected override void OnNavigating(ShellNavigatingEventArgs args)
+        {
+            base.OnNavigating(args);
+
+            if (args.Source == ShellNavigationSource.Pop)
+            {
+                args.Cancel();
+            }
+            else {
+                this.m_tracer.TraceInfo("Navigating to {0}", args.Target.Location);
+            }
+        }
+
     }
 }

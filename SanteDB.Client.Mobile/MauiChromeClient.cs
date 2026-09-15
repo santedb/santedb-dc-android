@@ -44,6 +44,7 @@ namespace SanteDB.Client.Mobile
 
         public MauiChromeClient(Context context)
         {
+            this.m_tracer.TraceInfo("Initializing Maui Chrome Client");
             this.m_localizationService = ApplicationServiceContext.Current.GetService<ILocalizationService>();
             this.m_context = context;
         }
@@ -55,6 +56,8 @@ namespace SanteDB.Client.Mobile
         /// <returns></returns>
         public override bool OnConsoleMessage(ConsoleMessage consoleMessage)
         {
+            this.m_tracer.TraceVerbose("Emitting console message");
+
             var retVal = base.OnConsoleMessage(consoleMessage);
 
             // Start off verbose
@@ -78,6 +81,8 @@ namespace SanteDB.Client.Mobile
         /// </summary>
         public override bool OnJsConfirm(WebView view, string url, string message, JsResult result)
         {
+            this.m_tracer.TraceVerbose("Showing JS Confirm");
+
             // JF - Use the native Android handlers as the Maui dialog builders have a cross-thread access issue setting result
             var alert = new Android.App.AlertDialog.Builder(this.m_context)
                 .SetMessage(message)
@@ -94,6 +99,7 @@ namespace SanteDB.Client.Mobile
         /// </summary>
         public override bool OnJsAlert(WebView view, string url, string message, JsResult result)
         {
+            this.m_tracer.TraceVerbose("Showing JS Alert");
             // JF - Use the native Android handlers as the Maui dialog builders have a cross-thread access issue setting result
             var alert = new Android.App.AlertDialog.Builder(this.m_context)
                 .SetMessage(message)

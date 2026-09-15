@@ -13,10 +13,12 @@ namespace SanteDB.Client.Mobile;
 /// <summary>
 /// Displays a message to the user to quit the application and relaunch it.
 /// </summary>
+[QueryProperty(nameof(Reason), nameof(Reason))]
 public partial class RestartPage : ContentPage, IQueryAttributable
 {
     readonly ILocalizationService? _LocalizationService;
-    
+    private string m_reason;
+
     /// <summary>
     /// Instantiates the <see cref="RestartPage"/> using <see cref="ApplicationServiceContext.Current" />.
     /// </summary>
@@ -24,6 +26,19 @@ public partial class RestartPage : ContentPage, IQueryAttributable
         : this(ApplicationServiceContext.Current as MauiApplicationContext)
     {
 
+    }
+
+    /// <summary>
+    /// The reason for the restart
+    /// </summary>
+    public string Reason
+    {
+        get => this.m_reason;
+        set
+        {
+            this.m_reason = value;
+            this.OnPropertyChanged(nameof(Reason));
+        }
     }
 
     /// <summary>

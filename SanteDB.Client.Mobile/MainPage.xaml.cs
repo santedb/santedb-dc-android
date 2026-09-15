@@ -19,16 +19,23 @@
  */
 using Android.Webkit;
 using CommunityToolkit.Maui.Views;
+using DocumentFormat.OpenXml.Office2016.Drawing.Command;
 using Hl7.Fhir.ElementModel.Types;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Dispatching;
 using Microsoft.Maui.Handlers;
+using SanteDB.Client.Configuration;
+using SanteDB.Client.Mobile.Diagnostics;
+using SanteDB.Client.Rest;
 using SanteDB.Core;
 using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Services;
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Threading.Tasks;
 using static Android.Webkit.WebSettings;
 
@@ -37,46 +44,50 @@ namespace SanteDB.Client.Mobile
     public partial class MainPage : ContentPage
     {
         private readonly Tracer m_tracer = Tracer.GetTracer(typeof(MainPage));
-
-        private long m_logicalScroll;
-        int count = 0;
+        
         private string _HttpMagic;
-        readonly MauiApplicationContext _ApplicationContext;
+        private MauiApplicationContext _ApplicationContext;
 
-        public MainPage(string sourceUrl, string httpMagicValue, MauiApplicationContext applicationContext)
+        public MainPage()
         {
-            try
+            this.InitializeComponent();
+            this.WebView.IsVisible = false;
+        }
+
+        protected override void OnNavigatedTo(NavigatedToEventArgs args)
+        {
+            base.OnNavigatedTo(args);
+
+            var baseBindingUrl = AppDomain.CurrentDomain.GetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA).ToString();
+            _ApplicationContext = ApplicationServiceContext.Current as MauiApplicationContext;
+            var startUrl = _ApplicationContext.GetService<IConfigurationManager>() switch
             {
-                _ApplicationContext = applicationContext;
+                InitialConfigurationManager => $"{baseBindingUrl}/#!/config/initialSettings",
+                _ => $"{baseBindingUrl}/#!/"
+            };
+            _HttpMagic = _ApplicationContext.ActivityUuid.ToByteArray().HexEncode();
+            this.m_tracer.TraceInfo("Launching applet browser host at {0}", startUrl);
 
-                this.m_tracer.TraceInfo("Setting Status Callbacks");
-                _ApplicationContext.GetInteractionProvider().SetStatusCallback = (task, message, progress) =>
-                {
-                    Nito.AsyncEx.AsyncContext.Run(() => NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress));
-                };
+            this.WebView.IsVisible = true;
+            this.WebView.Source = startUrl;
+            this.WebView.HandlerChanged += WebView_HandlerChanged;
 
-                this.m_tracer.TraceInfo("Initializing Main View...");
-                InitializeComponent();
-
-                _HttpMagic = httpMagicValue;
-                WebView.HandlerChanged += WebView_HandlerChanged;
-                WebView.Source = sourceUrl;
-            }
-            catch(Exception ex)
+            _ApplicationContext.GetInteractionProvider().SetStatusCallback = (task, message, progress) =>
             {
-                this.m_tracer.TraceError("Error initializing main view {0}", ex);
-            }
+                Nito.AsyncEx.AsyncContext.Run(() => NotificationBar.ShowOrUpdateNotificationAsync(task, message, progress));
+            };
         }
 
         /// <summary>
         /// Handles when the MAUI web view changes its handler to android
         /// </summary>
+        /// 
         private void WebView_HandlerChanged(object sender, EventArgs e)
         {
             try
             {
                 var handler = WebView.Handler;
-
+                this.m_tracer.TraceVerbose("Handler View is {0}", handler?.PlatformView);
                 if ((handler?.PlatformView) is Android.Webkit.WebView awebview)
                 {
                     this.m_tracer.TraceInfo("Initializing the trace handler web view");
@@ -84,26 +95,36 @@ namespace SanteDB.Client.Mobile
                     awebview.ClearFormData();
                     awebview.ClearHistory();
                     awebview.ClearCache(true);
+                    this.m_tracer.TraceInfo("Removing cookies");
+
                     CookieManager.Instance.RemoveAllCookies(null); // remove browser cookies
                     WebStorage.Instance.DeleteAllData(); // remove browser data
 
+                    this.m_tracer.TraceInfo("Set Location Controls");
+
                     awebview.Settings.UserAgentString = $"SanteDB-{_HttpMagic}"; // MAGIC is required so the API will not work when another app attempts to access 127.0.0.1
-                    awebview.Settings.JavaScriptEnabled = true; 
+                    awebview.Settings.JavaScriptEnabled = true;
                     awebview.Settings.SetGeolocationEnabled(true);
                     awebview.Settings.BuiltInZoomControls = false; // We don't allow pinch and zoom
                     awebview.Settings.DisplayZoomControls = false;
                     //awebview.Settings.BlockNetworkLoads = true;  // Don't allow network loads from the browser
+                    this.m_tracer.TraceInfo("Disabling Plugins");
                     if (!OperatingSystem.IsAndroidVersionAtLeast(31))
                         awebview.Settings.PluginsEnabled = false; // When this is commented out - sometimes the web view takes upwards of 30 seconds to initialize on Android versions < 30 - 
-                    awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false; 
+                    awebview.Settings.JavaScriptCanOpenWindowsAutomatically = false;
+                    this.m_tracer.TraceInfo("Setting Render Priority");
                     if (!OperatingSystem.IsAndroidVersionAtLeast(29))
                         awebview.Settings.SetRenderPriority(RenderPriority.Normal); // When commented out - sometimes on web views on Android Versions < 28 the scrolling experience is jittery
-                    awebview.Settings.SetSupportMultipleWindows(false); 
+
+
+                    this.m_tracer.TraceInfo("Disabling multiple windows");
+                    awebview.Settings.SetSupportMultipleWindows(false);
                     //awebview.Settings.SetAppCacheEnabled(true); //TODO: Do we need this? We do not appear to use window.applicationCache anywhere in the UI as of 2025-10-29. TD
                     awebview.SetScrollContainer(true);
                     awebview.ScrollBarStyle = Android.Views.ScrollbarStyles.InsideOverlay;
 
-                    var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this); 
+                    this.m_tracer.TraceInfo("Setting browser interface service");
+                    var browserinterface = new MauiBrowserInterface(ApplicationServiceContext.Current, this);
                     awebview.AddJavascriptInterface(browserinterface, "__sdb_bridge"); // Adds the Javascript bridge service (allows JS to interact with the C#)
                     awebview.SetWebChromeClient(new MauiChromeClient(awebview.Context));// Redirects the CONSOLE logs from the browser to our tracer system
                     //awebview.SetWebViewClient(new MauiWebViewClient());
@@ -117,7 +138,7 @@ namespace SanteDB.Client.Mobile
                     throw new InvalidOperationException("Platform not supported");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.m_tracer.TraceError("Error initializing the web view - {0}", ex);
             }

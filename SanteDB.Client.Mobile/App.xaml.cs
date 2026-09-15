@@ -17,6 +17,7 @@
  * User: trevor
  * Date: 2023-8-24
  */
+using Microsoft.Maui;
 using Microsoft.Maui.Controls;
 
 namespace SanteDB.Client.Mobile
@@ -27,7 +28,6 @@ namespace SanteDB.Client.Mobile
         {
             InitializeComponent();
 
-            MainPage = new StartupPage();
         }
 
         protected override void OnStart()
@@ -39,6 +39,14 @@ namespace SanteDB.Client.Mobile
         protected override void OnResume()
         {
             base.OnResume();
+        }
+
+        /// <summary>
+        /// App shell
+        /// </summary>
+        protected override Window CreateWindow(IActivationState activationState)
+        {
+            return new Window(new AppShell());
         }
     }
 }

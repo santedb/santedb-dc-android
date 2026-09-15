@@ -17,32 +17,35 @@
  * User: trevor
  * Date: 2023-4-19
  */
+using Android.Icu.Util;
 using Microsoft.Data.Sqlite;
+using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Dispatching;
+using Microsoft.Maui.Storage;
 using SanteDB.Client.Configuration;
+using SanteDB.Client.Mobile.Diagnostics;
 using SanteDB.Client.Rest;
-using SanteDB.Core.Model.Security;
+using SanteDB.Client.Shared;
 using SanteDB.Core;
-using System.Diagnostics;
-using System.Runtime.Loader;
-using SanteDB.Rest.HDSI;
+using SanteDB.Core.Diagnostics;
+using SanteDB.Core.Model.Security;
+using SanteDB.Core.Services;
+using SanteDB.Core.Services.Impl;
 using SanteDB.Rest.AMI;
 using SanteDB.Rest.BIS;
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using SanteDB.Client.Shared;
-using SanteDB.Core.Services.Impl;
-using SanteDB.Core.Services;
-using SanteDB.Rest.WWW;
-using Microsoft.Maui.Controls;
-using System.Collections.Generic;
-using System.IO;
-using Microsoft.Maui.Storage;
-using System.Threading.Tasks;
-using System.Linq;
-using System;
-using Microsoft.Maui.ApplicationModel;
-using SanteDB.Core.Diagnostics;
 using SanteDB.Rest.Common.Configuration;
+using SanteDB.Rest.HDSI;
+using SanteDB.Rest.WWW;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Loader;
+using System.Threading.Tasks;
 
 namespace SanteDB.Client.Mobile;
 
@@ -54,6 +57,8 @@ public partial class StartupPage : ContentPage
     // JF - Reduce the number of dispatching to the UI thread
     private string m_lastStatusText = string.Empty;
     private float m_lastStatusProgress = 0.0f;
+    private MauiApplicationContext m_context;
+    private string m_baseBindingUrl;
 
     public StartupPage()
     {
@@ -231,8 +236,7 @@ public partial class StartupPage : ContentPage
                     IConfigurationManager configmanager = null;
                     // Pick a random port
                     ushort portNumber = (ushort)new Random(DateTime.Now.Millisecond).Next(32768, 60999);
-                    var baseBindingUrl = $"http://127.0.0.1:{portNumber}";
-                    AppDomain.CurrentDomain.SetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA, baseBindingUrl);
+                    AppDomain.CurrentDomain.SetData(RestServiceInitialConfigurationProvider.BINDING_BASE_DATA, $"http://127.0.0.1:{portNumber}");
 
                     if (directoryprovider.IsConfigFilePresent())
                     {
@@ -265,23 +269,10 @@ public partial class StartupPage : ContentPage
                         }
                     }
 
-                    var context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
+                    this.m_context = new MauiApplicationContext("DEFAULT", configmanager, this, bridgescript);
                     SetStatus(null, "Starting SanteDB Service Context", 0f);
-                    ServiceUtil.Start(Guid.NewGuid(), context);
-                    var magic = context.ActivityUuid.ToByteArray().HexEncode();
-                    var starturl = configmanager switch
-                    {
-                        InitialConfigurationManager => $"{baseBindingUrl}/#!/config/initialSettings",
-                        _ => $"{baseBindingUrl}/#!/"
-                    };
-
-                    this.Dispatcher.Dispatch(() =>
-                    {
-                        this.m_tracer.TraceInfo("Launching applet browser host");
-                        this.StatusLabel.Text = "Welcome to SanteDB";
-                        var shell = Shell.Current;
-                        App.Current.MainPage = new MainPage(starturl, magic, context);
-                    });
+                    this.m_context.Started += Context_Started;
+                    ServiceUtil.Start(Guid.NewGuid(), this.m_context);
 
 
                 }
@@ -309,6 +300,25 @@ public partial class StartupPage : ContentPage
             }
         });
 
+
+    }
+
+    private void Context_Started(object sender, EventArgs e)
+    {
+        this.m_tracer.TraceInfo("Application context started - notify navigate to browser");
+        Nito.AsyncEx.AsyncContext.Run(() => this.Dispatcher.DispatchAsync(async () =>
+        {
+            try
+            { 
+                this.StatusLabel.Text = "Welcome to SanteDB";
+                await Shell.Current.GoToAsync("//MainPage");
+            }
+            catch (Exception ex)
+            {
+                this.ErrorLabel.Text = String.Format("Error navigating to main page - {0}", ex.ToHumanReadableString());
+                this.m_tracer.TraceError("Error navigating to main page - {0}", ex);
+            }
+        }));
 
     }
 }

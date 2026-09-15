@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:sdb="clr-namespace:SanteDB.Client.Mobile.Controls"
-             x:Class="SanteDB.Client.Mobile.MainPage">
+             x:Class="SanteDB.Client.Mobile.MainPage"
+             Title="">
     <Grid RowDefinitions="1*">
         <Border Grid.Row="0" StrokeThickness="0">
             <WebView x:Name="WebView"  />

@@ -41,7 +41,7 @@ namespace SanteDB.Client.Mobile
         /// <summary>
         /// JF- Allows the Maui application to push the currently visible content page
         /// </summary>
-        internal Page CurrentPage => _Application.MainPage;
+        internal Page CurrentPage => Shell.Current.CurrentPage;
 
         readonly Application _Application;
 
